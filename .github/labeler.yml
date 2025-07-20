@@ -1,0 +1,15 @@
+labels:
+  'feature':
+    - '^(feat):'
+  'fix':
+    - '^(fix):'
+  'refactor':
+    - '^(refactor):'
+  'release':
+    - '^(release):'
+  'test':
+    - '^(test):'
+  'docs':
+    - '^(docs):'
+  'chore':
+    - '^(chore):'
