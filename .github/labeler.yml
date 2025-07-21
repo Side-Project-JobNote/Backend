@@ -13,3 +13,7 @@ labels:
     - '^(docs):'
   'chore':
     - '^(chore):'
+  'config':
+    - '^(config):'
+  'build':
+    - '^(build):'
