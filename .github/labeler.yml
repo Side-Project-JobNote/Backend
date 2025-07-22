@@ -1,19 +1,16 @@
-labels:
-  'feature':
-    - '^(feat):'
-  'fix':
-    - '^(fix):'
-  'refactor':
-    - '^(refactor):'
-  'release':
-    - '^(release):'
-  'test':
-    - '^(test):'
-  'docs':
-    - '^(docs):'
-  'chore':
-    - '^(chore):'
-  'config':
-    - '^(config):'
-  'build':
-    - '^(build):'
+feature:
+  - head-branch: ['^feat', 'feat']
+fix:
+  - head-branch: ['^fix', 'fix']
+refactor:
+  - head-branch: ['^refactor', 'refactor']
+config:
+  - head-branch: ['^config', 'config']
+test:
+  - head-branch: ['^test', 'test']
+build:
+  - head-branch: ['^build', 'build']
+chore:
+  - head-branch: ['^chore', 'chore']
+release:
+  - head-branch: ['^release', 'release']
