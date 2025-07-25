@@ -1,12 +1,4 @@
 spring:
-  application:
-    name: jobnote
-
-  profiles:
-    group:
-      local: jwt, security
-      test: jwt, security
-
   datasource:
     url: jdbc:h2:mem:testdb
     username: sa
@@ -16,7 +8,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
