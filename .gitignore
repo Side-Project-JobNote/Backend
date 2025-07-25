@@ -38,3 +38,4 @@ out/
 
 ### Properties ###
 application-jwt.yml
+application-security.yml
