@@ -32,7 +32,7 @@ public class JwtGenerator {
 
     public String generateAccessToken(final long userId, final String role) {
         return Jwts.builder()
-                .claim(CLAIM_NAME_TOKEN, CLAIM_VALUE_ACCESS_TOKEN)
+                .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_ACCESS_TOKEN)
                 .claim(CLAIM_NAME_USER_ID, userId)
                 .claim(CLAIM_NAME_ROLE, role)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -43,7 +43,7 @@ public class JwtGenerator {
 
     public String generateRefreshToken() {
         return Jwts.builder()
-                .claim(CLAIM_NAME_TOKEN, CLAIM_VALUE_REFRESH_TOKEN)
+                .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_REFRESH_TOKEN)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(secretKey)

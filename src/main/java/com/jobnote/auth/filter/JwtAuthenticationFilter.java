@@ -33,8 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
-            final long userId = jwtProvider.getUserIdFromPayload(accessToken);
-            final String role = jwtProvider.getRoleFromPayload(accessToken);
+            final long userId = jwtProvider.getUserIdFromPayload(accessToken)
+                    .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
+
+            final String role = jwtProvider.getRoleFromPayload(accessToken)
+                    .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));;
 
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(userId, role));
 

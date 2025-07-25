@@ -2,7 +2,7 @@ package com.jobnote.common;
 
 public abstract class Constants {
 
-    public static final String CLAIM_NAME_TOKEN = "token";
+    public static final String CLAIM_NAME_TOKEN_TYPE = "token";
     public static final String CLAIM_NAME_USER_ID = "userId";
     public static final String CLAIM_NAME_ROLE = "role";
     public static final String CLAIM_VALUE_ACCESS_TOKEN = "ACCESS_TOKEN";
