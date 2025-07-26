@@ -16,7 +16,7 @@ import java.util.Date;
 import static com.jobnote.common.Constants.*;
 
 @Component
-public class JwtGenerator {
+class JwtGenerator {
 
     private final SecretKey secretKey;
 
