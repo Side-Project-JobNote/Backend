@@ -26,24 +26,32 @@ class JwtProvider {
         this.secretKey = new SecretKeySpec(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String generateAccessToken(final long userId, final String role) {
+    public String generateAccessToken(final long userId, final String role, final long expirationTime) {
         return Jwts.builder()
                 .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_ACCESS_TOKEN)
                 .claim(CLAIM_NAME_USER_ID, userId)
                 .claim(CLAIM_NAME_ROLE, role)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessToken().getExpirationTime()))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public String generateAccessToken(final long userId, final String role) {
+        return generateAccessToken(userId, role, jwtProperties.getAccessToken().getExpirationTime());
+    }
+
+    public String generateRefreshToken(final long expirationTime) {
+        return Jwts.builder()
+                .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_REFRESH_TOKEN)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(secretKey)
                 .compact();
     }
 
     public String generateRefreshToken() {
-        return Jwts.builder()
-                .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_REFRESH_TOKEN)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshToken().getExpirationTime()))
-                .signWith(secretKey)
-                .compact();
+        return generateRefreshToken(jwtProperties.getRefreshToken().getExpirationTime());
     }
 
     public Claims getTokenPayload(final String token) {
