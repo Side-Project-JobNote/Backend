@@ -1,7 +1,7 @@
 package com.jobnote.auth.config;
 
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
-import com.jobnote.auth.filter.JwtAuthenticationFilter;
+import com.jobnote.auth.filter.TokenAuthenticationFilter;
 import com.jobnote.common.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,7 @@ public class SecurityConfig {
 
     private final SecurityProperties securityProperties;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

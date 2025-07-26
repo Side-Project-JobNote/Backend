@@ -25,7 +25,7 @@ import static com.jobnote.common.Constants.*;
 
 @RequiredArgsConstructor
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
     private final TokenProvider tokenProvider;
