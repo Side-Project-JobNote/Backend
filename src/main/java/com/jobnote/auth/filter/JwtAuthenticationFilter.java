@@ -7,29 +7,42 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 import static com.jobnote.common.Constants.*;
 
-@RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final Set<String> whitelistSet;
+
     private final TokenProvider tokenProvider;
+
+    public JwtAuthenticationFilter(TokenProvider tokenProvider, @Value("${spring.security.whitelist}") String[] whitelistArray) {
+        this.tokenProvider = tokenProvider;
+
+        if (whitelistArray != null) {
+            this.whitelistSet = new HashSet<>(Arrays.asList(whitelistArray));
+        } else {
+            this.whitelistSet = Collections.emptySet();
+        }
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
+            System.out.println("필터 실행");
             final String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
@@ -56,5 +69,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private Authentication getAuthentication(final Long userId, final String role) {
         return new UsernamePasswordAuthenticationToken(userId, null, Collections.singleton(new SimpleGrantedAuthority(role)));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return whitelistSet.contains(request.getRequestURI());
     }
 }

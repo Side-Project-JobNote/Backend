@@ -2,7 +2,6 @@ package com.jobnote.auth.config;
 
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.filter.JwtAuthenticationFilter;
-import com.jobnote.auth.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Value("${spring.security.white-list}")
-    private String[] whiteList;
+    @Value("${spring.security.whitelist}")
+    private String[] whitelist;
 
-    private final TokenProvider tokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,11 +37,11 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers(whiteList).permitAll()
+                        .requestMatchers(whitelist).permitAll()
                         .anyRequest().authenticated());
 
         http
-                .addFilterAfter(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
