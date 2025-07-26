@@ -18,6 +18,11 @@ public enum ResponseCode {
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4011", "액세스 토큰이 만료되었습니다."),
+    INVALID_TOKEN_SIGNATURE(HttpStatus.UNAUTHORIZED, "4012", "유효하지 않은 토큰 서명입니다."),
+    MALFORMED_TOKEN(HttpStatus.UNAUTHORIZED, "4013", "잘못된 토큰 형식입니다."),
+    UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "4014", "지원하지 않는 토큰 형식입니다."),
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 액세스 토큰입니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, "4030", "요청 리소스에 대한 액세스가 금지되었습니다."),

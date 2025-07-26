@@ -2,6 +2,11 @@ spring:
   application:
     name: jobnote
 
+  profiles:
+    group:
+      local: jwt
+      test: jwt
+
   datasource:
     url: jdbc:h2:mem:testdb
     username: sa
@@ -15,3 +20,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    whitelist:
+      - /api/v1/users/signup
+      - /api/v1/users/login
+      - /api/v1/users/reissue
