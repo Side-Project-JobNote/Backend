@@ -27,8 +27,4 @@ public class TokenProvider {
     public Optional<String> getRoleFromPayload(final String token) {
         return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_ROLE, String.class));
     }
-
-    public Optional<String> getTokenTypeFromPayload(final String token) {
-        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_TOKEN_TYPE, String.class));
-    }
 }
