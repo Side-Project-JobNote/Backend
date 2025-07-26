@@ -1,4 +1,4 @@
-package com.jobnote.auth.jwt;
+package com.jobnote.auth.token;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -9,26 +9,26 @@ import static com.jobnote.common.Constants.*;
 
 @RequiredArgsConstructor
 @Component
-public class JwtProvider {
+public class TokenProvider {
 
-    private final JwtGenerator jwtGenerator;
+    private final JwtProvider jwtProvider;
 
     public Token issueToken(final long userId, final String role) {
         return Token.builder()
-                .accessToken(jwtGenerator.generateAccessToken(userId, role))
-                .refreshToken(jwtGenerator.generateRefreshToken())
+                .accessToken(jwtProvider.generateAccessToken(userId, role))
+                .refreshToken(jwtProvider.generateRefreshToken())
                 .build();
     }
 
     public Optional<Long> getUserIdFromPayload(final String token) {
-        return Optional.of(jwtGenerator.getTokenPayload(token).get(CLAIM_NAME_USER_ID, Long.class));
+        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_USER_ID, Long.class));
     }
 
     public Optional<String> getRoleFromPayload(final String token) {
-        return Optional.of(jwtGenerator.getTokenPayload(token).get(CLAIM_NAME_ROLE, String.class));
+        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_ROLE, String.class));
     }
 
     public Optional<String> getTokenTypeFromPayload(final String token) {
-        return Optional.of(jwtGenerator.getTokenPayload(token).get(CLAIM_NAME_TOKEN_TYPE, String.class));
+        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_TOKEN_TYPE, String.class));
     }
 }

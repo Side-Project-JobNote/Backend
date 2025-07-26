@@ -1,4 +1,4 @@
-package com.jobnote.auth.jwt;
+package com.jobnote.auth.token;
 
 import lombok.Builder;
 

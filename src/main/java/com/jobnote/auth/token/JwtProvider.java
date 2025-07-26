@@ -1,4 +1,4 @@
-package com.jobnote.auth.jwt;
+package com.jobnote.auth.token;
 
 import com.jobnote.common.api.ResponseCode;
 import com.jobnote.common.exception.JobNoteException;
@@ -16,7 +16,7 @@ import java.util.Date;
 import static com.jobnote.common.Constants.*;
 
 @Component
-class JwtGenerator {
+class JwtProvider {
 
     private final SecretKey secretKey;
 
@@ -26,7 +26,7 @@ class JwtGenerator {
     @Value("${jwt.refresh-token.expiration-time}")
     private long REFRESH_TOKEN_EXPIRE_TIME;
 
-    public JwtGenerator(@Value("${jwt.secret}") final String secret) {
+    public JwtProvider(@Value("${jwt.secret}") final String secret) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 

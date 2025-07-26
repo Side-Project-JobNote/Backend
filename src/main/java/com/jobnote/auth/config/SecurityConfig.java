@@ -2,7 +2,7 @@ package com.jobnote.auth.config;
 
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.filter.JwtAuthenticationFilter;
-import com.jobnote.auth.jwt.JwtProvider;
+import com.jobnote.auth.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,7 @@ public class SecurityConfig {
     @Value("${spring.security.white-list}")
     private String[] whiteList;
 
-    private final JwtProvider jwtProvider;
+    private final TokenProvider tokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterAfter(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

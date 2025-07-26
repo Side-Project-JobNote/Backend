@@ -1,6 +1,6 @@
 package com.jobnote.auth.filter;
 
-import com.jobnote.auth.jwt.JwtProvider;
+import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.common.api.ResponseCode;
 import com.jobnote.common.exception.JobNoteException;
 import jakarta.servlet.FilterChain;
@@ -25,7 +25,7 @@ import static com.jobnote.common.Constants.*;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtProvider jwtProvider;
+    private final TokenProvider tokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,11 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
-            final long userId = jwtProvider.getUserIdFromPayload(accessToken)
+            final long userId = tokenProvider.getUserIdFromPayload(accessToken)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
-            final String role = jwtProvider.getRoleFromPayload(accessToken)
-                    .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));;
+            final String role = tokenProvider.getRoleFromPayload(accessToken)
+                    .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(userId, role));
 
