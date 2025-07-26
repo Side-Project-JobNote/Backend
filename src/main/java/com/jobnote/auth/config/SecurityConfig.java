@@ -2,8 +2,8 @@ package com.jobnote.auth.config;
 
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.filter.JwtAuthenticationFilter;
+import com.jobnote.common.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,9 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Value("${spring.security.whitelist}")
-    private String[] whitelist;
-
+    private final SecurityProperties securityProperties;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -37,7 +35,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers(whitelist).permitAll()
+                        .requestMatchers(securityProperties.getWhitelist().toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated());
 
         http

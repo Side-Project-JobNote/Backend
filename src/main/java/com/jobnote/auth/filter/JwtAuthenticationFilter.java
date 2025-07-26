@@ -3,11 +3,12 @@ package com.jobnote.auth.filter;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.common.api.ResponseCode;
 import com.jobnote.common.exception.JobNoteException;
+import com.jobnote.common.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,27 +23,16 @@ import java.util.*;
 
 import static com.jobnote.common.Constants.*;
 
+@RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final Set<String> whitelistSet;
-
+    private final SecurityProperties securityProperties;
     private final TokenProvider tokenProvider;
-
-    public JwtAuthenticationFilter(TokenProvider tokenProvider, @Value("${spring.security.whitelist}") String[] whitelistArray) {
-        this.tokenProvider = tokenProvider;
-
-        if (whitelistArray != null) {
-            this.whitelistSet = new HashSet<>(Arrays.asList(whitelistArray));
-        } else {
-            this.whitelistSet = Collections.emptySet();
-        }
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            System.out.println("필터 실행");
             final String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
@@ -73,6 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return whitelistSet.contains(request.getRequestURI());
+        return new HashSet<>(securityProperties.getWhitelist()).contains(request.getRequestURI());
     }
 }

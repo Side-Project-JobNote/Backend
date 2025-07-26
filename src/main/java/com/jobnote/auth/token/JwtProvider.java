@@ -2,10 +2,10 @@ package com.jobnote.auth.token;
 
 import com.jobnote.common.api.ResponseCode;
 import com.jobnote.common.exception.JobNoteException;
+import com.jobnote.common.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.*;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,16 +18,12 @@ import static com.jobnote.common.Constants.*;
 @Component
 class JwtProvider {
 
+    private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
 
-    @Value("${jwt.access-token.expiration-time}")
-    private long ACCESS_TOKEN_EXPIRE_TIME;
-
-    @Value("${jwt.refresh-token.expiration-time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME;
-
-    public JwtProvider(@Value("${jwt.secret}") final String secret) {
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    JwtProvider(final JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.secretKey = new SecretKeySpec(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
     public String generateAccessToken(final long userId, final String role) {
@@ -36,7 +32,7 @@ class JwtProvider {
                 .claim(CLAIM_NAME_USER_ID, userId)
                 .claim(CLAIM_NAME_ROLE, role)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
+                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessToken().getExpirationTime()))
                 .signWith(secretKey)
                 .compact();
     }
@@ -45,7 +41,7 @@ class JwtProvider {
         return Jwts.builder()
                 .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_REFRESH_TOKEN)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME))
+                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshToken().getExpirationTime()))
                 .signWith(secretKey)
                 .compact();
     }
