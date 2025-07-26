@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Optional<String> parseBearerToken(final HttpServletRequest request, final String headerName) {
-        return Optional.of(request.getHeader(headerName))
+        return Optional.ofNullable(request.getHeader(headerName))
                 .filter(value -> StringUtils.hasText(value) && value.startsWith(AUTHORIZATION_TYPE_BEARER))
                 .map(value -> value.substring(AUTHORIZATION_TYPE_BEARER.length()));
     }
