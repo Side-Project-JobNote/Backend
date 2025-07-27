@@ -33,7 +33,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            final String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION)
+            final String accessToken = parseBearerToken(request)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
 
             final long userId = tokenProvider.getUserIdFromPayload(accessToken)
@@ -51,8 +51,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> parseBearerToken(final HttpServletRequest request, final String headerName) {
-        return Optional.ofNullable(request.getHeader(headerName))
+    private Optional<String> parseBearerToken(final HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
                 .filter(value -> StringUtils.hasText(value) && value.startsWith(AUTHORIZATION_TYPE_BEARER))
                 .map(value -> value.substring(AUTHORIZATION_TYPE_BEARER.length()));
     }
@@ -62,7 +62,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         return new HashSet<>(securityProperties.getWhitelist()).contains(request.getRequestURI());
     }
 }
