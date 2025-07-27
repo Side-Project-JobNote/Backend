@@ -21,14 +21,14 @@ public class ApplicationFormService {
     private final UserService userService;
 
     /* READ */
-    public ApplicationFormResponse getById(Long userId, Long formId) {
+    public ApplicationFormResponse getById(final Long userId, final Long formId) {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
         return ApplicationFormMapper.fromApplicationForm(form);
     }
 
-    public List<ApplicationFormResponse> getAll(Long userId) {
+    public List<ApplicationFormResponse> getAll(final Long userId) {
         return applicationFormRepository.findAllByUserId(userId).stream()
                 .map(ApplicationFormMapper::fromApplicationForm)
                 .collect(Collectors.toList());
@@ -36,7 +36,7 @@ public class ApplicationFormService {
 
     /* CREATE */
     @Transactional
-    public Long save(Long userId, ApplicationFormRequest request) {
+    public Long save(final Long userId, final ApplicationFormRequest request) {
         User user = userService.getUserById(userId);
 
         ApplicationForm saved = applicationFormRepository.save(ApplicationFormMapper.toApplicationForm(user, request));
@@ -45,7 +45,7 @@ public class ApplicationFormService {
 
     /* UPDATE */
     @Transactional
-    public void update(Long userId, Long formId, ApplicationFormRequest request) {
+    public void update(final Long userId, final Long formId, final ApplicationFormRequest request) {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
@@ -54,7 +54,7 @@ public class ApplicationFormService {
 
     /* DELETE */
     @Transactional
-    public void delete(Long userId, Long formId) {
+    public void delete(final Long userId, final Long formId) {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
@@ -62,7 +62,7 @@ public class ApplicationFormService {
     }
 
     /* HELPER METHOD */
-    private ApplicationForm getByIdOrThrow(Long formId) {
+    private ApplicationForm getByIdOrThrow(final Long formId) {
         return applicationFormRepository.findById(formId).orElseThrow(() ->
                 new JobNoteException(NOT_FOUND_APPLICATION_FORM));
     }

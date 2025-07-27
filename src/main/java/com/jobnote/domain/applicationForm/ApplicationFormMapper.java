@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplicationFormMapper {
-    public static ApplicationForm toApplicationForm(final User user, final ApplicationFormRequest request
-    ) {
+    public static ApplicationForm toApplicationForm(final User user, final ApplicationFormRequest request) {
         return ApplicationForm.builder()
                 .user(user)
                 .companyName(request.companyName())

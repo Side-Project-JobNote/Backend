@@ -14,21 +14,21 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User getUserById(Long id) {
+    public User getUserById(final Long id) {
         return getByIdOrThrow(id);
     }
 
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(final String email) {
         return getByEmailOrThrow(email);
     }
 
     /* HELPER METHOD */
-    private User getByIdOrThrow(Long id) {
+    private User getByIdOrThrow(final Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new JobNoteException(NOT_FOUND_USER));
     }
 
-    private User getByEmailOrThrow(String email) {
+    private User getByEmailOrThrow(final String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
                 new JobNoteException(NOT_FOUND_USER));
     }
