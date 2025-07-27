@@ -13,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/application-forms")
@@ -25,7 +24,7 @@ public class ApplicationFormController {
 
     /* CREATE */
     @PostMapping
-    public ResponseEntity<ApiResponse<Map<String, Object>>> createApplicationForm(
+    public ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid ApplicationFormRequest request,
             @AuthenticationPrincipal UserDetails user
     ) {
@@ -62,7 +61,7 @@ public class ApplicationFormController {
 
     /* UPDATE */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> updateApplicationForm(
+    public ResponseEntity<ApiResponse<Void>> updateApplicationForm(
             @PathVariable("id") Long formId,
             @Valid @RequestBody ApplicationFormRequest request,
             @AuthenticationPrincipal UserDetails user
@@ -75,7 +74,7 @@ public class ApplicationFormController {
 
     /* DELETE */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteApplicationForm(
+    public ResponseEntity<ApiResponse<Void>> deleteApplicationForm(
             @PathVariable("id") Long formId,
             @AuthenticationPrincipal UserDetails user
     ) {
