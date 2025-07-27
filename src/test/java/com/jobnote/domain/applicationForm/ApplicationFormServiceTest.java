@@ -16,8 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.jobnote.common.api.ResponseCode.FORBIDDEN;
-import static com.jobnote.common.api.ResponseCode.NOT_FOUND;
+import static com.jobnote.common.api.ResponseCode.*;
 import static com.jobnote.domain.applicationForm.ApplicationFormStatus.APPLIED;
 import static com.jobnote.domain.applicationForm.ApplicationFormStatus.DOCUMENT_PASSED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +95,7 @@ class ApplicationFormServiceTest {
             // when & then
             assertThatThrownBy(() -> applicationFormService.getById(userId, formId))
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_FOUND.getMessage());
+                    .hasMessage(NOT_FOUND_APPLICATION_FORM.getMessage());
         }
 
         @DisplayName("실패 - 권한 없음")
@@ -159,7 +158,7 @@ class ApplicationFormServiceTest {
             // when & then
             assertThatThrownBy(() -> applicationFormService.update(userId, formId, request))
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_FOUND.getMessage());
+                    .hasMessage(NOT_FOUND_APPLICATION_FORM.getMessage());
             then(applicationForm).should(never()).update(request);
         }
 
@@ -206,7 +205,7 @@ class ApplicationFormServiceTest {
             // when & then
             assertThatThrownBy(() -> applicationFormService.delete(userId, formId))
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_FOUND.getMessage());
+                    .hasMessage(NOT_FOUND_APPLICATION_FORM.getMessage());
             then(applicationFormRepository).should(never()).delete(any(ApplicationForm.class));
         }
 
