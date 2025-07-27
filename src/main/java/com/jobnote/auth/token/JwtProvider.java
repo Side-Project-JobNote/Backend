@@ -1,8 +1,8 @@
 package com.jobnote.auth.token;
 
-import com.jobnote.common.api.ResponseCode;
-import com.jobnote.common.exception.JobNoteException;
-import com.jobnote.common.properties.JwtProperties;
+import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static com.jobnote.common.Constants.*;
+import static com.jobnote.global.common.Constants.*;
 
 @Component
 class JwtProvider {

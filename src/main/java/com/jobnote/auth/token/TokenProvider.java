@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.jobnote.common.Constants.*;
+import static com.jobnote.global.common.Constants.*;
 
 @RequiredArgsConstructor
 @Component
