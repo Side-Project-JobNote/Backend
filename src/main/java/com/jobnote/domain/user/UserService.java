@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.jobnote.common.api.ResponseCode.NOT_FOUND;
+import static com.jobnote.common.api.ResponseCode.NOT_FOUND_USER;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,11 +25,11 @@ public class UserService {
     /* HELPER METHOD */
     private User getByIdOrThrow(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND));
+                new JobNoteException(NOT_FOUND_USER));
     }
 
     private User getByLoginIdOrThrow(String loginId) {
         return userRepository.findByLoginId(loginId).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND));
+                new JobNoteException(NOT_FOUND_USER));
     }
 }

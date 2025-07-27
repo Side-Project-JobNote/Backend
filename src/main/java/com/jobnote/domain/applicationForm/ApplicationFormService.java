@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.jobnote.common.api.ResponseCode.*;
+import static com.jobnote.common.api.ResponseCode.NOT_FOUND_APPLICATION_FORM;
 
 @Service
 @Transactional(readOnly = true)
@@ -64,6 +64,6 @@ public class ApplicationFormService {
     /* HELPER METHOD */
     private ApplicationForm getByIdOrThrow(Long formId) {
         return applicationFormRepository.findById(formId).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND));
+                new JobNoteException(NOT_FOUND_APPLICATION_FORM));
     }
 }
