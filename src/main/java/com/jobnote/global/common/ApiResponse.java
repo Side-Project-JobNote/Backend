@@ -45,7 +45,7 @@ public record ApiResponse<T>(
                 .build();
     }
 
-    public record FieldErrorDetail(
+    private record FieldErrorDetail(
             String field,
             String message
     ) {
