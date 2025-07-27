@@ -29,6 +29,9 @@ public enum ResponseCode {
 
     // 404 Not Found
     NOT_FOUND(HttpStatus.NOT_FOUND, "4040", "요청 리소스를 찾을 수 없습니다."),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "4041", "해당 사용자를 찾을 수 없습니다."),
+    NOT_FOUND_APPLICATION_FORM(HttpStatus.NOT_FOUND, "4042", "해당 지원서를 찾을 수 없습니다."),
+    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "4043", "해당 일정을 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),
