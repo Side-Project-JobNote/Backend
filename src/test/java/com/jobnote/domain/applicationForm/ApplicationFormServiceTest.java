@@ -23,8 +23,7 @@ import static com.jobnote.domain.applicationForm.ApplicationFormStatus.DOCUMENT_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
@@ -79,7 +78,7 @@ class ApplicationFormServiceTest {
         void success() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(true);
+            willDoNothing().given(applicationForm).validateOwner(userId);
 
             // when
             applicationFormService.getById(userId, formId);
@@ -105,7 +104,9 @@ class ApplicationFormServiceTest {
         void fail_forbidden() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(false);
+            doThrow(new JobNoteException(FORBIDDEN))
+                    .when(applicationForm)
+                    .validateOwner(userId);
 
             // when & then
             assertThatThrownBy(() -> applicationFormService.getById(userId, formId))
@@ -139,7 +140,7 @@ class ApplicationFormServiceTest {
         void success() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(true);
+            willDoNothing().given(applicationForm).validateOwner(userId);
 
             // when
             applicationFormService.update(userId, formId, request);
@@ -167,7 +168,9 @@ class ApplicationFormServiceTest {
         void fail_forbidden() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(false);
+            doThrow(new JobNoteException(FORBIDDEN))
+                    .when(applicationForm)
+                    .validateOwner(userId);
 
             // when & then
             assertThatThrownBy(() -> applicationFormService.update(userId, formId, request))
@@ -185,7 +188,7 @@ class ApplicationFormServiceTest {
         void success() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(true);
+            willDoNothing().given(applicationForm).validateOwner(userId);
 
             // when
             applicationFormService.delete(userId, formId);
@@ -212,7 +215,9 @@ class ApplicationFormServiceTest {
         void fail_forbidden() {
             // given
             given(applicationFormRepository.findById(formId)).willReturn(Optional.of(applicationForm));
-            given(applicationForm.isOwner(userId)).willReturn(false);
+            doThrow(new JobNoteException(FORBIDDEN))
+                    .when(applicationForm)
+                    .validateOwner(userId);
 
             // when & then
             assertThatThrownBy(() -> applicationFormService.delete(userId, formId))

@@ -1,9 +1,12 @@
 package com.jobnote.domain.applicationForm;
 
+import com.jobnote.common.exception.JobNoteException;
 import com.jobnote.domain.user.User;
 import com.jobnote.domain.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import static com.jobnote.common.api.ResponseCode.FORBIDDEN;
 
 @Entity
 @Getter
@@ -66,8 +69,10 @@ public class ApplicationForm extends BaseTimeEntity {
       this.status = status;
     }
 
-    public boolean isOwner(Long id) {
-        return this.user.getId().equals(id);
+    public void validateOwner(Long id) {
+        if (!this.user.getId().equals(id)) {
+            throw new JobNoteException(FORBIDDEN);
+        }
     }
 
     public void update(ApplicationFormRequest request) {

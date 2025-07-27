@@ -23,7 +23,7 @@ public class ApplicationFormService {
     /* READ */
     public ApplicationFormResponse getById(Long userId, Long formId) {
         ApplicationForm form = getByIdOrThrow(formId);
-        if (!form.isOwner(userId)) throw new JobNoteException(FORBIDDEN);
+        form.validateOwner(userId);
 
         return ApplicationFormMapper.fromApplicationForm(form);
     }
@@ -47,7 +47,7 @@ public class ApplicationFormService {
     @Transactional
     public void update(Long userId, Long formId, ApplicationFormRequest request) {
         ApplicationForm form = getByIdOrThrow(formId);
-        if (!form.isOwner(userId)) throw new JobNoteException(FORBIDDEN);
+        form.validateOwner(userId);
 
         form.update(request);
     }
@@ -56,7 +56,7 @@ public class ApplicationFormService {
     @Transactional
     public void delete(Long userId, Long formId) {
         ApplicationForm form = getByIdOrThrow(formId);
-        if (!form.isOwner(userId)) throw new JobNoteException(FORBIDDEN);
+        form.validateOwner(userId);
 
         applicationFormRepository.delete(form);
     }
