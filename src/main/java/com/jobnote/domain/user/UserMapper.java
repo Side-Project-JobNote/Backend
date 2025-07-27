@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 public class UserMapper {
     public static User toUser(final UserRequest request) {
         return User.builder()
-                .loginId(request.loginId())
-                .password(request.password())
                 .email(request.email())
+                .password(request.password())
                 .name(request.name())
                 .avatarUrl(request.avatarUrl())
                 .build();
@@ -18,9 +17,8 @@ public class UserMapper {
     public static UserResponse fromUser(final User user) {
         return new UserResponse(
                 user.getId(),
-                user.getLoginId(),
-                user.getPassword(),
                 user.getEmail(),
+                user.getPassword(),
                 user.getName(),
                 user.getAvatarUrl()
         );

@@ -85,6 +85,6 @@ public class ApplicationFormController {
     }
 
     private Long getUserIdFromUserDetails(UserDetails user) {
-        return userService.getUserByLoginId(user.getUsername()).getId();
+        return userService.getUserByEmail(user.getUsername()).getId();
     }
 }

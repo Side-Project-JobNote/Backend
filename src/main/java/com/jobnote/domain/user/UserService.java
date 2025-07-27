@@ -18,8 +18,8 @@ public class UserService {
         return getByIdOrThrow(id);
     }
 
-    public User getUserByLoginId(String loginId) {
-        return getByLoginIdOrThrow(loginId);
+    public User getUserByEmail(String email) {
+        return getByEmailOrThrow(email);
     }
 
     /* HELPER METHOD */
@@ -28,8 +28,8 @@ public class UserService {
                 new JobNoteException(NOT_FOUND_USER));
     }
 
-    private User getByLoginIdOrThrow(String loginId) {
-        return userRepository.findByLoginId(loginId).orElseThrow(() ->
+    private User getByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
                 new JobNoteException(NOT_FOUND_USER));
     }
 }
