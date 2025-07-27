@@ -63,6 +63,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
-        return new HashSet<>(securityProperties.getWhitelist()).contains(request.getRequestURI());
+        return new HashSet<>(securityProperties.whitelist()).contains(request.getRequestURI());
     }
 }

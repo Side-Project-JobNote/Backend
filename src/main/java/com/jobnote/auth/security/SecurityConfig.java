@@ -33,7 +33,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers(securityProperties.getWhitelist().toArray(String[]::new)).permitAll()
+                        .requestMatchers(securityProperties.whitelist().toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated());
 
         http
