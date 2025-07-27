@@ -33,10 +33,10 @@ public class Schedule extends BaseTimeEntity {
 
     @Builder
     public Schedule(
-            ApplicationForm  applicationForm,
-            String title,
-            String memo,
-            LocalDateTime dateTime
+            final ApplicationForm  applicationForm,
+            final String title,
+            final String memo,
+            final LocalDateTime dateTime
     ) {
         this.applicationForm = applicationForm;
         this.title = title;
@@ -44,7 +44,7 @@ public class Schedule extends BaseTimeEntity {
         this.dateTime = dateTime;
     }
 
-    public boolean isOwner(Long id) {
+    public boolean isOwner(final Long id) {
         return this.applicationForm.getUser().getId().equals(id);
     }
 }

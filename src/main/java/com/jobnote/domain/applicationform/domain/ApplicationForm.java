@@ -47,16 +47,16 @@ public class ApplicationForm extends BaseTimeEntity {
 
     @Builder
     public ApplicationForm(
-            User user,
-            String companyName,
-            String companyTel,
-            String companyAddress,
-            String companyUrl,
-            String companyEmail,
-            String companyScale,
-            String position,
-            String memo,
-            ApplicationFormStatus status
+            final User user,
+            final String companyName,
+            final String companyTel,
+            final String companyAddress,
+            final String companyUrl,
+            final String companyEmail,
+            final String companyScale,
+            final String position,
+            final String memo,
+            final ApplicationFormStatus status
     ) {
       this.user = user;
       this.companyName = companyName;
@@ -70,13 +70,13 @@ public class ApplicationForm extends BaseTimeEntity {
       this.status = status;
     }
 
-    public void validateOwner(Long id) {
+    public void validateOwner(final Long id) {
         if (!this.user.getId().equals(id)) {
             throw new JobNoteException(FORBIDDEN);
         }
     }
 
-    public void update(ApplicationFormRequest request) {
+    public void update(final ApplicationFormRequest request) {
         this.companyName = request.companyName();
         this.companyTel = request.companyTel();
         this.companyAddress = request.companyAddress();

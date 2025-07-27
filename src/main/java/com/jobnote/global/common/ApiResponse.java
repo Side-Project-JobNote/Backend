@@ -15,14 +15,14 @@ public record ApiResponse<T>(
         T data
 ) {
 
-    public static <T> ApiResponse<T> ofSuccess(ResponseCode responseCode) {
+    public static <T> ApiResponse<T> ofSuccess(final ResponseCode responseCode) {
         return ApiResponse.<T>builder()
                 .code(responseCode.getCode())
                 .message(responseCode.getMessage())
                 .build();
     }
 
-    public static <T> ApiResponse<T> ofSuccess(ResponseCode responseCode, T data) {
+    public static <T> ApiResponse<T> ofSuccess(final ResponseCode responseCode, T data) {
         return ApiResponse.<T>builder()
                 .code(responseCode.getCode())
                 .message(responseCode.getMessage())
@@ -30,14 +30,14 @@ public record ApiResponse<T>(
                 .build();
     }
 
-    public static <T> ApiResponse<T> ofFail(ResponseCode responseCode) {
+    public static <T> ApiResponse<T> ofFail(final ResponseCode responseCode) {
         return ApiResponse.<T>builder()
                 .code(responseCode.getCode())
                 .message(responseCode.getMessage())
                 .build();
     }
 
-    public static <T> ApiResponse<T> ofFail(ResponseCode responseCode, List<FieldError> fieldErrors) {
+    public static <T> ApiResponse<T> ofFail(final ResponseCode responseCode, final List<FieldError> fieldErrors) {
         return ApiResponse.<T>builder()
                 .code(responseCode.getCode())
                 .message(responseCode.getMessage())
@@ -50,11 +50,11 @@ public record ApiResponse<T>(
             String message
     ) {
 
-        private static FieldErrorDetail of(FieldError fieldError) {
+        private static FieldErrorDetail of(final FieldError fieldError) {
             return new FieldErrorDetail(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        private static List<FieldErrorDetail> of(List<FieldError> fieldErrors) {
+        private static List<FieldErrorDetail> of(final List<FieldError> fieldErrors) {
             return fieldErrors.stream()
                     .map(FieldErrorDetail::of)
                     .collect(Collectors.toList());

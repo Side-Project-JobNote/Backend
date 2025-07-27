@@ -28,10 +28,10 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(
-            String password,
-            String email,
-            String name,
-            String avatarUrl
+            final String password,
+            final String email,
+            final String name,
+            final String avatarUrl
     ) {
         this.email = email;
         this.password = password;

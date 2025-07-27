@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("select s from Schedule s join fetch s.applicationForm af join fetch af.user where af.user.id = :userId")
-    List<Schedule> findAllByUserId(Long userId);
+    List<Schedule> findAllByUserId(final Long userId);
 }

@@ -31,7 +31,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         try {
             final String accessToken = parseBearerToken(request)
                     .orElseThrow(() -> new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN));
@@ -62,7 +62,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(final HttpServletRequest request) {
         return new HashSet<>(securityProperties.getWhitelist()).contains(request.getRequestURI());
     }
 }
