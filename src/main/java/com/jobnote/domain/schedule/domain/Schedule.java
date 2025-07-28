@@ -2,10 +2,14 @@ package com.jobnote.domain.schedule.domain;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.common.BaseTimeEntity;
+import com.jobnote.domain.schedule.dto.ScheduleRequest;
+import com.jobnote.global.exception.JobNoteException;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
+import static com.jobnote.global.common.ResponseCode.FORBIDDEN;
 
 @Entity
 @Getter
@@ -44,7 +48,15 @@ public class Schedule extends BaseTimeEntity {
         this.dateTime = dateTime;
     }
 
-    public boolean isOwner(final Long id) {
-        return this.applicationForm.getUser().getId().equals(id);
+    public void validateOwner(final Long userId) {
+        if (!this.applicationForm.getUser().getId().equals(userId)) {
+            throw new JobNoteException(FORBIDDEN);
+        }
+    }
+
+    public void update(final ScheduleRequest request) {
+        this.title = request.title();
+        this.memo = request.memo();
+        this.dateTime = request.dateTime();
     }
 }

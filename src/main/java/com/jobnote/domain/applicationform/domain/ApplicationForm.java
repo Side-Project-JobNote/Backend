@@ -70,8 +70,8 @@ public class ApplicationForm extends BaseTimeEntity {
       this.status = status;
     }
 
-    public void validateOwner(final Long id) {
-        if (!this.user.getId().equals(id)) {
+    public void validateOwner(final Long userId) {
+        if (!this.user.getId().equals(userId)) {
             throw new JobNoteException(FORBIDDEN);
         }
     }

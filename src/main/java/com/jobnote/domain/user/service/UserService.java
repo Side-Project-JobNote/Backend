@@ -4,6 +4,7 @@ import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +25,18 @@ public class UserService {
         return getByEmailOrThrow(email);
     }
 
-    /* HELPER METHOD */
-    private User getByIdOrThrow(final Long id) {
-        return userRepository.findById(id).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND_USER));
+    public Long getUserIdFromUserDetails(final UserDetails user) {
+        return getUserByEmail(user.getUsername()).getId();
     }
 
-    private User getByEmailOrThrow(final String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND_USER));
+    /* HELPER METHOD */
+    public User getByIdOrThrow(final Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
+    }
+
+    public User getByEmailOrThrow(final String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
 }

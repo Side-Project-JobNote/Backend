@@ -66,8 +66,8 @@ public class ApplicationFormService {
     }
 
     /* HELPER METHOD */
-    private ApplicationForm getByIdOrThrow(final Long formId) {
-        return applicationFormRepository.findById(formId).orElseThrow(() ->
-                new JobNoteException(NOT_FOUND_APPLICATION_FORM));
+    public ApplicationForm getByIdOrThrow(final Long formId) {
+        return applicationFormRepository.findById(formId)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_APPLICATION_FORM));
     }
 }
