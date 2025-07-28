@@ -1,8 +1,8 @@
 package com.jobnote.auth.token;
 
-import com.jobnote.common.api.ResponseCode;
-import com.jobnote.common.exception.JobNoteException;
-import com.jobnote.common.properties.JwtProperties;
+import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static com.jobnote.common.Constants.*;
+import static com.jobnote.global.common.Constants.*;
 
 @Component
 class JwtProvider {
@@ -23,7 +23,7 @@ class JwtProvider {
 
     JwtProvider(final JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
-        this.secretKey = new SecretKeySpec(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this.secretKey = new SecretKeySpec(jwtProperties.secret().getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
     public String generateAccessToken(final long userId, final String role, final long expirationTime) {
@@ -38,7 +38,7 @@ class JwtProvider {
     }
 
     public String generateAccessToken(final long userId, final String role) {
-        return generateAccessToken(userId, role, jwtProperties.getAccessToken().getExpirationTime());
+        return generateAccessToken(userId, role, jwtProperties.accessToken().expirationTime());
     }
 
     public String generateRefreshToken(final long expirationTime) {
@@ -51,7 +51,7 @@ class JwtProvider {
     }
 
     public String generateRefreshToken() {
-        return generateRefreshToken(jwtProperties.getRefreshToken().getExpirationTime());
+        return generateRefreshToken(jwtProperties.refreshToken().expirationTime());
     }
 
     public Claims getTokenPayload(final String token) {
