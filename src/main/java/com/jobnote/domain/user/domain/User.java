@@ -22,7 +22,7 @@ public class User extends BaseTimeEntity {
     private String password;
 
     @Column(nullable = false)
-    private String name;
+    private String nickname;
 
     private String avatarUrl;
 
@@ -30,12 +30,12 @@ public class User extends BaseTimeEntity {
     public User(
             final String password,
             final String email,
-            final String name,
+            final String nickname,
             final String avatarUrl
     ) {
         this.email = email;
         this.password = password;
-        this.name = name;
+        this.nickname = nickname;
         this.avatarUrl = avatarUrl;
     }
 }

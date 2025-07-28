@@ -4,7 +4,7 @@ public record UserResponse(
         Long id,
         String email,
         String password,
-        String name,
+        String nickname,
         String avatarUrl
 ) {
 }

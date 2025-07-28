@@ -12,7 +12,7 @@ public class UserMapper {
         return User.builder()
                 .email(request.email())
                 .password(request.password())
-                .name(request.name())
+                .nickname(request.nickname())
                 .avatarUrl(request.avatarUrl())
                 .build();
     }
@@ -22,7 +22,7 @@ public class UserMapper {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getName(),
+                user.getNickname(),
                 user.getAvatarUrl()
         );
     }
