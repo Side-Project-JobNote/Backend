@@ -39,6 +39,7 @@ public enum ResponseCode {
 
     // 409 Conflict
     CONFLICT(HttpStatus.CONFLICT, "4090", "요청이 서버의 상태와 충돌했습니다."),
+    DUPLICATED_USER_NICKNAME(HttpStatus.CONFLICT, "4091", "이미 사용중인 닉네임입니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "서버에 에러가 발생했습니다."),
