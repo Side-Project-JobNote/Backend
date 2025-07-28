@@ -7,6 +7,8 @@ import lombok.*;
 @Entity
 @Getter
 @Table(name = "users")
+@Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
@@ -30,19 +32,13 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @Builder
-    public User(
-            final String password,
-            final String email,
-            final String nickname,
-            final String avatarUrl,
-            final UserRole role
-    ) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.avatarUrl = avatarUrl;
-        this.role = role;
+    public static User signUp(final String email, final String password, final String nickname) {
+        return User.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .role(UserRole.USER)
+                .build();
     }
 
     public String getRoleKey() {
