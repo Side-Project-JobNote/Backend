@@ -1,12 +1,13 @@
 package com.jobnote.domain.applicationform.dto;
 
+import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.domain.ApplicationFormStatus;
+import com.jobnote.domain.user.domain.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ApplicationFormRequest(
-
         @NotBlank(message = "회사명은 비어있을 수 없습니다.")
         String companyName,
 
@@ -28,4 +29,18 @@ public record ApplicationFormRequest(
         @NotNull(message = "지원 상태는 비어있을 수 없습니다.")
         ApplicationFormStatus status
 ) {
+    public ApplicationForm toEntity(final User user) {
+        return ApplicationForm.builder()
+                .user(user)
+                .companyName(companyName)
+                .companyTel(companyTel)
+                .companyAddress(companyAddress)
+                .companyUrl(companyUrl)
+                .companyEmail(companyEmail)
+                .companyScale(companyScale)
+                .position(position)
+                .memo(memo)
+                .status(status)
+                .build();
+    }
 }

@@ -29,12 +29,12 @@ public class ApplicationFormService {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
-        return ApplicationFormMapper.fromApplicationForm(form);
+        return ApplicationFormResponse.from(form);
     }
 
     public List<ApplicationFormResponse> getAll(final Long userId) {
         return applicationFormRepository.findAllByUserId(userId).stream()
-                .map(ApplicationFormMapper::fromApplicationForm)
+                .map(ApplicationFormResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -43,7 +43,7 @@ public class ApplicationFormService {
     public Long save(final Long userId, final ApplicationFormRequest request) {
         User user = userService.getUserById(userId);
 
-        ApplicationForm saved = applicationFormRepository.save(ApplicationFormMapper.toApplicationForm(user, request));
+        ApplicationForm saved = applicationFormRepository.save(request.toEntity(user));
         return saved.getId();
     }
 
