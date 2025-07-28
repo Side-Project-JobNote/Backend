@@ -1,10 +1,9 @@
-package com.jobnote.domain.applicationform;
+package com.jobnote.domain.applicationform.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
-import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
