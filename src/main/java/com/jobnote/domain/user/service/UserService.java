@@ -40,7 +40,7 @@ public class UserService {
     public void signUp(final UserSignUpRequest request) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
-        userRepository.save(request.toEntity(bCryptPasswordEncoder.encode(request.password())));
+        userRepository.save(User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname()));
     }
 
     /* HELPER METHOD */

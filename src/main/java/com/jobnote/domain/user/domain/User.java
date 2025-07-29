@@ -37,7 +37,7 @@ public class User extends BaseTimeEntity {
                 .email(email)
                 .password(password)
                 .nickname(nickname)
-                .role(UserRole.USER)
+                .role(UserRole.GUEST)
                 .build();
     }
 
