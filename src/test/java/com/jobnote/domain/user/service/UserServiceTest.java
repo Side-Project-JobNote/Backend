@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +39,7 @@ class UserServiceTest extends ServiceUnitTest {
         void success() {
             // given
             UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
+            given(userRepository.existsByEmail(request.email())).willReturn(false);
             given(userRepository.existsByNickname(request.nickname())).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(any(User.class));
 
@@ -47,6 +49,22 @@ class UserServiceTest extends ServiceUnitTest {
             // then
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should().save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("실패 - 이메일 중복")
+        void fail_DuplicatedEmail() {
+            // given
+            UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
+            given(userRepository.existsByEmail(request.email())).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.signUp(request))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(DUPLICATED_USER_EMAIL.getMessage());
+
+            then(userRepository).should().existsByEmail(request.email());
+            then(userRepository).should(never()).save(any(User.class));
         }
 
         @Test
