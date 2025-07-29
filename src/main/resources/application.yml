@@ -5,7 +5,7 @@ spring:
   profiles:
     group:
       local: jwt, mail
-      test: jwt
+      test: jwt, mail
 
   datasource:
     url: jdbc:h2:mem:testdb
@@ -26,3 +26,6 @@ spring:
       - /api/v1/users/signup
       - /api/v1/users/login
       - /api/v1/users/reissue
+
+app:
+  email-verification-path: /api/v1/users/verify
