@@ -9,7 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-import static com.jobnote.global.common.ResponseCode.FORBIDDEN;
+import static com.jobnote.global.common.ResponseCode.*;
 
 @Entity
 @Getter
@@ -51,6 +51,12 @@ public class Schedule extends BaseTimeEntity {
     public void validateOwner(final Long userId) {
         if (!this.applicationForm.getUser().getId().equals(userId)) {
             throw new JobNoteException(FORBIDDEN);
+        }
+    }
+
+    public void validateBelongsTo(final Long formId) {
+        if (!this.applicationForm.getId().equals(formId)) {
+            throw new JobNoteException(INVALID_SCHEDULE_FORM_ASSOCIATION);
         }
     }
 

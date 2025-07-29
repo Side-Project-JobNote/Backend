@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
@@ -35,7 +38,25 @@ public class ScheduleService {
     public List<ScheduleResponse> getAll(final Long userId) {
         return scheduleRepository.findAllByUserId(userId).stream()
                 .map(ScheduleResponse::from)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    public List<ScheduleResponse> getAllByApplicationFormId(final Long userId, final Long formId) {
+        return scheduleRepository.findAllByUserIdAndApplicationFormId(userId, formId).stream()
+                .map(ScheduleResponse::from)
+                .toList();
+    }
+
+    public Map<Long, List<ScheduleResponse>> getAllGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
+        List<Schedule> schedules = scheduleRepository.findAllByUserIdAndApplicationFormIds(userId, formIds);
+
+        return schedules.stream()
+                .collect(Collectors.groupingBy(
+                        // 각 일정이 속한 지원서의 ID를 기준으로 그룹핑
+                        schedule -> schedule.getApplicationForm().getId(),
+                        // 그룹핑된 일정들을 ScheduleResponse로 변환하여 List로 수집
+                        Collectors.mapping(ScheduleResponse::from, Collectors.toList())
+                ));
     }
 
     /* CREATE */
@@ -48,6 +69,18 @@ public class ScheduleService {
         return saved.getId();
     }
 
+    @Transactional
+    public void saveAll(final Long userId, final Long formId, final List<ScheduleRequest> requests) {
+        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
+        form.validateOwner(userId);
+
+        List<Schedule> schedules = requests.stream()
+                .map(req -> req.toEntity(form))
+                .toList();
+
+        scheduleRepository.saveAll(schedules);
+    }
+
     /* UPDATE */
     @Transactional
     public void update(final Long userId, final Long scheduleId, final ScheduleRequest request) {
@@ -57,6 +90,43 @@ public class ScheduleService {
         schedule.update(request);
     }
 
+    @Transactional
+    public void updateAll(final Long userId, final Long formId, final List<ScheduleRequest> requests) {
+        // 기존 일정 조회
+        List<Schedule> existsSchedules = scheduleRepository.findAllByUserIdAndApplicationFormId(userId, formId);
+
+        // 요청 일정 ID 목록
+        Set<Long> requestsIds = requests.stream()
+                .map(ScheduleRequest::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 삭제 : 기존 일정 중 요청에 없는 일정 삭제
+        for (Schedule schedule : existsSchedules) {
+            if (!requestsIds.contains(schedule.getId())) {
+                schedule.validateOwner(userId);
+                scheduleRepository.delete(schedule);
+            }
+        }
+
+        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
+
+        // 업데이트 또는 신규 생성
+        for (ScheduleRequest req : requests) {
+            if (req.id() != null) {
+                // 업데이트
+                Schedule schedule = getByIdOrThrow(req.id());
+                schedule.validateOwner(userId);
+                schedule.validateBelongsTo(formId);
+                schedule.update(req);
+            } else {
+                // 신규 생성
+                Schedule newSchedule = req.toEntity(form);
+                scheduleRepository.save(newSchedule);
+            }
+        }
+    }
+
     /* DELETE */
     @Transactional
     public void delete(final Long userId, final Long scheduleId) {
@@ -64,6 +134,11 @@ public class ScheduleService {
         schedule.validateOwner(userId);
 
         scheduleRepository.delete(schedule);
+    }
+
+    @Transactional
+    public void deleteAllByApplicationFormId(final Long formId) {
+        scheduleRepository.deleteAllByApplicationFormId(formId);
     }
 
     /* HELPER METHOD */

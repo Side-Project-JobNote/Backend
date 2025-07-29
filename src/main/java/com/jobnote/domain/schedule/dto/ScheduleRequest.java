@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 public record ScheduleRequest(
 
+        Long id,
+
         @NotBlank(message = "제목은 비어있을 수 없습니다.")
         String title,
 

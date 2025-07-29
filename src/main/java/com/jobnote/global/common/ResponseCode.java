@@ -15,6 +15,7 @@ public enum ResponseCode {
     // 400 Bad Request
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "4000", "잘못된 요청입니다."),
     INVALID_METHOD_ARGUMENT(HttpStatus.BAD_REQUEST, "4001", "입력값 유효성 검증에 실패했습니다."),
+    INVALID_SCHEDULE_FORM_ASSOCIATION(HttpStatus.BAD_REQUEST, "4002", "일정이 지정한 지원서에 속하지 않습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
