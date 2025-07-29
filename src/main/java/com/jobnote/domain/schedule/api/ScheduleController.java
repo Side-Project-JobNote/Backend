@@ -1,5 +1,6 @@
 package com.jobnote.domain.schedule.api;
 
+import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
@@ -26,6 +27,7 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
     private final UserService userService;
+    private final ApplicationFormService applicationFormService;
 
     /* CREATE */
     @PostMapping
@@ -35,7 +37,7 @@ public class ScheduleController {
             @AuthenticationPrincipal final UserDetails user
     ) {
         Long userId = userService.getUserIdFromUserDetails(user);
-        Long savedScheduleId = scheduleService.save(userId, formId, request);
+        Long savedScheduleId = scheduleService.save(userId, applicationFormService.getByIdOrThrow(formId), request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedScheduleId).toUri();
 

@@ -54,7 +54,7 @@ public class ApplicationFormService {
         User user = userService.getUserById(userId);
 
         ApplicationForm form = applicationFormRepository.save(request.toEntity(user));
-        scheduleService.saveAll(userId, form.getId(), request.schedules());
+        scheduleService.saveAll(userId, form, request.schedules());
 
         return form.getId();
     }
@@ -66,7 +66,7 @@ public class ApplicationFormService {
         form.validateOwner(userId);
 
         form.update(request);
-        scheduleService.updateAll(userId, formId, request.schedules());
+        scheduleService.updateAll(userId, form, request.schedules());
     }
 
     /* DELETE */

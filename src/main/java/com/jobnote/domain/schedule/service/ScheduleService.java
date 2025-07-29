@@ -1,7 +1,6 @@
 package com.jobnote.domain.schedule.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
-import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.schedule.domain.Schedule;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
@@ -26,7 +25,6 @@ import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final ApplicationFormService applicationFormService;
 
     /* READ */
     public ScheduleResponse getById(final Long userId, final Long scheduleId) {
@@ -62,8 +60,7 @@ public class ScheduleService {
 
     /* CREATE */
     @Transactional
-    public Long save(final Long userId, final Long formId, final ScheduleRequest request) {
-        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
+    public Long save(final Long userId, final ApplicationForm form, final ScheduleRequest request) {
         form.validateOwner(userId);
 
         Schedule saved = request.toEntity(form);
@@ -71,8 +68,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void saveAll(final Long userId, final Long formId, final List<ScheduleRequest> requests) {
-        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
+    public void saveAll(final Long userId, final ApplicationForm form, final List<ScheduleRequest> requests) {
         form.validateOwner(userId);
 
         List<Schedule> schedules = requests.stream()
@@ -92,9 +88,9 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateAll(final Long userId, final Long formId, final List<ScheduleRequest> requests) {
+    public void updateAll(final Long userId, final ApplicationForm form, final List<ScheduleRequest> requests) {
         // 기존 일정 조회
-        List<Schedule> existsSchedules = scheduleRepository.findAllByUserIdAndApplicationFormId(userId, formId);
+        List<Schedule> existsSchedules = scheduleRepository.findAllByUserIdAndApplicationFormId(userId, form.getId());
 
         // 요청 일정 ID 목록
         Set<Long> requestsIds = requests.stream()
@@ -110,15 +106,13 @@ public class ScheduleService {
             }
         }
 
-        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
-
         // 업데이트 또는 신규 생성
         for (ScheduleRequest req : requests) {
             if (req.id() != null) {
                 // 업데이트
                 Schedule schedule = getByIdOrThrow(req.id());
                 schedule.validateOwner(userId);
-                schedule.validateBelongsTo(formId);
+                schedule.validateBelongsTo(form.getId());
                 schedule.update(req);
             } else {
                 // 신규 생성
