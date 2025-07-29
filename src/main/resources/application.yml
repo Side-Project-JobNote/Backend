@@ -21,11 +21,5 @@ spring:
       hibernate:
         format_sql: true
 
-  security:
-    whitelist:
-      - /api/v1/users/signup
-      - /api/v1/users/login
-      - /api/v1/users/reissue
-
 app:
   email-verification-path: /api/v1/users/verify

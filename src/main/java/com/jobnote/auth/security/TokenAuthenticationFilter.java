@@ -3,7 +3,6 @@ package com.jobnote.auth.security;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.global.config.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +24,6 @@ import static com.jobnote.global.common.Constants.*;
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    private final SecurityProperties securityProperties;
     private final TokenProvider tokenProvider;
 
     @Override
@@ -61,6 +59,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
-        return new HashSet<>(securityProperties.whitelist()).contains(request.getRequestURI());
+        return new HashSet<>(List.of(WHITELIST)).contains(request.getRequestURI());
     }
 }

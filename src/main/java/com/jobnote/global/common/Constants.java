@@ -10,4 +10,10 @@ public abstract class Constants {
     public static final String AUTHORIZATION_TYPE_BEARER = "Bearer ";
     public static final String CHARACTER_ENCODING = "UTF-8";
     public static final String ATTRIBUTE_EXCEPTION = "exception";
+    public static final String[] WHITELIST = {
+            "/api/v1/users/signup",
+            "/api/v1/users/login",
+            "/api/v1/users/reissue",
+            "/api/v1/users/verify"
+    };
 }

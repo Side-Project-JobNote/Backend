@@ -3,7 +3,6 @@ package com.jobnote.auth.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
-import com.jobnote.global.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +16,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.jobnote.global.common.Constants.WHITELIST;
+
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
-    private final SecurityProperties securityProperties;
     private final TokenProvider tokenProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
@@ -50,7 +50,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers(securityProperties.whitelist().toArray(String[]::new)).permitAll()
+                        .requestMatchers(WHITELIST).permitAll()
                         .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
 
@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
-                .addFilterBefore(new TokenAuthenticationFilter(securityProperties, tokenProvider), LoginFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(tokenProvider), LoginFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
