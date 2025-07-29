@@ -1,6 +1,7 @@
 package com.jobnote.domain.schedule.dto;
 
 import com.jobnote.domain.schedule.domain.Schedule;
+import com.jobnote.domain.schedule.domain.ScheduleStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 
@@ -11,7 +12,8 @@ public record ScheduleResponse(
         Long id,
         String title,
         String memo,
-        LocalDateTime dateTime
+        LocalDateTime dateTime,
+        ScheduleStatus status
 ) {
     public static ScheduleResponse from(final Schedule schedule) {
         return ScheduleResponse.builder()
@@ -19,6 +21,7 @@ public record ScheduleResponse(
                 .title(schedule.getTitle())
                 .memo(schedule.getMemo())
                 .dateTime(schedule.getDateTime())
+                .status(schedule.getStatus())
                 .build();
     }
 }

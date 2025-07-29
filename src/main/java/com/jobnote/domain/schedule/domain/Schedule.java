@@ -35,17 +35,22 @@ public class Schedule extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime dateTime;
 
+    @Enumerated(EnumType.STRING)
+    private ScheduleStatus status;
+
     @Builder
     public Schedule(
             final ApplicationForm  applicationForm,
             final String title,
             final String memo,
-            final LocalDateTime dateTime
+            final LocalDateTime dateTime,
+            final ScheduleStatus status
     ) {
         this.applicationForm = applicationForm;
         this.title = title;
         this.memo = memo;
         this.dateTime = dateTime;
+        this.status = status;
     }
 
     public void validateOwner(final Long userId) {
@@ -64,5 +69,6 @@ public class Schedule extends BaseTimeEntity {
         this.title = request.title();
         this.memo = request.memo();
         this.dateTime = request.dateTime();
+        this.status = request.status();
     }
 }
