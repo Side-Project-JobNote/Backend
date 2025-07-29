@@ -24,6 +24,7 @@ public enum ResponseCode {
     MALFORMED_TOKEN(HttpStatus.UNAUTHORIZED, "4013", "잘못된 토큰 형식입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "4014", "지원하지 않는 토큰 형식입니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 액세스 토큰입니다."),
+    INVALID_USERNAME_PASSWORD(HttpStatus.UNAUTHORIZED, "4016", "아이디 또는 비밀번호가 잘못되었습니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, "4030", "요청 리소스에 대한 액세스가 금지되었습니다."),

@@ -6,6 +6,8 @@ import com.jobnote.global.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,7 +23,13 @@ public class SecurityConfig {
 
     private final SecurityProperties securityProperties;
     private final TokenProvider tokenProvider;
+    private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
+
+    @Bean
+    public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -44,8 +52,14 @@ public class SecurityConfig {
                         .requestMatchers(securityProperties.whitelist().toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated());
 
+        final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, objectMapper);
+        loginFilter.setFilterProcessesUrl("/api/v1/users/login");
+
         http
-                .addFilterBefore(new TokenAuthenticationFilter(securityProperties, tokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .addFilterBefore(new TokenAuthenticationFilter(securityProperties, tokenProvider), LoginFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
