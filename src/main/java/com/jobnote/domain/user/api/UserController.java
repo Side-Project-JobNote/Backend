@@ -7,10 +7,9 @@ import com.jobnote.global.common.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -22,7 +21,14 @@ public class UserController {
     /* SIGN UP */
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signUp(@RequestBody @Valid final UserSignUpRequest request) {
-        userService.signUp(request);
+        userService.signUp(request, LocalDateTime.now().plusDays(1));
         return ResponseEntity.status(ResponseCode.CREATED.getStatus()).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
+    }
+
+    /* EMAIL VERIFICATION */
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") final String token) {
+        userService.verifyEmail(token, LocalDateTime.now());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 }

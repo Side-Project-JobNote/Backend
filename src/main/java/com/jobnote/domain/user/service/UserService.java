@@ -1,15 +1,23 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
+import com.jobnote.domain.user.repository.VerificationTokenRepository;
+import com.jobnote.global.config.properties.AppProperties;
 import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.mail.MailService;
+import com.jobnote.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.*;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
@@ -21,7 +29,10 @@ import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MailService mailService;
+    private final AppProperties appProperties;
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
@@ -37,10 +48,29 @@ public class UserService {
 
     /* SIGN UP */
     @Transactional
-    public void signUp(final UserSignUpRequest request) {
+    public void signUp(final UserSignUpRequest request, final LocalDateTime emailVerificationExpiryDate) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
-        userRepository.save(User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname()));
+        User savedUser = userRepository.save(User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname()));
+        VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), savedUser, emailVerificationExpiryDate);
+        verificationTokenRepository.save(verificationToken);
+        sendVerificationEmail(savedUser.getEmail(), verificationToken);
+    }
+
+    /* EMAIL VERIFICATION */
+    @Transactional
+    public void verifyEmail(final String token, final LocalDateTime currentDate) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_VERIFICATION_TOKEN));
+        User user = verificationToken.getUser();
+
+        if (verificationToken.validateExpiration(currentDate)) {
+            verificationTokenRepository.delete(verificationToken);
+            throw new JobNoteException(EXPIRED_VERIFICATION_TOKEN);
+        }
+
+        user.accept();
+        verificationTokenRepository.delete(verificationToken);
     }
 
     /* HELPER METHOD */
@@ -64,5 +94,22 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new JobNoteException(DUPLICATED_USER_EMAIL);
         }
+    }
+
+    private void sendVerificationEmail(final String email, final VerificationToken verificationToken) {
+        final String link = appProperties.baseUrl() + appProperties.emailVerificationPath() + "?token=" + verificationToken.getToken();
+        final String subject = "JobNote 회원가입 이메일 인증";
+        final String text = String.format("""
+                JobNote를 이용해주셔서 감사합니다.
+                아래 이메일 인증 링크를 클릭하여 회원가입을 완료해 주세요.
+                감사합니다.
+                %s
+                """, link);
+        MailMessageDto mailMessageDto = MailMessageDto.builder()
+                .to(email)
+                .subject(subject)
+                .text(text)
+                .build();
+        mailService.sendMail(mailMessageDto);
     }
 }
