@@ -8,6 +8,7 @@ import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -54,10 +56,12 @@ public class ScheduleController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getAllSchedules(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
             @AuthenticationPrincipal final UserDetails user
     ) {
         Long userId = userService.getUserIdFromUserDetails(user);
-        List<ScheduleResponse> schedules = scheduleService.getAll(userId);
+        List<ScheduleResponse> schedules = scheduleService.getAll(userId, startDate, endDate);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, schedules));
     }

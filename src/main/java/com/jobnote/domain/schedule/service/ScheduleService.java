@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,8 +36,8 @@ public class ScheduleService {
         return ScheduleResponse.from(schedule);
     }
 
-    public List<ScheduleResponse> getAll(final Long userId) {
-        return scheduleRepository.findAllByUserId(userId).stream()
+    public List<ScheduleResponse> getAll(final Long userId, final LocalDateTime startDate, final LocalDateTime endDate) {
+        return scheduleRepository.findAllByUserIdAndDateTimeBetween(userId, startDate, endDate).stream()
                 .map(ScheduleResponse::from)
                 .toList();
     }
