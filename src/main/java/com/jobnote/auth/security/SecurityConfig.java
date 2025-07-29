@@ -2,6 +2,7 @@ package com.jobnote.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.token.TokenProvider;
+import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.global.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +51,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .requestMatchers(securityProperties.whitelist().toArray(String[]::new)).permitAll()
-                        .anyRequest().authenticated());
+                        .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
+                        .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
 
         final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, objectMapper);
         loginFilter.setFilterProcessesUrl("/api/v1/users/login");
