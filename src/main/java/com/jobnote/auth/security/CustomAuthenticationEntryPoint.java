@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -20,7 +19,6 @@ import static com.jobnote.global.common.Constants.CHARACTER_ENCODING;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;

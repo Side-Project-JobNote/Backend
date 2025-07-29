@@ -1,5 +1,7 @@
 package com.jobnote.auth.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.config.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final SecurityProperties securityProperties;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final TokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -43,11 +45,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(securityProperties, tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
-                        .authenticationEntryPoint(customAuthenticationEntryPoint));
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper)));
 
         http
                 .sessionManagement(session -> session.

@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,7 +23,6 @@ import java.util.*;
 import static com.jobnote.global.common.Constants.*;
 
 @RequiredArgsConstructor
-@Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
