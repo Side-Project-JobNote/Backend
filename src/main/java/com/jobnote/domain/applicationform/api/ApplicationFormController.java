@@ -32,7 +32,7 @@ public class ApplicationFormController {
             @AuthenticationPrincipal final UserDetails user
     ) {
         //todo 추후 CustomUserDetails 구현 후 User id 값으로 받아올 예정
-        Long userId = getUserIdFromUserDetails(user);
+        Long userId = userService.getUserIdFromUserDetails(user);
         Long savedFormId = applicationFormService.save(userId, request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedFormId).toUri();
@@ -46,7 +46,7 @@ public class ApplicationFormController {
             @PathVariable("id") final Long formId,
             @AuthenticationPrincipal final UserDetails user
     ) {
-        Long userId = getUserIdFromUserDetails(user);
+        Long userId = userService.getUserIdFromUserDetails(user);
         ApplicationFormResponse form = applicationFormService.getById(userId, formId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, form));
@@ -56,7 +56,7 @@ public class ApplicationFormController {
     public ResponseEntity<ApiResponse<List<ApplicationFormResponse>>> getAllApplicationForms(
             @AuthenticationPrincipal final UserDetails user
     ) {
-        Long userId = getUserIdFromUserDetails(user);
+        Long userId = userService.getUserIdFromUserDetails(user);
         List<ApplicationFormResponse> forms = applicationFormService.getAll(userId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, forms));
@@ -69,7 +69,7 @@ public class ApplicationFormController {
             @Valid @RequestBody final ApplicationFormRequest request,
             @AuthenticationPrincipal final UserDetails user
     ) {
-        Long userId = getUserIdFromUserDetails(user);
+        Long userId = userService.getUserIdFromUserDetails(user);
         applicationFormService.update(userId, formId, request);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
@@ -81,13 +81,9 @@ public class ApplicationFormController {
             @PathVariable("id") final Long formId,
             @AuthenticationPrincipal final UserDetails user
     ) {
-        Long userId = getUserIdFromUserDetails(user);
+        Long userId = userService.getUserIdFromUserDetails(user);
         applicationFormService.delete(userId, formId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
-    }
-
-    private Long getUserIdFromUserDetails(final UserDetails user) {
-        return userService.getUserByEmail(user.getUsername()).getId();
     }
 }
