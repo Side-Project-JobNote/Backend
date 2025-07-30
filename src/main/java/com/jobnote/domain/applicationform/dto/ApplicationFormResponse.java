@@ -6,6 +6,7 @@ import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 
+import java.util.Collections;
 import java.util.List;
 
 @Builder(access = AccessLevel.PRIVATE)
@@ -36,5 +37,10 @@ public record ApplicationFormResponse(
                 .status(form.getStatus())
                 .schedules(schedules)
                 .build();
+    }
+
+    @Override
+    public List<ScheduleResponse> schedules() {
+        return schedules != null ? schedules : Collections.emptyList();
     }
 }

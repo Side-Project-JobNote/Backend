@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 public record ApplicationFormRequest(
@@ -47,5 +48,10 @@ public record ApplicationFormRequest(
                 .memo(memo)
                 .status(status)
                 .build();
+    }
+
+    @Override
+    public List<ScheduleRequest> schedules() {
+        return schedules != null ? schedules : Collections.emptyList();
     }
 }
