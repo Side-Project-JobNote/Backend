@@ -33,7 +33,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
             throw new JobNoteException(UNAUTHORIZED);
         }
 
-        if (authentication.getPrincipal() == "anonymousUser") {
+        if (authentication.getPrincipal().equals("anonymousUser")) {
             log.error("principal is anonymous.");
             throw new JobNoteException(UNAUTHORIZED);
         }
