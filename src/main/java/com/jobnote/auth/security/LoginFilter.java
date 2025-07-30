@@ -23,7 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 
+import static com.jobnote.global.common.Constants.ATTRIBUTE_EXCEPTION;
 import static com.jobnote.global.common.Constants.CHARACTER_ENCODING;
+import static com.jobnote.global.common.ResponseCode.BAD_REQUEST;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,7 +43,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password(), null);
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
-            throw new JobNoteException(ResponseCode.BAD_REQUEST);
+            request.setAttribute(ATTRIBUTE_EXCEPTION, BAD_REQUEST);
+            throw new JobNoteException(BAD_REQUEST);
         }
     }
 

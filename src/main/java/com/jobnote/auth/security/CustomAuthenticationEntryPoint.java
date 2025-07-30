@@ -26,9 +26,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException {
         final JobNoteException e = (JobNoteException) request.getAttribute(ATTRIBUTE_EXCEPTION);
-        log.error("AuthenticationException: ", e);
+        final ResponseCode responseCode = e == null ? ResponseCode.FORBIDDEN : e.getResponseCode();
 
-        final ResponseCode responseCode = e.getResponseCode();
+        log.error("AuthenticationException: ", e == null ? authException : e);
+
         response.setStatus(responseCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
