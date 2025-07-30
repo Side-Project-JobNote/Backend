@@ -27,9 +27,10 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     /* READ */
-    public ScheduleResponse getById(final Long userId, final Long scheduleId) {
+    public ScheduleResponse getById(final Long userId, final Long formId, final Long scheduleId) {
         Schedule schedule = getByIdOrThrow(scheduleId);
         schedule.validateOwner(userId);
+        schedule.validateBelongsTo(formId);
 
         return ScheduleResponse.from(schedule);
     }
@@ -63,7 +64,7 @@ public class ScheduleService {
     public Long save(final Long userId, final ApplicationForm form, final ScheduleRequest request) {
         form.validateOwner(userId);
 
-        Schedule saved = request.toEntity(form);
+        Schedule saved = scheduleRepository.save(request.toEntity(form));
         return saved.getId();
     }
 
@@ -80,9 +81,10 @@ public class ScheduleService {
 
     /* UPDATE */
     @Transactional
-    public void update(final Long userId, final Long scheduleId, final ScheduleRequest request) {
+    public void update(final Long userId, final Long formId, final Long scheduleId, final ScheduleRequest request) {
         Schedule schedule = getByIdOrThrow(scheduleId);
         schedule.validateOwner(userId);
+        schedule.validateBelongsTo(formId);
 
         schedule.update(request);
     }
@@ -102,6 +104,7 @@ public class ScheduleService {
         for (Schedule schedule : existsSchedules) {
             if (!requestsIds.contains(schedule.getId())) {
                 schedule.validateOwner(userId);
+                schedule.validateBelongsTo(form.getId());
                 scheduleRepository.delete(schedule);
             }
         }
@@ -124,9 +127,10 @@ public class ScheduleService {
 
     /* DELETE */
     @Transactional
-    public void delete(final Long userId, final Long scheduleId) {
+    public void delete(final Long userId, final Long formId, final Long scheduleId) {
         Schedule schedule = getByIdOrThrow(scheduleId);
         schedule.validateOwner(userId);
+        schedule.validateBelongsTo(formId);
 
         scheduleRepository.delete(schedule);
     }

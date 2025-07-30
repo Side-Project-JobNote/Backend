@@ -4,6 +4,7 @@ import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.schedule.domain.Schedule;
 import com.jobnote.domain.schedule.domain.ScheduleStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ public record ScheduleRequest(
 
         String memo,
 
-        @NotBlank(message = "날짜는 비어있을 수 없습니다.")
+        @NotNull(message = "날짜는 비어있을 수 없습니다.")
         LocalDateTime dateTime,
 
         ScheduleStatus status
