@@ -15,6 +15,10 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       JWT_ACCESS_TOKEN_EXPIRATION_TIME: ${{ secrets.JWT_ACCESS_TOKEN_EXPIRATION_TIME }}
       JWT_REFRESH_TOKEN_EXPIRATION_TIME: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRATION_TIME }}
+      SPRING_MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      SPRING_MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      SPRING_MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      SPRING_MAIL_PORT: ${{ secrets.MAIL_PORT }}
 
     steps:
       - uses: actions/checkout@v4
