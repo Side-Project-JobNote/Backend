@@ -10,7 +10,6 @@ import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/application-forms/{formId}/schedules")
 @RequiredArgsConstructor
