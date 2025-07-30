@@ -63,7 +63,7 @@ public class ScheduleService {
     public Long save(final Long userId, final ApplicationForm form, final ScheduleRequest request) {
         form.validateOwner(userId);
 
-        Schedule saved = request.toEntity(form);
+        Schedule saved = scheduleRepository.save(request.toEntity(form));
         return saved.getId();
     }
 
