@@ -59,7 +59,7 @@ public class SecurityConfig {
         loginFilter.setFilterProcessesUrl("/api/v1/users/login");
 
         http
-                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
                 .addFilterBefore(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
