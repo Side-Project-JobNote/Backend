@@ -4,6 +4,7 @@ import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.domain.ApplicationFormStatus;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.user.domain.User;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +34,7 @@ public record ApplicationFormRequest(
         @NotNull(message = "지원 상태는 비어있을 수 없습니다.")
         ApplicationFormStatus status,
 
+        @Valid
         List<ScheduleRequest> schedules
 ) {
     public ApplicationForm toEntity(final User user) {
