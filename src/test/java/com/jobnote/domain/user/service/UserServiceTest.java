@@ -2,9 +2,14 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
+import com.jobnote.domain.user.repository.VerificationTokenRepository;
+import com.jobnote.global.config.properties.AppProperties;
 import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.mail.MailService;
+import com.jobnote.mail.dto.MailMessageDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,12 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDateTime;
+
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.never;
 
 class UserServiceTest extends ServiceUnitTest {
@@ -26,7 +32,16 @@ class UserServiceTest extends ServiceUnitTest {
     private UserRepository userRepository;
 
     @Mock
+    private VerificationTokenRepository verificationTokenRepository;
+
+    @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Mock
+    private MailService mailService;
+
+    @Mock
+    private AppProperties appProperties;
 
     @InjectMocks
     private UserService userService;
@@ -38,17 +53,20 @@ class UserServiceTest extends ServiceUnitTest {
         @DisplayName("성공")
         void success() {
             // given
-            UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
+            final UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
+            final User user = User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname());
             given(userRepository.existsByEmail(request.email())).willReturn(false);
             given(userRepository.existsByNickname(request.nickname())).willReturn(false);
-            given(userRepository.save(any(User.class))).willReturn(any(User.class));
+            given(userRepository.save(any(User.class))).willReturn(user);
 
             // when
-            userService.signUp(request);
+            userService.signUp(request, LocalDateTime.now());
 
             // then
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should().save(any(User.class));
+            then(verificationTokenRepository).should().save(any(VerificationToken.class));
+            then(mailService).should().sendMail(any(MailMessageDto.class));
         }
 
         @Test
@@ -59,7 +77,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByEmail(request.email())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request))
+            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_EMAIL.getMessage());
 
@@ -75,7 +93,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByNickname(request.nickname())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request))
+            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
 
