@@ -3,6 +3,7 @@ package com.jobnote.auth.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.security.dto.CustomUserDetails;
 import com.jobnote.auth.token.Token;
+import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.UserLoginRequest;
 import com.jobnote.domain.user.dto.UserTokenResponse;
@@ -51,18 +52,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException {
         final CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
-        final Long userId = customUserDetails.getId();
-        final String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
+        final TokenClaim tokenClaim = TokenClaim.builder()
+                .userId(customUserDetails.getId())
+                .email(customUserDetails.getUsername())
+                .role(customUserDetails.getAuthorities().iterator().next().getAuthority())
+                .build();
 
-        final Token token = tokenProvider.issueToken(userId, role);
+        final Token token = tokenProvider.issueToken(tokenClaim);
 
-        log.info("로그인 성공 id: {}, role: {}", userId, role);
+        log.info("로그인 성공, tokenClaim: {}", tokenClaim);
 
         final ResponseCode responseCode = ResponseCode.OK;
         response.setStatus(responseCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(userId, token))));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(tokenClaim.userId(), token))));
     }
 
     @Override

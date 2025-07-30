@@ -13,18 +13,14 @@ public class TokenProvider {
 
     private final JwtProvider jwtProvider;
 
-    public Token issueToken(final long userId, final String role) {
+    public Token issueToken(final TokenClaim tokenClaim) {
         return Token.builder()
-                .accessToken(jwtProvider.generateAccessToken(userId, role))
+                .accessToken(jwtProvider.generateAccessToken(tokenClaim))
                 .refreshToken(jwtProvider.generateRefreshToken())
                 .build();
     }
 
-    public Optional<Long> getUserIdFromPayload(final String token) {
-        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_USER_ID, Long.class));
-    }
-
-    public Optional<String> getRoleFromPayload(final String token) {
-        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_ROLE, String.class));
+    public Optional<String> getEmailFromPayload(final String token) {
+        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_EMAIL, String.class));
     }
 }

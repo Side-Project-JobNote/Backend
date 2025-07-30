@@ -26,19 +26,20 @@ class JwtProvider {
         this.secretKey = new SecretKeySpec(jwtProperties.secret().getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String generateAccessToken(final long userId, final String role, final long expirationTime) {
+    public String generateAccessToken(final TokenClaim tokenClaim, final long expirationTime) {
         return Jwts.builder()
                 .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_ACCESS_TOKEN)
-                .claim(CLAIM_NAME_USER_ID, userId)
-                .claim(CLAIM_NAME_ROLE, role)
+                .claim(CLAIM_NAME_USER_ID, tokenClaim.userId())
+                .claim(CLAIM_NAME_EMAIL, tokenClaim.email())
+                .claim(CLAIM_NAME_ROLE, tokenClaim.role())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public String generateAccessToken(final long userId, final String role) {
-        return generateAccessToken(userId, role, jwtProperties.accessToken().expirationTime());
+    public String generateAccessToken(final TokenClaim tokenClaim) {
+        return generateAccessToken(tokenClaim, jwtProperties.accessToken().expirationTime());
     }
 
     public String generateRefreshToken(final long expirationTime) {
