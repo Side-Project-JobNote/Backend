@@ -4,6 +4,7 @@ import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.common.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
         log.error("MethodArgumentNotValidException: ", e);
         ResponseCode responseCode = ResponseCode.INVALID_METHOD_ARGUMENT;
         return new ResponseEntity<>(ApiResponse.ofFail(responseCode, e.getBindingResult().getFieldErrors()), responseCode.getStatus());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException e) {
+        log.error("HttpRequestMethodNotSupportedException: ", e);
+        ResponseCode responseCode = ResponseCode.METHOD_NOT_ALLOWED;
+        return new ResponseEntity<>(ApiResponse.ofFail(responseCode), responseCode.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
