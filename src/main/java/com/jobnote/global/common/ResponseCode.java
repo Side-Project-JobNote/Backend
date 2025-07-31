@@ -16,6 +16,7 @@ public enum ResponseCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "4000", "잘못된 요청입니다."),
     INVALID_METHOD_ARGUMENT(HttpStatus.BAD_REQUEST, "4001", "입력값 유효성 검증에 실패했습니다."),
     INVALID_SCHEDULE_FORM_ASSOCIATION(HttpStatus.BAD_REQUEST, "4002", "일정이 지정한 지원서에 속하지 않습니다."),
+    NOT_SUPPORTED_SOCIAL_PROVIDER(HttpStatus.BAD_REQUEST, "4003", "해당 소셜 로그인은 지원되지 않습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
@@ -26,6 +27,7 @@ public enum ResponseCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 액세스 토큰입니다."),
     INVALID_USERNAME_PASSWORD(HttpStatus.UNAUTHORIZED, "4016", "아이디 또는 비밀번호가 잘못되었습니다."),
     EXPIRED_VERIFICATION_TOKEN(HttpStatus.UNAUTHORIZED, "4017", "만료된 이메일 검증 토큰입니다."),
+    UNAUTHORIZED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, "4018", "소셜 로그인 인증에 실패했습니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, "4030", "요청 리소스에 대한 액세스가 금지되었습니다."),
