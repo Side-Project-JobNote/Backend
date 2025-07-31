@@ -2,11 +2,8 @@ package com.jobnote.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.security.dto.CustomUserDetails;
-import com.jobnote.auth.token.Token;
-import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.UserLoginRequest;
-import com.jobnote.domain.user.dto.UserTokenResponse;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
@@ -51,20 +48,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException {
-        final CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
-        final TokenClaim tokenClaim = TokenClaim.builder()
-                .email(customUserDetails.getUsername())
-                .build();
-
-        final Token token = tokenProvider.issueToken(tokenClaim);
-
-        log.info("로그인 성공, tokenClaim: {}", tokenClaim);
-
-        final ResponseCode responseCode = ResponseCode.OK;
-        response.setStatus(responseCode.getStatus().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(CHARACTER_ENCODING);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(customUserDetails.getUserId(), token))));
+        final CustomUserDetails principal = (CustomUserDetails) authResult.getPrincipal();
+        tokenProvider.responseToken(response, objectMapper, principal.getUserId(), principal.getUsername());
     }
 
     @Override
