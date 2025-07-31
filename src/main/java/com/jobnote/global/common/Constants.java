@@ -13,8 +13,9 @@ public abstract class Constants {
     public static final String ATTRIBUTE_EXCEPTION = "exception";
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/users/login",
             "/api/v1/users/reissue",
             "/api/v1/users/verify",
+            "/login/**",
+            "/oauth2/**"
     };
 }

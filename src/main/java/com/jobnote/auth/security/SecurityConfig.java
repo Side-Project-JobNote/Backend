@@ -1,6 +1,9 @@
 package com.jobnote.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobnote.auth.oauth2.CustomOAuth2FailureHandler;
+import com.jobnote.auth.oauth2.CustomOAuth2SuccessHandler;
+import com.jobnote.auth.oauth2.CustomOAuth2UserService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,9 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -50,19 +56,25 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
 
         http
+                .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customOAuth2SuccessHandler)
+                        .failureHandler(customOAuth2FailureHandler));
+
+        http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .requestMatchers(WHITELIST).permitAll()
                         .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
 
         final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, objectMapper);
-        loginFilter.setFilterProcessesUrl("/api/v1/users/login");
 
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
-                .addFilterBefore(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
+                .addFilterAfter(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
