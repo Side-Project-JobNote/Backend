@@ -4,8 +4,8 @@ spring:
 
   profiles:
     group:
-      local: jwt, mail
-      test: jwt, mail
+      local: secret
+      test: secret
 
   datasource:
     url: jdbc:h2:mem:testdb
