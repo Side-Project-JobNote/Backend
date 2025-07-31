@@ -16,6 +16,7 @@ public abstract class Constants {
             "/api/v1/users/reissue",
             "/api/v1/users/verify",
             "/login/**",
-            "/oauth2/**"
+            "/oauth2/**",
+            "/h2-console/**"
     };
 }
