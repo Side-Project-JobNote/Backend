@@ -38,7 +38,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
     private User savedUser;
 
-    private final String LOGIN_URI = "/api/v1/users/login";
+    private final String LOGIN_URI = "/login";
     private final String CORRECT_EMAIL = "testCorrectEmail@test.com";
     private final String CORRECT_PASSWORD = "testCorrectPassword";
 

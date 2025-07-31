@@ -53,9 +53,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException {
         final CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
         final TokenClaim tokenClaim = TokenClaim.builder()
-                .userId(customUserDetails.getId())
                 .email(customUserDetails.getUsername())
-                .role(customUserDetails.getAuthorities().iterator().next().getAuthority())
                 .build();
 
         final Token token = tokenProvider.issueToken(tokenClaim);
@@ -66,7 +64,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(responseCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(tokenClaim.userId(), token))));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(customUserDetails.getUserId(), token))));
     }
 
     @Override

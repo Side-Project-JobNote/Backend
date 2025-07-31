@@ -33,7 +33,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
         final TokenClaim tokenClaim = TokenClaim.builder()
                 .email(principal.getEmail())
-                .role(principal.getAuthorities().iterator().next().getAuthority())
                 .build();
 
         final Token token = tokenProvider.issueToken(tokenClaim);
@@ -42,6 +41,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         response.setStatus(responseCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(tokenClaim.userId(), token))));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode, UserTokenResponse.of(principal.getUserId(), token))));
     }
 }

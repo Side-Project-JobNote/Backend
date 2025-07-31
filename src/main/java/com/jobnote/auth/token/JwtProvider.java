@@ -29,9 +29,7 @@ class JwtProvider {
     public String generateAccessToken(final TokenClaim tokenClaim, final long expirationTime) {
         return Jwts.builder()
                 .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_ACCESS_TOKEN)
-                .claim(CLAIM_NAME_USER_ID, tokenClaim.userId())
                 .claim(CLAIM_NAME_EMAIL, tokenClaim.email())
-                .claim(CLAIM_NAME_ROLE, tokenClaim.role())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(secretKey)
