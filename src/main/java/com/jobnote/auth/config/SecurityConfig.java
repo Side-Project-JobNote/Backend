@@ -1,9 +1,13 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.auth.oauth2.CustomOAuth2FailureHandler;
-import com.jobnote.auth.oauth2.CustomOAuth2SuccessHandler;
-import com.jobnote.auth.oauth2.CustomOAuth2UserService;
+import com.jobnote.auth.filter.LoginFilter;
+import com.jobnote.auth.filter.TokenAuthenticationFilter;
+import com.jobnote.auth.handler.CustomOAuth2FailureHandler;
+import com.jobnote.auth.handler.CustomOAuth2SuccessHandler;
+import com.jobnote.auth.service.CustomOAuth2UserService;
+import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
+import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;

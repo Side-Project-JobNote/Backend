@@ -1,4 +1,4 @@
-package com.jobnote.auth.oauth2;
+package com.jobnote.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.global.util.ResponseUtil;

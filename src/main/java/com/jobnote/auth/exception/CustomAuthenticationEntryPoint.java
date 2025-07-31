@@ -1,4 +1,4 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.global.util.ResponseUtil;

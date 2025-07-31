@@ -1,4 +1,4 @@
-package com.jobnote.auth.oauth2.dto;
+package com.jobnote.auth.dto;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

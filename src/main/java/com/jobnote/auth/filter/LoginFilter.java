@@ -1,7 +1,7 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.auth.security.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.util.ResponseUtil;
 import com.jobnote.domain.user.dto.UserLoginRequest;

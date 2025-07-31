@@ -1,7 +1,7 @@
-package com.jobnote.auth.oauth2;
+package com.jobnote.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.auth.oauth2.dto.CustomOAuth2User;
+import com.jobnote.auth.dto.CustomOAuth2User;
 import com.jobnote.auth.token.TokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

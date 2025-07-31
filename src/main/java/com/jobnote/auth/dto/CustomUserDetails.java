@@ -1,4 +1,4 @@
-package com.jobnote.auth.security.dto;
+package com.jobnote.auth.dto;
 
 import com.jobnote.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;

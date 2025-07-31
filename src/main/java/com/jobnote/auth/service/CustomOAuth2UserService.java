@@ -1,7 +1,7 @@
-package com.jobnote.auth.oauth2;
+package com.jobnote.auth.service;
 
-import com.jobnote.auth.oauth2.dto.CustomOAuth2User;
-import com.jobnote.auth.oauth2.dto.OAuth2Attributes;
+import com.jobnote.auth.dto.CustomOAuth2User;
+import com.jobnote.auth.dto.OAuth2Attributes;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
