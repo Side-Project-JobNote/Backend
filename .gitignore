@@ -37,6 +37,4 @@ out/
 .vscode/
 
 ### Properties ###
-application-jwt.yml
-application-security.yml
-application-mail.yml
+application-secret.yml

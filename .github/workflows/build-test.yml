@@ -11,15 +11,6 @@ jobs:
     permissions:
       contents: read
 
-    env:
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_ACCESS_TOKEN_EXPIRATION_TIME: ${{ secrets.JWT_ACCESS_TOKEN_EXPIRATION_TIME }}
-      JWT_REFRESH_TOKEN_EXPIRATION_TIME: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRATION_TIME }}
-      SPRING_MAIL_HOST: ${{ secrets.MAIL_HOST }}
-      SPRING_MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      SPRING_MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-      SPRING_MAIL_PORT: ${{ secrets.MAIL_PORT }}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +19,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Set up Application Secret YML
+        run: echo "${{ secrets.APPLICATION_SECRET }}" | base64 --decode > src/main/resources/application-secret.yml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
