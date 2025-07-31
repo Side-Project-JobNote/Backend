@@ -1,0 +1,124 @@
+package com.jobnote.auth.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobnote.JobnoteApplicationTests;
+import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.dto.UserLoginRequest;
+import com.jobnote.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import static com.jobnote.global.common.ResponseCode.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+class LoginFilterApplicationTest extends JobnoteApplicationTests {
+
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
+
+    private User savedUser;
+
+    private final String LOGIN_URI = "/api/v1/users/login";
+    private final String CORRECT_EMAIL = "testCorrectEmail@test.com";
+    private final String CORRECT_PASSWORD = "testCorrectPassword";
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+
+        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, bCryptPasswordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+    }
+
+    @Nested
+    @DisplayName("로그인")
+    class Login {
+        @Test
+        @DisplayName("성공 - 토큰 발급")
+        void success_IssueToken() throws Exception {
+            // given
+            UserLoginRequest request = new UserLoginRequest(CORRECT_EMAIL, CORRECT_PASSWORD);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(post(LOGIN_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)));
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.userId").value(savedUser.getId()))
+                    .andExpect(jsonPath("$.data.accessToken").isString())
+                    .andExpect(jsonPath("$.data.refreshToken").isString());
+        }
+
+        @Nested
+        @DisplayName("실패 - 토큰 미발급")
+        class Fail {
+
+            @Test
+            @DisplayName("잘못된 이메일")
+            void fail_NotIssueToken_InvalidEmail() throws Exception {
+                // given
+                final String WRONG_EMAIL = "testWrongEmail@test.com";
+                UserLoginRequest request = new UserLoginRequest(WRONG_EMAIL, CORRECT_PASSWORD);
+
+                // when
+                ResultActions resultActions = mockMvc.perform(post(LOGIN_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)));
+
+                // then
+                resultActions
+                        .andExpect(status().isUnauthorized())
+                        .andExpect(jsonPath("$.data").isEmpty())
+                        .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));
+            }
+
+            @Test
+            @DisplayName("잘못된 비밀번호")
+            void fail_NotIssueToken_InvalidPassword() throws Exception {
+                // given
+                final String WRONG_PASSWORD = "testWrongPassword ";
+                UserLoginRequest request = new UserLoginRequest(CORRECT_EMAIL, WRONG_PASSWORD);
+
+                // when
+                ResultActions resultActions = mockMvc.perform(post(LOGIN_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)));
+
+                // then
+                resultActions
+                        .andExpect(status().isUnauthorized())
+                        .andExpect(jsonPath("$.data").isEmpty())
+                        .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));
+            }
+        }
+    }
+}

@@ -23,14 +23,17 @@ class TokenProviderTest {
     @DisplayName("JWT 토큰 생성에 성공한다")
     void generateToken_Success() {
         // given
-        final long userId = 1L;
-        final String role = "ROLE_USER";
+        TokenClaim tokenClaim = TokenClaim.builder()
+                .userId(1L)
+                .email("testEmail@email.com")
+                .role("ROLE_USER")
+                .build();
 
         // when
-        Token token = tokenProvider.issueToken(userId, role);
+        Token token = tokenProvider.issueToken(tokenClaim);
 
         // then
-        verify(jwtProvider, times(1)).generateAccessToken(userId, role);
+        verify(jwtProvider, times(1)).generateAccessToken(tokenClaim);
         verify(jwtProvider, times(1)).generateRefreshToken();
     }
 }

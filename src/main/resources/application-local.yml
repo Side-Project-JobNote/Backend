@@ -1,12 +1,4 @@
 spring:
-  application:
-    name: jobnote
-
-  profiles:
-    group:
-      local: jwt, mail
-      test: jwt, mail
-
   datasource:
     url: jdbc:h2:mem:testdb
     username: sa
@@ -22,4 +14,4 @@ spring:
         format_sql: true
 
 app:
-  email-verification-path: /api/v1/users/verify
+  base-url: http://localhost:8080

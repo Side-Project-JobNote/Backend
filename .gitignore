@@ -39,3 +39,4 @@ out/
 ### Properties ###
 application-jwt.yml
 application-security.yml
+application-mail.yml

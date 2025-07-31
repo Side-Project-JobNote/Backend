@@ -24,6 +24,8 @@ public enum ResponseCode {
     MALFORMED_TOKEN(HttpStatus.UNAUTHORIZED, "4013", "잘못된 토큰 형식입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "4014", "지원하지 않는 토큰 형식입니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 액세스 토큰입니다."),
+    INVALID_USERNAME_PASSWORD(HttpStatus.UNAUTHORIZED, "4016", "아이디 또는 비밀번호가 잘못되었습니다."),
+    EXPIRED_VERIFICATION_TOKEN(HttpStatus.UNAUTHORIZED, "4017", "만료된 이메일 검증 토큰입니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, "4030", "요청 리소스에 대한 액세스가 금지되었습니다."),
@@ -33,15 +35,19 @@ public enum ResponseCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "4041", "해당 사용자를 찾을 수 없습니다."),
     NOT_FOUND_APPLICATION_FORM(HttpStatus.NOT_FOUND, "4042", "해당 지원서를 찾을 수 없습니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "4043", "해당 일정을 찾을 수 없습니다."),
+    NOT_FOUND_VERIFICATION_TOKEN(HttpStatus.NOT_FOUND, "4044", "해당 이메일 검증 토큰을 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),
 
     // 409 Conflict
     CONFLICT(HttpStatus.CONFLICT, "4090", "요청이 서버의 상태와 충돌했습니다."),
+    DUPLICATED_USER_NICKNAME(HttpStatus.CONFLICT, "4091", "이미 사용중인 닉네임입니다."),
+    DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, "4091", "이미 가입된 이메일입니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "서버에 에러가 발생했습니다."),
+    UNABLE_TO_SEND_MAIL(HttpStatus.INTERNAL_SERVER_ERROR, "5001", "메일을 전송하지 못했습니다."),
     ;
 
     private final HttpStatus status;

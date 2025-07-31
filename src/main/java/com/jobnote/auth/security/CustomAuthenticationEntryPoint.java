@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -20,7 +19,6 @@ import static com.jobnote.global.common.Constants.CHARACTER_ENCODING;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
@@ -28,9 +26,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException {
         final JobNoteException e = (JobNoteException) request.getAttribute(ATTRIBUTE_EXCEPTION);
-        log.error("AuthenticationException: ", e);
+        final ResponseCode responseCode = e == null ? ResponseCode.FORBIDDEN : e.getResponseCode();
 
-        final ResponseCode responseCode = e.getResponseCode();
+        log.error("AuthenticationException: ", e == null ? authException : e);
+
         response.setStatus(responseCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
