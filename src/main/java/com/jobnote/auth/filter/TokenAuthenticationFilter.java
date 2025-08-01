@@ -6,7 +6,6 @@ import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.exception.JobNoteException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.jobnote.global.common.Constants.*;
-import static com.jobnote.global.common.ResponseCode.INVALID_ACCESS_TOKEN;
+import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
+import static com.jobnote.global.util.CookieUtil.getCookie;
 
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -30,15 +30,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         try {
-            final String accessToken = getCookie(request, COOKIE_NAME_ACCESS_TOKEN)
-                    .orElseThrow(() -> new JobNoteException(INVALID_ACCESS_TOKEN))
-                    .getValue();
-
-            final String email = tokenProvider.getEmailFromPayload(accessToken)
-                    .orElseThrow(() -> new JobNoteException(INVALID_ACCESS_TOKEN));
-
-            setAuthentication((CustomUserDetails) customUserDetailsService.loadUserByUsername(email));
-
+            if (URI_USER_REISSUE.equals(request.getRequestURI())) {
+                validateRefreshToken(request);
+            } else {
+                authenticate(request);
+            }
         } catch (JobNoteException e) {
             request.setAttribute(ATTRIBUTE_EXCEPTION, e);
         }
@@ -46,10 +42,23 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<Cookie> getCookie(final HttpServletRequest request, final String name) {
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> name.equals(cookie.getName()))
-                .findFirst();
+    private void validateRefreshToken(final HttpServletRequest request) {
+        final String refreshToken = getCookie(request, COOKIE_NAME_REFRESH_TOKEN)
+                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
+                .getValue();
+
+        tokenProvider.validateRefreshToken(refreshToken);
+    }
+
+    private void authenticate(final HttpServletRequest request) {
+        final String accessToken = getCookie(request, COOKIE_NAME_ACCESS_TOKEN)
+                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
+                .getValue();
+
+        final String email = tokenProvider.getEmailFromPayload(accessToken)
+                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN));
+
+        setAuthentication((CustomUserDetails) customUserDetailsService.loadUserByUsername(email));
     }
 
     private void setAuthentication(final CustomUserDetails customUserDetails) {

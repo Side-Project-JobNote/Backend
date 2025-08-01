@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.jobnote.global.common.Constants.*;
+import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN_TYPE;
 
 @Component
 class JwtProvider {
@@ -56,19 +57,24 @@ class JwtProvider {
         return generateRefreshToken(jwtProperties.refreshToken().expirationTime());
     }
 
-    public Claims getTokenPayload(final String token) {
+    public Claims validateAndGetTokenPayload(final String token, final String expectedTokenType) {
         try {
-            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+            Claims payload = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+            String tokenType = payload.get(CLAIM_NAME_TOKEN_TYPE, String.class);
+            if (!expectedTokenType.equals(tokenType)) {
+                throw new JobNoteException(INVALID_TOKEN_TYPE);
+            }
+            return payload;
         } catch (SignatureException e) {
             throw new JobNoteException(ResponseCode.INVALID_TOKEN_SIGNATURE);
         } catch (ExpiredJwtException e) {
-            throw new JobNoteException(ResponseCode.EXPIRED_ACCESS_TOKEN);
+            throw new JobNoteException(ResponseCode.EXPIRED_TOKEN);
         } catch (MalformedKeyException e) {
             throw new JobNoteException(ResponseCode.MALFORMED_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw new JobNoteException(ResponseCode.UNSUPPORTED_TOKEN);
         } catch (JwtException e) {
-            throw new JobNoteException(ResponseCode.INVALID_ACCESS_TOKEN);
+            throw new JobNoteException(ResponseCode.INVALID_TOKEN);
         }
     }
 }

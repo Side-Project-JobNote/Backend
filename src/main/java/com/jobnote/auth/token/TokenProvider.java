@@ -29,7 +29,11 @@ public class TokenProvider {
     }
 
     public Optional<String> getEmailFromPayload(final String token) {
-        return Optional.of(jwtProvider.getTokenPayload(token).get(CLAIM_NAME_EMAIL, String.class));
+        return Optional.of(jwtProvider.validateAndGetTokenPayload(token, CLAIM_VALUE_ACCESS_TOKEN).get(CLAIM_NAME_EMAIL, String.class));
+    }
+
+    public void validateRefreshToken(final String refreshToken) {
+        jwtProvider.validateAndGetTokenPayload(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
     }
 
     public void responseToken(final HttpServletResponse response, final ObjectMapper objectMapper, final String email) throws IOException {
