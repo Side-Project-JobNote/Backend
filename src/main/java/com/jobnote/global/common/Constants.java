@@ -2,19 +2,38 @@ package com.jobnote.global.common;
 
 public abstract class Constants {
 
+    // uri
+    public static final String URI_USER_SIGNUP = "/api/v1/users/signup";
+    public static final String URI_USER_REISSUE = "/api/v1/users/reissue";
+    public static final String URI_USER_VERIFY = "/api/v1/users/verify";
+    public static final String URI_USER_LOGIN = "/login/**";
+    public static final String URI_USER_OAUTH2 = "/oauth2/**";
+    public static final String URI_H2_CONSOLE = "/h2-console/**";
+
+    // claim
     public static final String CLAIM_NAME_TOKEN_TYPE = "token";
     public static final String CLAIM_NAME_EMAIL = "email";
     public static final String CLAIM_VALUE_ACCESS_TOKEN = "ACCESS_TOKEN";
     public static final String CLAIM_VALUE_REFRESH_TOKEN = "REFRESH_TOKEN";
-    public static final String AUTHORIZATION_TYPE_BEARER = "Bearer ";
+
+    // header
     public static final String CHARACTER_ENCODING = "UTF-8";
+
+    // http request
     public static final String ATTRIBUTE_EXCEPTION = "exception";
+
+    // cookie
+    public static final String COOKIE_NAME_ACCESS_TOKEN = "access_token";
+    public static final String COOKIE_NAME_REFRESH_TOKEN = "refresh_token";
+    public static final String COOKIE_PATH_ACCESS_TOKEN = "/";
+    public static final String COOKIE_PATH_REFRESH_TOKEN = URI_USER_REISSUE;
+
+    // whitelist
     public static final String[] WHITELIST = {
-            "/api/v1/users/signup",
-            "/api/v1/users/reissue",
-            "/api/v1/users/verify",
-            "/login/**",
-            "/oauth2/**",
-            "/h2-console/**"
+            URI_USER_SIGNUP,
+            URI_USER_VERIFY,
+            URI_USER_LOGIN,
+            URI_USER_OAUTH2,
+            URI_H2_CONSOLE
     };
 }

@@ -23,6 +23,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
-        tokenProvider.responseToken(response, objectMapper, principal.getUserId(), principal.getEmail());
+        tokenProvider.responseToken(response, objectMapper, principal.getEmail());
     }
 }

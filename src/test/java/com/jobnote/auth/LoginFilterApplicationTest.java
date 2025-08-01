@@ -10,10 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.jobnote.global.common.Constants.COOKIE_NAME_ACCESS_TOKEN;
+import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
 import static com.jobnote.global.common.ResponseCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
@@ -56,9 +57,8 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
             // then
             resultActions
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.userId").value(savedUser.getId()))
-                    .andExpect(jsonPath("$.data.accessToken").isString())
-                    .andExpect(jsonPath("$.data.refreshToken").isString());
+                    .andExpect(cookie().exists(COOKIE_NAME_ACCESS_TOKEN))
+                    .andExpect(cookie().exists(COOKIE_NAME_REFRESH_TOKEN));
         }
 
         @Nested

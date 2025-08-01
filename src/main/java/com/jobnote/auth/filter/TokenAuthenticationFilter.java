@@ -6,14 +6,13 @@ import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.exception.JobNoteException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -31,8 +30,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         try {
-            final String accessToken = parseBearerToken(request)
-                    .orElseThrow(() -> new JobNoteException(INVALID_ACCESS_TOKEN));
+            final String accessToken = getCookie(request, COOKIE_NAME_ACCESS_TOKEN)
+                    .orElseThrow(() -> new JobNoteException(INVALID_ACCESS_TOKEN))
+                    .getValue();
 
             final String email = tokenProvider.getEmailFromPayload(accessToken)
                     .orElseThrow(() -> new JobNoteException(INVALID_ACCESS_TOKEN));
@@ -46,10 +46,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> parseBearerToken(final HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
-                .filter(value -> StringUtils.hasText(value) && value.startsWith(AUTHORIZATION_TYPE_BEARER))
-                .map(value -> value.substring(AUTHORIZATION_TYPE_BEARER.length()));
+    private Optional<Cookie> getCookie(final HttpServletRequest request, final String name) {
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> name.equals(cookie.getName()))
+                .findFirst();
     }
 
     private void setAuthentication(final CustomUserDetails customUserDetails) {

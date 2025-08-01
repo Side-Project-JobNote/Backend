@@ -6,6 +6,7 @@ import com.jobnote.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.*;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,7 +19,9 @@ import static com.jobnote.global.common.Constants.*;
 @Component
 class JwtProvider {
 
+    @Getter
     private final JwtProperties jwtProperties;
+
     private final SecretKey secretKey;
 
     JwtProvider(final JwtProperties jwtProperties) {

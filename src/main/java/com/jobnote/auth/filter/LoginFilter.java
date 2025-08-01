@@ -47,7 +47,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException {
         final CustomUserDetails principal = (CustomUserDetails) authResult.getPrincipal();
-        tokenProvider.responseToken(response, objectMapper, principal.getUserId(), principal.getUsername());
+        tokenProvider.responseToken(response, objectMapper, principal.getUsername());
     }
 
     @Override
