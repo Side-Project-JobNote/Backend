@@ -1,6 +1,6 @@
 package com.jobnote.auth.config;
 
-import com.jobnote.auth.security.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;

@@ -1,6 +1,6 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.service;
 
-import com.jobnote.auth.security.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

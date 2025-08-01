@@ -1,6 +1,13 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobnote.auth.filter.LoginFilter;
+import com.jobnote.auth.filter.TokenAuthenticationFilter;
+import com.jobnote.auth.handler.CustomOAuth2FailureHandler;
+import com.jobnote.auth.handler.CustomOAuth2SuccessHandler;
+import com.jobnote.auth.service.CustomOAuth2UserService;
+import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
+import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +18,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,6 +35,9 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -44,10 +55,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable);
 
         http
+                .headers(header -> header
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+
+        http
                 .formLogin(AbstractHttpConfigurer::disable);
 
         http
                 .httpBasic(AbstractHttpConfigurer::disable);
+
+        http
+                .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customOAuth2SuccessHandler)
+                        .failureHandler(customOAuth2FailureHandler));
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
@@ -56,13 +78,12 @@ public class SecurityConfig {
                         .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
 
         final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, objectMapper);
-        loginFilter.setFilterProcessesUrl("/api/v1/users/login");
 
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
-                .addFilterBefore(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
+                .addFilterAfter(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

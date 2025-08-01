@@ -1,5 +1,6 @@
 package com.jobnote.domain.user.repository;
 
+import com.jobnote.domain.user.domain.SocialProvider;
 import com.jobnote.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +10,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(final String email);
     boolean existsByNickname(final String nickname);
     boolean existsByEmail(final String email);
+    Optional<User> findBySocialProviderAndSocialId(final SocialProvider socialProvider, final String socialId);
 }

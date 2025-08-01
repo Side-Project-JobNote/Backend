@@ -1,4 +1,4 @@
-package com.jobnote.auth.security.dto;
+package com.jobnote.auth.dto;
 
 import com.jobnote.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    public Long getId() {
+    public Long getUserId() {
         return user.getId();
     }
 }

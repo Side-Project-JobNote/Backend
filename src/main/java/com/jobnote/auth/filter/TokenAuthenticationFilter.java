@@ -1,6 +1,7 @@
-package com.jobnote.auth.security;
+package com.jobnote.auth.filter;
 
-import com.jobnote.auth.security.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.exception.JobNoteException;
 import jakarta.servlet.FilterChain;

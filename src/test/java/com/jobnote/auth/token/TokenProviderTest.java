@@ -24,9 +24,7 @@ class TokenProviderTest {
     void generateToken_Success() {
         // given
         TokenClaim tokenClaim = TokenClaim.builder()
-                .userId(1L)
                 .email("testEmail@email.com")
-                .role("ROLE_USER")
                 .build();
 
         // when

@@ -20,10 +20,8 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     private String nickname;
 
     private String avatarUrl;
@@ -32,11 +30,28 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    private String socialEmail;
+
+    @Enumerated(EnumType.STRING)
+    private SocialProvider socialProvider;
+
+    private String socialId;
+
     public static User signUp(final String email, final String password, final String nickname) {
         return User.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
+                .role(UserRole.GUEST)
+                .build();
+    }
+
+    public static User socialSignUp(final String email, final String socialEmail, final SocialProvider socialProvider, final String socialId) {
+        return User.builder()
+                .email(email)
+                .socialEmail(socialEmail)
+                .socialProvider(socialProvider)
+                .socialId(socialId)
                 .role(UserRole.GUEST)
                 .build();
     }

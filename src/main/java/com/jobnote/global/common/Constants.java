@@ -3,9 +3,7 @@ package com.jobnote.global.common;
 public abstract class Constants {
 
     public static final String CLAIM_NAME_TOKEN_TYPE = "token";
-    public static final String CLAIM_NAME_USER_ID = "userId";
     public static final String CLAIM_NAME_EMAIL = "email";
-    public static final String CLAIM_NAME_ROLE = "role";
     public static final String CLAIM_VALUE_ACCESS_TOKEN = "ACCESS_TOKEN";
     public static final String CLAIM_VALUE_REFRESH_TOKEN = "REFRESH_TOKEN";
     public static final String AUTHORIZATION_TYPE_BEARER = "Bearer ";
@@ -13,8 +11,10 @@ public abstract class Constants {
     public static final String ATTRIBUTE_EXCEPTION = "exception";
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/users/login",
             "/api/v1/users/reissue",
             "/api/v1/users/verify",
+            "/login/**",
+            "/oauth2/**",
+            "/h2-console/**"
     };
 }
