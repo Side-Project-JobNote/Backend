@@ -1,7 +1,7 @@
 package com.jobnote.auth.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.dto.CustomOAuth2User;
+import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,11 +18,13 @@ import java.io.IOException;
 public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
-    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
-        tokenProvider.responseToken(response, objectMapper, principal.getEmail());
+        final CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
+        final TokenClaim tokenClaim = TokenClaim.builder()
+                .email(principal.getEmail())
+                .build();
+        tokenProvider.responseToken(response, tokenProvider.issueToken(tokenClaim));
     }
 }

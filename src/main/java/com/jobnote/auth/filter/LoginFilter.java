@@ -2,6 +2,7 @@ package com.jobnote.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.util.ResponseUtil;
 import com.jobnote.domain.user.dto.UserLoginRequest;
@@ -47,7 +48,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException {
         final CustomUserDetails principal = (CustomUserDetails) authResult.getPrincipal();
-        tokenProvider.responseToken(response, objectMapper, principal.getUsername());
+        final TokenClaim tokenClaim = TokenClaim.builder()
+                .email(principal.getUsername())
+                .build();
+        tokenProvider.responseToken(response, tokenProvider.issueToken(tokenClaim));
     }
 
     @Override
