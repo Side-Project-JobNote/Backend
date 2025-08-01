@@ -15,7 +15,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.jobnote.global.common.Constants.*;
-import static com.jobnote.global.util.ResponseUtil.createResponseCookie;
+import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 
 @RequiredArgsConstructor
 @Component

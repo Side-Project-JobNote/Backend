@@ -19,7 +19,7 @@ import java.util.*;
 
 import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
-import static com.jobnote.global.util.CookieUtil.getCookie;
+import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
 
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -43,19 +43,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validateRefreshToken(final HttpServletRequest request) {
-        final String refreshToken = getCookie(request, COOKIE_NAME_REFRESH_TOKEN)
-                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
-                .getValue();
-
-        tokenProvider.validateRefreshToken(refreshToken);
+        tokenProvider.validateRefreshToken(getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
     }
 
     private void authenticate(final HttpServletRequest request) {
-        final String accessToken = getCookie(request, COOKIE_NAME_ACCESS_TOKEN)
-                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
-                .getValue();
-
-        final String email = tokenProvider.getEmailFromPayload(accessToken)
+        final String email = tokenProvider.getEmailFromPayload(getTokenFromCookie(request, COOKIE_NAME_ACCESS_TOKEN))
                 .orElseThrow(() -> new JobNoteException(INVALID_TOKEN));
 
         setAuthentication(email);

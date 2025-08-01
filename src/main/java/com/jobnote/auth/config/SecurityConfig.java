@@ -40,6 +40,7 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final CustomLogoutHandler customLogoutHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -91,7 +92,7 @@ public class SecurityConfig {
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper)));
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
 
         http
                 .sessionManagement(session -> session.

@@ -9,7 +9,6 @@ import com.jobnote.domain.user.service.AuthTokenService;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
-import com.jobnote.global.exception.JobNoteException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -21,8 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
-import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
-import static com.jobnote.global.util.CookieUtil.getCookie;
+import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -50,11 +48,7 @@ public class UserController {
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        final String refreshToken = getCookie(request, COOKIE_NAME_REFRESH_TOKEN)
-                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
-                .getValue();
-
-        final Token token = authTokenService.reissue(principal.getUserId(), refreshToken);
+        final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
 
         tokenProvider.responseToken(response, token);
 
