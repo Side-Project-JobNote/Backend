@@ -48,7 +48,7 @@ public class UserController {
     }
 
     /* TOKEN REISSUE */
-    @GetMapping("/reissue")
+    @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         final String refreshToken = getCookie(request, COOKIE_NAME_REFRESH_TOKEN)
                 .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
