@@ -8,7 +8,7 @@ import com.jobnote.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_ACCESS_TOKEN;
@@ -26,7 +26,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     private User savedUser;
 
@@ -36,7 +36,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
     @BeforeEach
     void setUp() {
-        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, bCryptPasswordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
+        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, passwordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
     }
 
     @AfterEach
