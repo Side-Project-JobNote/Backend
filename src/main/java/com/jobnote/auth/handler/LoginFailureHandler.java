@@ -25,10 +25,10 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        if (URI_USER_LOGIN.startsWith(request.getRequestURI())) {
+        if (URI_USER_LOGIN.equals(request.getRequestURI())) {
             ResponseUtil.responseError(response, objectMapper, INVALID_USERNAME_PASSWORD);
         }
-        if (URI_USER_OAUTH2.startsWith(request.getRequestURI())) {
+        if (request.getRequestURI().startsWith(URI_USER_OAUTH2)) {
             ResponseUtil.responseError(response, objectMapper, UNAUTHORIZED_SOCIAL_LOGIN);
         }
     }

@@ -3,12 +3,9 @@ package com.jobnote.global.common;
 public abstract class Constants {
 
     // uri
-    public static final String URI_USER_SIGNUP = "/api/v1/users/signup";
     public static final String URI_USER_REISSUE = "/api/v1/users/reissue";
-    public static final String URI_USER_VERIFY = "/api/v1/users/verify";
-    public static final String URI_USER_LOGIN = "/login/**";
-    public static final String URI_USER_OAUTH2 = "/oauth2/**";
-    public static final String URI_H2_CONSOLE = "/h2-console/**";
+    public static final String URI_USER_LOGIN = "/login";
+    public static final String URI_USER_OAUTH2 = "/oauth2/authorization";
 
     // claim
     public static final String CLAIM_NAME_TOKEN_TYPE = "token";
@@ -30,10 +27,10 @@ public abstract class Constants {
 
     // whitelist
     public static final String[] WHITELIST = {
-            URI_USER_SIGNUP,
-            URI_USER_VERIFY,
-            URI_USER_LOGIN,
-            URI_USER_OAUTH2,
-            URI_H2_CONSOLE
+            "/api/v1/users/signup",
+            "/api/v1/users/verify",
+            "/login**",
+            "/oauth2/**",
+            "/h2-console/**"
     };
 }
