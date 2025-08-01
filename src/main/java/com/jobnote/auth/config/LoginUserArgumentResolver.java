@@ -1,6 +1,6 @@
 package com.jobnote.auth.config;
 
-import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -21,9 +21,9 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isCustomUserDetailsClass = CustomUserDetails.class.equals(parameter.getParameterType());
+        boolean isCustomPrincipalClass = CustomPrincipal.class.equals(parameter.getParameterType());
 
-        return isLoginUserAnnotation && isCustomUserDetailsClass;
+        return isLoginUserAnnotation && isCustomPrincipalClass;
     }
 
     @Override

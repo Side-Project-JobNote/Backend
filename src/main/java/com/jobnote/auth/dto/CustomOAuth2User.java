@@ -1,28 +1,39 @@
 package com.jobnote.auth.dto;
 
+import com.jobnote.domain.user.domain.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 @Getter
-public class CustomOAuth2User extends DefaultOAuth2User {
+public class CustomOAuth2User extends CustomPrincipal implements OAuth2User {
 
-    private final Long userId;
-    private final String email;
-    /**
-     * Constructs a {@code DefaultOAuth2User} using the provided parameters.
-     *
-     * @param authorities      the authorities granted to the user
-     * @param attributes       the attributes about the user
-     * @param nameAttributeKey the key used to access the user's &quot;name&quot; from
-     *                         {@link #getAttributes()}
-     */
-    public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes, String nameAttributeKey, final Long userId, final String email) {
-        super(authorities, attributes, nameAttributeKey);
-        this.userId = userId;
-        this.email = email;
+    private final User user;
+    private final OAuth2Attributes oAuth2Attributes;
+
+    public CustomOAuth2User(final User user, final OAuth2Attributes oAuth2Attributes) {
+        super(user.getId(), user.getEmail());
+        this.user = user;
+        this.oAuth2Attributes = oAuth2Attributes;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return oAuth2Attributes.getAttributes();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey()));
+    }
+
+    @Override
+    public String getName() {
+        return oAuth2Attributes.getProviderId();
     }
 }

@@ -1,7 +1,6 @@
 package com.jobnote.auth.dto;
 
 import com.jobnote.domain.user.domain.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +8,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails extends CustomPrincipal implements UserDetails {
 
     private final User user;
+
+    public CustomUserDetails(final User user) {
+        super(user.getId(), user.getEmail());
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -27,9 +30,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
-    }
-
-    public Long getUserId() {
-        return user.getId();
     }
 }

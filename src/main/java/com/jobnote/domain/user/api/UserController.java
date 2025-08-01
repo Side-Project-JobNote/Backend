@@ -1,7 +1,7 @@
 package com.jobnote.domain.user.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
@@ -49,12 +49,12 @@ public class UserController {
 
     /* TOKEN REISSUE */
     @GetMapping("/reissue")
-    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomUserDetails userDetails, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         final String refreshToken = getCookie(request, COOKIE_NAME_REFRESH_TOKEN)
                 .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
                 .getValue();
 
-        final Token token = authTokenService.reissue(userDetails.getUserId(), refreshToken);
+        final Token token = authTokenService.reissue(principal.getUserId(), refreshToken);
 
         tokenProvider.responseToken(response, token);
 
