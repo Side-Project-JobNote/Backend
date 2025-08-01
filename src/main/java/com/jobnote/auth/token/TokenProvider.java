@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.jobnote.global.common.Constants.*;
@@ -35,6 +37,13 @@ public class TokenProvider {
 
     public void validateRefreshToken(final String refreshToken) {
         jwtProvider.validateAndGetTokenPayload(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
+    }
+
+    public LocalDateTime getExpiration(final String token, final String tokenType) {
+        return jwtProvider.validateAndGetTokenPayload(token, tokenType).getExpiration()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
     public void responseToken(final HttpServletResponse response, final Token token) throws IOException {
