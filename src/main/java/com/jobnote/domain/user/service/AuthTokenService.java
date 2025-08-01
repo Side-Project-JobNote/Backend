@@ -26,15 +26,21 @@ public class AuthTokenService {
     private final UserService userService;
 
     @Transactional
-    public Token reissue(final Long userId, final String existingRefreshToken) {
-        validateExistsRefreshToken(existingRefreshToken);
+    public Token saveAndGetToken(final Long userId) {
         final User user = userService.getUserById(userId);
-        refreshTokenRepository.deleteByToken(existingRefreshToken);
         final Token token = issueToken(user.getEmail());
         final LocalDateTime expiration = tokenProvider.getExpiration(token.refreshToken(), CLAIM_VALUE_REFRESH_TOKEN);
         refreshTokenRepository.save(RefreshToken.of(user, token.refreshToken(), expiration));
 
         return token;
+    }
+
+    @Transactional
+    public Token reissue(final Long userId, final String existingRefreshToken) {
+        validateExistsRefreshToken(existingRefreshToken);
+        refreshTokenRepository.deleteByToken(existingRefreshToken);
+
+        return saveAndGetToken(userId);
     }
 
     private Token issueToken(final String email) {

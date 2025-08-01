@@ -3,6 +3,7 @@ package com.jobnote.auth;
 import com.jobnote.JobnoteApplicationTests;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.dto.UserLoginRequest;
+import com.jobnote.domain.user.repository.RefreshTokenRepository;
 import com.jobnote.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     private UserRepository userRepository;
 
     @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private User savedUser;
@@ -37,6 +41,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
     @AfterEach
     void tearDown() {
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
     }
 
