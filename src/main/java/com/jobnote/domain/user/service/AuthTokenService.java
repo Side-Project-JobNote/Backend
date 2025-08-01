@@ -37,10 +37,14 @@ public class AuthTokenService {
 
     @Transactional
     public Token reissue(final Long userId, final String existingRefreshToken) {
-        validateExistsRefreshToken(existingRefreshToken);
-        refreshTokenRepository.deleteByToken(existingRefreshToken);
-
+        invalidate(existingRefreshToken);
         return saveAndGetToken(userId);
+    }
+
+    @Transactional
+    public void invalidate(final String targetRefreshToken) {
+        validateExistsRefreshToken(targetRefreshToken);
+        refreshTokenRepository.deleteByToken(targetRefreshToken);
     }
 
     private Token issueToken(final String email) {
@@ -50,7 +54,7 @@ public class AuthTokenService {
         return tokenProvider.issueToken(tokenClaim);
     }
 
-    private void validateExistsRefreshToken(String existingRefreshToken) {
+    private void validateExistsRefreshToken(final String existingRefreshToken) {
         if (!refreshTokenRepository.existsByToken(existingRefreshToken)) {
             throw new JobNoteException(NOT_FOUND_REFRESH_TOKEN);
         }

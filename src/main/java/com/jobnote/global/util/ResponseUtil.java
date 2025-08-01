@@ -21,6 +21,14 @@ public class ResponseUtil {
         response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofFail(responseCode)));
     }
 
+    public static void responseOk(final HttpServletResponse response, final ObjectMapper objectMapper) throws IOException {
+        final ResponseCode responseCode = ResponseCode.OK;
+        response.setStatus(responseCode.getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(CHARACTER_ENCODING);
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode)));
+    }
+
     public static String createResponseCookie(final String name, final String value, final String path, final int maxAge) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
