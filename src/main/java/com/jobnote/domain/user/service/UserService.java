@@ -12,7 +12,7 @@ import com.jobnote.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final AppProperties appProperties;
 
@@ -51,7 +51,7 @@ public class UserService {
     public void signUp(final UserSignUpRequest request, final LocalDateTime emailVerificationExpiryDate) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
-        User savedUser = userRepository.save(User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname()));
+        User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
         VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), savedUser, emailVerificationExpiryDate);
         verificationTokenRepository.save(verificationToken);
         sendVerificationEmail(savedUser.getEmail(), verificationToken);

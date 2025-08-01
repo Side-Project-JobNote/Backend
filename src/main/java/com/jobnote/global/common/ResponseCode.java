@@ -17,14 +17,15 @@ public enum ResponseCode {
     INVALID_METHOD_ARGUMENT(HttpStatus.BAD_REQUEST, "4001", "입력값 유효성 검증에 실패했습니다."),
     INVALID_SCHEDULE_FORM_ASSOCIATION(HttpStatus.BAD_REQUEST, "4002", "일정이 지정한 지원서에 속하지 않습니다."),
     NOT_SUPPORTED_SOCIAL_PROVIDER(HttpStatus.BAD_REQUEST, "4003", "해당 소셜 로그인은 지원되지 않습니다."),
+    INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "4004", "올바르지 않은 토큰 타입입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
-    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4011", "액세스 토큰이 만료되었습니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "4011", "토큰이 만료되었습니다."),
     INVALID_TOKEN_SIGNATURE(HttpStatus.UNAUTHORIZED, "4012", "유효하지 않은 토큰 서명입니다."),
     MALFORMED_TOKEN(HttpStatus.UNAUTHORIZED, "4013", "잘못된 토큰 형식입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "4014", "지원하지 않는 토큰 형식입니다."),
-    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 액세스 토큰입니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "4015", "유효하지 않은 토큰입니다."),
     INVALID_USERNAME_PASSWORD(HttpStatus.UNAUTHORIZED, "4016", "아이디 또는 비밀번호가 잘못되었습니다."),
     EXPIRED_VERIFICATION_TOKEN(HttpStatus.UNAUTHORIZED, "4017", "만료된 이메일 검증 토큰입니다."),
     UNAUTHORIZED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, "4018", "소셜 로그인 인증에 실패했습니다."),
@@ -38,6 +39,7 @@ public enum ResponseCode {
     NOT_FOUND_APPLICATION_FORM(HttpStatus.NOT_FOUND, "4042", "해당 지원서를 찾을 수 없습니다."),
     NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "4043", "해당 일정을 찾을 수 없습니다."),
     NOT_FOUND_VERIFICATION_TOKEN(HttpStatus.NOT_FOUND, "4044", "해당 이메일 검증 토큰을 찾을 수 없습니다."),
+    NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "4045", "해당 리프레시 토큰을 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),

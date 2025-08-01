@@ -3,8 +3,8 @@ package com.jobnote.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.filter.LoginFilter;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
-import com.jobnote.auth.handler.CustomOAuth2FailureHandler;
-import com.jobnote.auth.handler.CustomOAuth2SuccessHandler;
+import com.jobnote.auth.handler.LoginFailureHandler;
+import com.jobnote.auth.handler.LoginSuccessHandler;
 import com.jobnote.auth.service.CustomOAuth2UserService;
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.service.CustomUserDetailsService;
@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -36,17 +35,12 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
-    private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -68,8 +62,8 @@ public class SecurityConfig {
                 .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(customOAuth2SuccessHandler)
-                        .failureHandler(customOAuth2FailureHandler));
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler));
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
@@ -77,7 +71,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
                         .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
 
-        final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, objectMapper);
+        final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), objectMapper);
+        loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        loginFilter.setAuthenticationFailureHandler(loginFailureHandler);
 
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);

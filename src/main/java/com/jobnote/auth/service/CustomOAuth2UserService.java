@@ -5,14 +5,12 @@ import com.jobnote.auth.dto.OAuth2Attributes;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,13 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         final OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(registrationId, attributes, userNameAttributeName);
         final User user = getUser(oAuth2Attributes);
 
-        return new CustomOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
-                oAuth2Attributes.getAttributes(),
-                oAuth2Attributes.getUserNameAttributeKey(),
-                user.getId(),
-                user.getEmail()
-        );
+        return new CustomOAuth2User(user, oAuth2Attributes);
     }
 
     private User getUser(final OAuth2Attributes oAuth2Attributes) {

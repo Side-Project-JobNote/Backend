@@ -3,17 +3,19 @@ package com.jobnote.auth;
 import com.jobnote.JobnoteApplicationTests;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.dto.UserLoginRequest;
+import com.jobnote.domain.user.repository.RefreshTokenRepository;
 import com.jobnote.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.jobnote.global.common.Constants.COOKIE_NAME_ACCESS_TOKEN;
+import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
 import static com.jobnote.global.common.ResponseCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
@@ -21,7 +23,10 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     private UserRepository userRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private User savedUser;
 
@@ -31,11 +36,12 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
     @BeforeEach
     void setUp() {
-        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, bCryptPasswordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
+        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, passwordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
     }
 
     @AfterEach
     void tearDown() {
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -56,9 +62,8 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
             // then
             resultActions
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.userId").value(savedUser.getId()))
-                    .andExpect(jsonPath("$.data.accessToken").isString())
-                    .andExpect(jsonPath("$.data.refreshToken").isString());
+                    .andExpect(cookie().exists(COOKIE_NAME_ACCESS_TOKEN))
+                    .andExpect(cookie().exists(COOKIE_NAME_REFRESH_TOKEN));
         }
 
         @Nested
