@@ -3,7 +3,6 @@ package com.jobnote.auth;
 import com.jobnote.JobnoteApplicationTests;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.dto.UserLoginRequest;
-import com.jobnote.domain.user.repository.RefreshTokenRepository;
 import com.jobnote.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     private UserRepository userRepository;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    private User savedUser;
 
     private final String LOGIN_URI = "/login";
     private final String CORRECT_EMAIL = "testCorrectEmail@test.com";
@@ -36,13 +30,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
 
     @BeforeEach
     void setUp() {
-        savedUser = userRepository.save(User.signUp(CORRECT_EMAIL, passwordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
-    }
-
-    @AfterEach
-    void tearDown() {
-        refreshTokenRepository.deleteAll();
-        userRepository.deleteAll();
+        userRepository.save(User.signUp(CORRECT_EMAIL, passwordEncoder.encode(CORRECT_PASSWORD), "testNickname"));
     }
 
     @Nested
@@ -85,6 +73,8 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isUnauthorized())
+                        .andExpect(cookie().doesNotExist(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(cookie().doesNotExist(COOKIE_NAME_REFRESH_TOKEN))
                         .andExpect(jsonPath("$.data").isEmpty())
                         .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));
             }
@@ -104,6 +94,8 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isUnauthorized())
+                        .andExpect(cookie().doesNotExist(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(cookie().doesNotExist(COOKIE_NAME_REFRESH_TOKEN))
                         .andExpect(jsonPath("$.data").isEmpty())
                         .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));
             }

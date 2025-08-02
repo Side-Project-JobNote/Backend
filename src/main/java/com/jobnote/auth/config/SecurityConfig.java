@@ -3,6 +3,7 @@ package com.jobnote.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.filter.LoginFilter;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
+import com.jobnote.auth.handler.CustomLogoutHandler;
 import com.jobnote.auth.handler.LoginFailureHandler;
 import com.jobnote.auth.handler.LoginSuccessHandler;
 import com.jobnote.auth.service.CustomOAuth2UserService;
@@ -24,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.jobnote.global.common.Constants.WHITELIST;
+import static com.jobnote.global.util.ResponseUtil.responseOk;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -37,6 +39,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -66,6 +70,11 @@ public class SecurityConfig {
                         .failureHandler(loginFailureHandler));
 
         http
+                .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer
+                        .addLogoutHandler(customLogoutHandler)
+                        .logoutSuccessHandler(((request, response, authentication) -> responseOk(response, objectMapper))));
+
+        http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .requestMatchers(WHITELIST).permitAll()
                         .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
@@ -83,7 +92,7 @@ public class SecurityConfig {
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper)));
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
 
         http
                 .sessionManagement(session -> session.
