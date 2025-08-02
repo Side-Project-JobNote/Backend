@@ -39,12 +39,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         log.error("AuthenticationException: ", e == null ? authException : e);
 
         if (URI_USER_REISSUE.equals(request.getRequestURI())) {
-            response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_ACCESS_TOKEN));
-            response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_REFRESH_TOKEN));
+            response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_ACCESS_TOKEN).toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_REFRESH_TOKEN).toString());
             SecurityContextHolder.clearContext();
 
             if (EXPIRED_TOKEN.equals(responseCode)) {
-                authTokenService.invalidate(getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
+                authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
             }
         }
 

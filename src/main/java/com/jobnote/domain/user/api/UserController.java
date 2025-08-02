@@ -48,7 +48,7 @@ public class UserController {
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-        final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
+        final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
 
         tokenProvider.responseToken(response, token);
 

@@ -22,10 +22,10 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     @Override
     public void logout(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) {
-        authTokenService.invalidate(getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
+        authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
 
-        response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_ACCESS_TOKEN));
-        response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_REFRESH_TOKEN));
+        response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_ACCESS_TOKEN).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, invalidateCookie(COOKIE_NAME_REFRESH_TOKEN).toString());
         SecurityContextHolder.clearContext();
     }
 }

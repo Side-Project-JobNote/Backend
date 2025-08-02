@@ -43,11 +43,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validateRefreshToken(final HttpServletRequest request) {
-        tokenProvider.validateRefreshToken(getTokenFromCookie(request, COOKIE_NAME_REFRESH_TOKEN));
+        tokenProvider.validateRefreshToken(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
     }
 
     private void authenticate(final HttpServletRequest request) {
-        final String email = tokenProvider.getEmailFromPayload(getTokenFromCookie(request, COOKIE_NAME_ACCESS_TOKEN))
+        final String email = tokenProvider.getEmailFromPayload(getTokenFromCookie(request.getCookies(), COOKIE_NAME_ACCESS_TOKEN))
                 .orElseThrow(() -> new JobNoteException(INVALID_TOKEN));
 
         setAuthentication(email);

@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -52,11 +54,12 @@ public class TokenProvider {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(CHARACTER_ENCODING);
 
-        response.addHeader(HttpHeaders.SET_COOKIE,
-                createResponseCookie(COOKIE_NAME_ACCESS_TOKEN, token.accessToken(), COOKIE_PATH_ACCESS_TOKEN, Math.toIntExact(jwtProvider.getJwtProperties().accessToken().expirationTime())));
+        ResponseCookie accessTokenCookie = createResponseCookie(COOKIE_NAME_ACCESS_TOKEN, token.accessToken(), COOKIE_PATH_ACCESS_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().accessToken().expirationTime()));
+        ResponseCookie refreshTokenCookie = createResponseCookie(COOKIE_NAME_REFRESH_TOKEN, token.refreshToken(), COOKIE_PATH_REFRESH_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().refreshToken().expirationTime()));
 
-        response.addHeader(HttpHeaders.SET_COOKIE,
-                createResponseCookie(COOKIE_NAME_REFRESH_TOKEN, token.refreshToken(), COOKIE_PATH_REFRESH_TOKEN, Math.toIntExact(jwtProvider.getJwtProperties().refreshToken().expirationTime())));
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode)));
     }
