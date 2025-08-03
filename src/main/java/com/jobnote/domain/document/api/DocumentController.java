@@ -3,6 +3,8 @@ package com.jobnote.domain.document.api;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.document.dto.DocumentRequest;
+import com.jobnote.domain.document.dto.DocumentResponse;
+import com.jobnote.domain.document.dto.DocumentVersionResponse;
 import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/document")
@@ -20,6 +23,7 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
+    /* CREATE */
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody final DocumentRequest request,
@@ -43,5 +47,36 @@ public class DocumentController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedId).toUri();
 
         return ResponseEntity.created(location).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
+    }
+
+    /* READ */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments(
+            @LoginUser final CustomPrincipal principal
+    ) {
+        List<DocumentResponse> documents = documentService.getAll(principal.getUserId());
+
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+    }
+
+    @GetMapping("/{documentId}")
+    public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> getAllDocumentVersions(
+            @PathVariable final Long documentId,
+            @LoginUser final CustomPrincipal principal
+    ) {
+        List<DocumentVersionResponse> documents = documentService.getAllVersions(documentId, principal.getUserId());
+
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+    }
+
+    /* DELETE */
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
+            @PathVariable final Long documentId,
+            @LoginUser final CustomPrincipal principal
+    ) {
+        documentService.deleteDocument(principal.getUserId(), documentId);
+
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 }

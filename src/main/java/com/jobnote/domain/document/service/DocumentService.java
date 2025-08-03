@@ -3,6 +3,8 @@ package com.jobnote.domain.document.service;
 import com.jobnote.domain.document.domain.Document;
 import com.jobnote.domain.document.domain.DocumentVersion;
 import com.jobnote.domain.document.dto.DocumentRequest;
+import com.jobnote.domain.document.dto.DocumentResponse;
+import com.jobnote.domain.document.dto.DocumentVersionResponse;
 import com.jobnote.domain.document.repository.DocumentRepository;
 import com.jobnote.domain.document.repository.DocumentVersionRepository;
 import com.jobnote.domain.user.domain.User;
@@ -11,6 +13,8 @@ import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_DOCUMENT;
 
@@ -59,6 +63,26 @@ public class DocumentService {
         DocumentVersion savedDocumentVersion = documentVersionRepository.save(documentVersion);
 
         return savedDocumentVersion.getId();
+    }
+
+    public List<DocumentResponse> getAll(final Long userId) {
+        return documentRepository.findAllByUserId(userId).stream()
+                .map(DocumentResponse::from).toList();
+    }
+
+    public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {
+        return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId);
+    }
+
+    @Transactional
+    public void deleteDocument(final Long userId, final Long documentId) {
+        Document document = getByIdOrThrow(documentId);
+        document.validateOwner(userId);
+
+        //todo s3에서 문서 삭제
+//        List<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByDocumentId(document.getId());
+
+        documentRepository.delete(document);
     }
 
     /* HELPER METHOD */
