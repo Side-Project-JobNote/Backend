@@ -8,10 +8,7 @@ import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -24,11 +21,24 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @PostMapping("/upload")
-    public ResponseEntity<ApiResponse<Void>> uploadDocument(
-            @RequestBody DocumentRequest request,
-            @LoginUser CustomPrincipal principal
+    public ResponseEntity<ApiResponse<Void>> uploadNewDocument(
+            @RequestBody final DocumentRequest request,
+            @LoginUser final CustomPrincipal principal
     ) {
         Long savedId = documentService.uploadNewDocument(principal.getUserId(), request);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedId).toUri();
+
+        return ResponseEntity.created(location).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
+    }
+
+    @PostMapping("/upload/{documentId}")
+    public ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
+            @PathVariable final Long documentId,
+            @RequestBody final DocumentRequest request,
+            @LoginUser final CustomPrincipal principal
+    ) {
+        Long savedId = documentService.uploadNewVersionDocument(principal.getUserId(), documentId, request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedId).toUri();
 

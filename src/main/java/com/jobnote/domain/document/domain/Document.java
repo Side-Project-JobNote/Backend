@@ -3,11 +3,14 @@ package com.jobnote.domain.document.domain;
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.common.BaseTimeEntity;
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.global.exception.JobNoteException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static com.jobnote.global.common.ResponseCode.FORBIDDEN;
 
 @Entity
 @Getter
@@ -42,5 +45,11 @@ public class Document extends BaseTimeEntity {
         this.applicationForm = applicationForm;
         this.type = documentType;
         this.title = title;
+    }
+
+    public void validateOwner(final Long userId) {
+        if (!this.user.getId().equals(userId)) {
+            throw new JobNoteException(FORBIDDEN);
+        }
     }
 }
