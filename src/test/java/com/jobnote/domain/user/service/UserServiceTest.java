@@ -3,18 +3,17 @@ package com.jobnote.domain.user.service;
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
+import com.jobnote.domain.user.dto.SignUpEvent;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
-import com.jobnote.global.config.properties.AppProperties;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.mail.MailService;
-import com.jobnote.mail.dto.MailMessageDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -38,10 +37,7 @@ class UserServiceTest extends ServiceUnitTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Mock
-    private MailService mailService;
-
-    @Mock
-    private AppProperties appProperties;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -66,7 +62,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should().save(any(User.class));
             then(verificationTokenRepository).should().save(any(VerificationToken.class));
-            then(mailService).should().sendMail(any(MailMessageDto.class));
+            then(eventPublisher).should().publishEvent(any(SignUpEvent.class));
         }
 
         @Test
@@ -83,6 +79,8 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
+            then(verificationTokenRepository).should(never()).save(any(VerificationToken.class));
+            then(eventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
 
         @Test
@@ -99,6 +97,8 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
+            then(verificationTokenRepository).should(never()).save(any(VerificationToken.class));
+            then(eventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
     }
 }
