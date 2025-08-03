@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.mail.javamail.*;
@@ -24,6 +25,7 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String username;
 
+    @Async
     public void sendMail(final MailMessageDto mailMessageDto) {
         SimpleMailMessage message = createMailMessage(mailMessageDto);
 
