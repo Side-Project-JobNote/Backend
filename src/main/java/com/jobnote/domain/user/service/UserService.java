@@ -5,11 +5,10 @@ import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
-import com.jobnote.global.config.properties.AppProperties;
+import com.jobnote.domain.user.dto.SignUpEvent;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.mail.MailService;
-import com.jobnote.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,8 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MailService mailService;
-    private final AppProperties appProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
@@ -48,13 +46,13 @@ public class UserService {
 
     /* SIGN UP */
     @Transactional
-    public void signUp(final UserSignUpRequest request, final LocalDateTime emailVerificationExpiryDate) {
+    public void signUp(final UserSignUpRequest request, final LocalDateTime verificationExpiryDate) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), savedUser, emailVerificationExpiryDate);
-        verificationTokenRepository.save(verificationToken);
-        sendVerificationEmail(savedUser.getEmail(), verificationToken);
+        VerificationToken savedVerificationToken = verificationTokenRepository.save(VerificationToken.create(UUID.randomUUID().toString(), savedUser, verificationExpiryDate));
+
+        eventPublisher.publishEvent(new SignUpEvent(savedUser, savedVerificationToken));
     }
 
     /* EMAIL VERIFICATION */
@@ -94,22 +92,5 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new JobNoteException(DUPLICATED_USER_EMAIL);
         }
-    }
-
-    private void sendVerificationEmail(final String email, final VerificationToken verificationToken) {
-        final String link = appProperties.baseUrl() + appProperties.emailVerificationPath() + "?token=" + verificationToken.getToken();
-        final String subject = "JobNote 회원가입 이메일 인증";
-        final String text = String.format("""
-                JobNote를 이용해주셔서 감사합니다.
-                아래 이메일 인증 링크를 클릭하여 회원가입을 완료해 주세요.
-                감사합니다.
-                %s
-                """, link);
-        MailMessageDto mailMessageDto = MailMessageDto.builder()
-                .to(email)
-                .subject(subject)
-                .text(text)
-                .build();
-        mailService.sendMail(mailMessageDto);
     }
 }
