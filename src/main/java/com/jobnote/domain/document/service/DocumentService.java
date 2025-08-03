@@ -71,7 +71,8 @@ public class DocumentService {
     }
 
     public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {
-        return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId);
+        return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
+                .map(DocumentVersionResponse::from).toList();
     }
 
     @Transactional
