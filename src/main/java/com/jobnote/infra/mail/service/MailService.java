@@ -1,7 +1,7 @@
-package com.jobnote.mail;
+package com.jobnote.infra.mail.service;
 
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.mail.dto.MailMessageDto;
+import com.jobnote.infra.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +9,12 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.mail.javamail.*;
 
 import static com.jobnote.global.common.ResponseCode.UNABLE_TO_SEND_MAIL;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class MailService {
 

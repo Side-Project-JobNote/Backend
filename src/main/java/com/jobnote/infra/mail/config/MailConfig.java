@@ -1,4 +1,4 @@
-package com.jobnote.domain.config;
+package com.jobnote.infra.mail.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

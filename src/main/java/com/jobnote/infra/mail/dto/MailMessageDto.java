@@ -1,4 +1,4 @@
-package com.jobnote.mail.dto;
+package com.jobnote.infra.mail.dto;
 
 import lombok.Builder;
 
