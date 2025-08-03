@@ -26,9 +26,9 @@ public class AuthTokenService {
     private final UserService userService;
 
     @Transactional
-    public Token saveAndGetToken(final Long userId) {
+    public Token issue(final Long userId) {
         final User user = userService.getUserById(userId);
-        final Token token = issueToken(user.getEmail());
+        final Token token = tokenProvider.issueToken(TokenClaim.builder().email(user.getEmail()).build());
         final LocalDateTime expiration = tokenProvider.getExpiration(token.refreshToken(), CLAIM_VALUE_REFRESH_TOKEN);
         refreshTokenRepository.save(RefreshToken.of(user, token.refreshToken(), expiration));
 
@@ -38,20 +38,13 @@ public class AuthTokenService {
     @Transactional
     public Token reissue(final Long userId, final String existingRefreshToken) {
         invalidate(existingRefreshToken);
-        return saveAndGetToken(userId);
+        return issue(userId);
     }
 
     @Transactional
     public void invalidate(final String targetRefreshToken) {
         validateExistsRefreshToken(targetRefreshToken);
         refreshTokenRepository.deleteByToken(targetRefreshToken);
-    }
-
-    private Token issueToken(final String email) {
-        final TokenClaim tokenClaim = TokenClaim.builder()
-                .email(email)
-                .build();
-        return tokenProvider.issueToken(tokenClaim);
     }
 
     private void validateExistsRefreshToken(final String existingRefreshToken) {

@@ -28,7 +28,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private void responseToken(final HttpServletResponse response, final Long userId) throws IOException {
-        final Token token = authTokenService.saveAndGetToken(userId);
+        final Token token = authTokenService.issue(userId);
         tokenProvider.responseToken(response, token);
     }
 }
