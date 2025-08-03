@@ -35,7 +35,7 @@ public class S3Service {
 
     private PresignedFileResponse generatePresignedFileResponse(final Long  userId, final PresignedFileRequest request) {
         String key = createUniqueFileName(userId, request.fileName());
-        return new PresignedFileResponse(request.fileName(), generatePresignedUrl(key, request.fileType()), generateFileUrl(key));
+        return new PresignedFileResponse(request.fileName(), generatePresignedUrl(key, request.contentType()), generateFileUrl(key));
     }
 
     private URL generatePresignedUrl(final String key, final String contentType) {
