@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/document")
+@RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
 public class DocumentController {
 
