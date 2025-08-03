@@ -50,10 +50,13 @@ class UserServiceTest extends ServiceUnitTest {
         void success() {
             // given
             final UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
-            final User user = User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname());
+            final User user = mock(User.class);
+            final VerificationToken verificationToken = mock(VerificationToken.class);
             given(userRepository.existsByEmail(request.email())).willReturn(false);
             given(userRepository.existsByNickname(request.nickname())).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
+            given(verificationTokenRepository.save(any(VerificationToken.class))).willReturn(verificationToken);
+            willDoNothing().given(eventPublisher).publishEvent(any(SignUpEvent.class));
 
             // when
             userService.signUp(request, LocalDateTime.now());
