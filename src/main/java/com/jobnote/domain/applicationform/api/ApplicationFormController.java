@@ -1,16 +1,15 @@
 package com.jobnote.domain.applicationform.api;
 
+import com.jobnote.auth.config.LoginUser;
+import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
-import com.jobnote.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,17 +22,14 @@ import java.util.List;
 public class ApplicationFormController {
 
     private final ApplicationFormService applicationFormService;
-    private final UserService userService;
 
     /* CREATE */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid final ApplicationFormRequest request,
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        //todo 추후 CustomUserDetails 구현 후 User id 값으로 받아올 예정
-        Long userId = userService.getUserIdFromUserDetails(user);
-        Long savedFormId = applicationFormService.save(userId, request);
+        Long savedFormId = applicationFormService.save(principal.getUserId(), request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedFormId).toUri();
 
@@ -44,20 +40,18 @@ public class ApplicationFormController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ApplicationFormResponse>> getApplicationForm(
             @PathVariable("id") final Long formId,
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        Long userId = userService.getUserIdFromUserDetails(user);
-        ApplicationFormResponse form = applicationFormService.getById(userId, formId);
+        ApplicationFormResponse form = applicationFormService.getById(principal.getUserId(), formId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, form));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ApplicationFormResponse>>> getAllApplicationForms(
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        Long userId = userService.getUserIdFromUserDetails(user);
-        List<ApplicationFormResponse> forms = applicationFormService.getAll(userId);
+        List<ApplicationFormResponse> forms = applicationFormService.getAll(principal.getUserId());
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, forms));
     }
@@ -67,10 +61,9 @@ public class ApplicationFormController {
     public ResponseEntity<ApiResponse<Void>> updateApplicationForm(
             @PathVariable("id") final Long formId,
             @Valid @RequestBody final ApplicationFormRequest request,
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        Long userId = userService.getUserIdFromUserDetails(user);
-        applicationFormService.update(userId, formId, request);
+        applicationFormService.update(principal.getUserId(), formId, request);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
@@ -79,10 +72,9 @@ public class ApplicationFormController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteApplicationForm(
             @PathVariable("id") final Long formId,
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        Long userId = userService.getUserIdFromUserDetails(user);
-        applicationFormService.delete(userId, formId);
+        applicationFormService.delete(principal.getUserId(), formId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
