@@ -13,6 +13,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN_TYPE;
@@ -46,6 +47,7 @@ class JwtProvider {
 
     public String generateRefreshToken(final long expirationTime) {
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .claim(CLAIM_NAME_TOKEN_TYPE, CLAIM_VALUE_REFRESH_TOKEN)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
