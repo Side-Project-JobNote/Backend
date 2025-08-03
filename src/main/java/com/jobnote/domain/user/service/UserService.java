@@ -52,7 +52,7 @@ public class UserService {
         User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
         VerificationToken savedVerificationToken = verificationTokenRepository.save(VerificationToken.create(UUID.randomUUID().toString(), savedUser, verificationExpiryDate));
 
-        eventPublisher.publishEvent(new SignUpEvent(savedUser, savedVerificationToken));
+        eventPublisher.publishEvent(new SignUpEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
     }
 
     /* EMAIL VERIFICATION */
