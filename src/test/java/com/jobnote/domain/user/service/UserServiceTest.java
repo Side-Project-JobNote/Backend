@@ -2,6 +2,7 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.SignUpEvent;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
@@ -17,9 +18,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
-import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
+import static com.jobnote.global.common.ResponseCode.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -102,6 +104,68 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should(never()).save(any(User.class));
             then(verificationTokenRepository).should(never()).save(any(VerificationToken.class));
             then(eventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증")
+    class VerifyEmail {
+        @Test
+        @DisplayName("성공 - 회원의 Role은 MEMBER가 된다")
+        void success() {
+            // given
+            final String token = "testToken";
+            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 3, 15, 26, 0);
+            final VerificationToken verificationToken = VerificationToken.create(token, user, expiryDate);
+
+            given(verificationTokenRepository.findByToken(token)).willReturn(Optional.of(verificationToken));
+
+            // when
+            userService.verifyEmail(token, expiryDate.minusDays(1));
+
+            // then
+            then(verificationTokenRepository).should().findByToken(token);
+            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+        }
+
+        @Test
+        @DisplayName("실패 - 검증 토큰이 DB에 존재하지 않으면 NOT_FOUND_VERIFICATION_TOKEN 예외를 발생한다")
+        void fail_NotFound_VerificationToken() {
+            // given
+            final String token = "testToken";
+            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 3, 15, 26, 0);
+
+            given(verificationTokenRepository.findByToken(token)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.verifyEmail(token, expiryDate.minusDays(1)))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(NOT_FOUND_VERIFICATION_TOKEN.getMessage());
+
+            then(verificationTokenRepository).should().findByToken(token);
+            assertThat(user.getRole()).isEqualTo(UserRole.GUEST);
+        }
+
+        @Test
+        @DisplayName("실패 - 검증 토큰이 만료되면 EXPIRED_VERIFICATION_TOKEN 예외를 발생한다")
+        void fail_Expired_VerificationToken() {
+            // given
+            final String token = "testToken";
+            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 3, 15, 26, 0);
+            final VerificationToken verificationToken = VerificationToken.create(token, user, expiryDate);
+
+            given(verificationTokenRepository.findByToken(token)).willReturn(Optional.of(verificationToken));
+
+            // when & then
+            assertThatThrownBy(() -> userService.verifyEmail(token, expiryDate.plusDays(1)))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(EXPIRED_VERIFICATION_TOKEN.getMessage());
+
+            then(verificationTokenRepository).should().findByToken(token);
+            assertThat(user.getRole()).isEqualTo(UserRole.GUEST);
         }
     }
 }

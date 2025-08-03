@@ -60,15 +60,12 @@ public class UserService {
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_VERIFICATION_TOKEN));
-        User user = verificationToken.getUser();
 
         if (verificationToken.validateExpiration(currentDate)) {
-            verificationTokenRepository.delete(verificationToken);
             throw new JobNoteException(EXPIRED_VERIFICATION_TOKEN);
         }
 
-        user.accept();
-        verificationTokenRepository.delete(verificationToken);
+        verificationToken.getUser().accept();
     }
 
     /* HELPER METHOD */
