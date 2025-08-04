@@ -63,4 +63,9 @@ public class User extends BaseTimeEntity {
     public void accept() {
         this.role = UserRole.MEMBER;
     }
+
+    public void acceptSocial(final String nickname) {
+        this.nickname = nickname;
+        this.accept();
+    }
 }

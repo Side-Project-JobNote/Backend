@@ -31,7 +31,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
 
         if (UserRole.GUEST.getKey().equals(principal.getRole())) {
-            ResponseUtil.responseError(response, objectMapper, ResponseCode.NOT_YET_SIGNED_UP);
+            responseTokenAndError(response, principal.getUserId());
             return;
         }
 
@@ -41,5 +41,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private void responseToken(final HttpServletResponse response, final Long userId) throws IOException {
         final Token token = authTokenService.saveAndGetToken(userId);
         tokenProvider.responseToken(response, token);
+    }
+
+    private void responseTokenAndError(final HttpServletResponse response, final Long userId) throws IOException {
+        final Token token = authTokenService.saveAndGetToken(userId);
+        tokenProvider.addTokenToCookie(response, token);
+        ResponseUtil.responseError(response, objectMapper, ResponseCode.NOT_YET_SIGNED_UP);
     }
 }
