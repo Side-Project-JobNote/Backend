@@ -22,7 +22,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.jobnote.global.common.Constants.WHITELIST;
+import static com.jobnote.domain.user.domain.UserRole.*;
+import static com.jobnote.domain.user.domain.UserRole.GUEST;
+import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.util.ResponseUtil.responseOk;
 
 @RequiredArgsConstructor
@@ -77,8 +79,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .requestMatchers(WHITELIST).permitAll()
-                        .requestMatchers("/api/*/admin/**").hasRole(UserRole.ADMIN.name())
-                        .anyRequest().hasAnyRole(UserRole.MEMBER.name(), UserRole.ADMIN.name()));
+                        .requestMatchers("/api/*/admin/**").hasRole(ADMIN.name())
+                        .requestMatchers(ONLY_GUEST).hasRole(GUEST.name())
+                        .anyRequest().hasAnyRole(MEMBER.name(), ADMIN.name()));
 
         final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), objectMapper);
         loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
