@@ -3,9 +3,7 @@ package com.jobnote.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.filter.LoginFilter;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
-import com.jobnote.auth.handler.CustomLogoutHandler;
-import com.jobnote.auth.handler.LoginFailureHandler;
-import com.jobnote.auth.handler.LoginSuccessHandler;
+import com.jobnote.auth.handler.*;
 import com.jobnote.auth.service.CustomOAuth2UserService;
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.service.CustomUserDetailsService;
@@ -39,6 +37,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomLogoutHandler customLogoutHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
@@ -66,8 +66,8 @@ public class SecurityConfig {
                 .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(loginSuccessHandler)
-                        .failureHandler(loginFailureHandler));
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler));
 
         http
                 .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer

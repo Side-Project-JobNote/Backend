@@ -12,16 +12,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.jobnote.global.common.ResponseCode.INVALID_USERNAME_PASSWORD;
+import static com.jobnote.global.common.ResponseCode.UNAUTHORIZED_SOCIAL_LOGIN;
 
 @RequiredArgsConstructor
 @Component
-public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        ResponseUtil.responseError(response, objectMapper, INVALID_USERNAME_PASSWORD);
+        ResponseUtil.responseError(response, objectMapper, UNAUTHORIZED_SOCIAL_LOGIN);
     }
 }
