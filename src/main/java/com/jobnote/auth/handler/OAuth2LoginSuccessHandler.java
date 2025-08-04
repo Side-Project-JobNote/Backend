@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Component
-public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
     private final AuthTokenService authTokenService;
@@ -31,7 +31,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
 
         if (UserRole.GUEST.getKey().equals(principal.getRole())) {
-            ResponseUtil.responseError(response, objectMapper, ResponseCode.PENDING_EMAIL_VERIFICATION);
+            ResponseUtil.responseError(response, objectMapper, ResponseCode.NOT_YET_SIGNED_UP);
             return;
         }
 
