@@ -15,13 +15,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(final String email);
     Optional<User> findBySocialProviderAndSocialId(final SocialProvider socialProvider, final String socialId);
 
-    default User getById(final Long id) {
-        return this.findById(id)
-                .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
+    default User getByIdOrThrow(final Long id) {
+        return findById(id).orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
 
-    default User getByEmail(final String email) {
-        return this.findByEmail(email)
-                .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
+    default User getByEmailOrThrow(final String email) {
+        return findByEmail(email).orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
 }

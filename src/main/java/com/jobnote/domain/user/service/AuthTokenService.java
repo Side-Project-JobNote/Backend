@@ -28,7 +28,7 @@ public class AuthTokenService {
 
     @Transactional
     public Token saveAndGetToken(final Long userId) {
-        final User user = userRepository.getById(userId);
+        final User user = userRepository.getByIdOrThrow(userId);
         final Token token = issueToken(user.getEmail());
         final LocalDateTime expiration = tokenProvider.getExpiration(token.refreshToken(), CLAIM_VALUE_REFRESH_TOKEN);
         refreshTokenRepository.save(RefreshToken.of(user, token.refreshToken(), expiration));
