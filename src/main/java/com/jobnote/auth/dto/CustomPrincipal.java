@@ -14,4 +14,6 @@ public abstract class CustomPrincipal {
     private final String email;
 
     public abstract Collection<? extends GrantedAuthority> getAuthorities();
+
+    public abstract String getRole();
 }

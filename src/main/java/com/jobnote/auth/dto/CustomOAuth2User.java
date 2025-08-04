@@ -33,6 +33,11 @@ public class CustomOAuth2User extends CustomPrincipal implements OAuth2User {
     }
 
     @Override
+    public String getRole() {
+        return getAuthorities().iterator().next().getAuthority();
+    }
+
+    @Override
     public String getName() {
         return oAuth2Attributes.getProviderId();
     }
