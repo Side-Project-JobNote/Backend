@@ -2,6 +2,7 @@ package com.jobnote.domain.applicationform.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.domain.applicationform.api.ApplicationFormApi;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
@@ -19,11 +20,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/application-forms")
 @RequiredArgsConstructor
-public class ApplicationFormController {
+public class ApplicationFormController implements ApplicationFormApi {
 
     private final ApplicationFormService applicationFormService;
 
     /* CREATE */
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid final ApplicationFormRequest request,
@@ -37,6 +39,7 @@ public class ApplicationFormController {
     }
 
     /* READ */
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ApplicationFormResponse>> getApplicationForm(
             @PathVariable("id") final Long formId,
@@ -47,6 +50,7 @@ public class ApplicationFormController {
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, form));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<ApplicationFormResponse>>> getAllApplicationForms(
             @LoginUser final CustomPrincipal principal
@@ -57,6 +61,7 @@ public class ApplicationFormController {
     }
 
     /* UPDATE */
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateApplicationForm(
             @PathVariable("id") final Long formId,
@@ -69,6 +74,7 @@ public class ApplicationFormController {
     }
 
     /* DELETE */
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteApplicationForm(
             @PathVariable("id") final Long formId,

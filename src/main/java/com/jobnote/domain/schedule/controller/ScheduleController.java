@@ -4,6 +4,7 @@ import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
+import com.jobnote.domain.schedule.api.ScheduleApi;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
@@ -20,12 +21,13 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/v1/application-forms/{formId}/schedules")
 @RequiredArgsConstructor
-public class ScheduleController {
+public class ScheduleController implements ScheduleApi {
 
     private final ScheduleService scheduleService;
     private final ApplicationFormService applicationFormService;
 
     /* CREATE */
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createSchedule(
             @PathVariable Long formId,
@@ -42,6 +44,7 @@ public class ScheduleController {
     }
 
     /* READ */
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ScheduleResponse>> getSchedule(
             @PathVariable Long formId,
@@ -54,6 +57,7 @@ public class ScheduleController {
     }
 
     /* UPDATE */
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateSchedule(
             @PathVariable Long formId,
@@ -67,6 +71,7 @@ public class ScheduleController {
     }
 
     /* DELETE */
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSchedule(
             @PathVariable Long formId,
