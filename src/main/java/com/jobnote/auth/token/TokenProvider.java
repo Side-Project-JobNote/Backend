@@ -1,12 +1,10 @@
 package com.jobnote.auth.token;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.global.common.ApiResponse;
-import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.util.ResponseUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
@@ -49,18 +47,15 @@ public class TokenProvider {
     }
 
     public void responseToken(final HttpServletResponse response, final Token token) throws IOException {
-        final ResponseCode responseCode = ResponseCode.OK;
-        response.setStatus(responseCode.getStatus().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(CHARACTER_ENCODING);
+        addTokenToCookie(response, token);
+        ResponseUtil.responseOk(response, objectMapper);
+    }
 
+    public void addTokenToCookie(final HttpServletResponse response, final Token token) {
         ResponseCookie accessTokenCookie = createResponseCookie(COOKIE_NAME_ACCESS_TOKEN, token.accessToken(), COOKIE_PATH_ACCESS_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().accessToken().expirationTime()));
         ResponseCookie refreshTokenCookie = createResponseCookie(COOKIE_NAME_REFRESH_TOKEN, token.refreshToken(), COOKIE_PATH_REFRESH_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().refreshToken().expirationTime()));
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.ofSuccess(responseCode)));
     }
 }

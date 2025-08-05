@@ -2,6 +2,7 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
+import com.jobnote.domain.user.dto.SocialSignUpRequest;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
@@ -55,6 +56,14 @@ public class UserService {
         VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), savedUser, emailVerificationExpiryDate);
         verificationTokenRepository.save(verificationToken);
         sendVerificationEmail(savedUser.getEmail(), verificationToken);
+    }
+
+    /* SOCIAL LOGIN SIGN UP */
+    @Transactional
+    public void socialSignUp(final SocialSignUpRequest request, final Long userId) {
+        validateDuplicatedNickname(request.nickname());
+        final User user = getUserById(userId);
+        user.acceptSocial(request.nickname());
     }
 
     /* EMAIL VERIFICATION */

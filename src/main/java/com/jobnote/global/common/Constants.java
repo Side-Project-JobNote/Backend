@@ -4,8 +4,6 @@ public abstract class Constants {
 
     // uri
     public static final String URI_USER_REISSUE = "/api/v1/users/reissue";
-    public static final String URI_USER_LOGIN = "/login";
-    public static final String URI_USER_OAUTH2 = "/oauth2/authorization";
 
     // claim
     public static final String CLAIM_NAME_TOKEN_TYPE = "token";
@@ -28,9 +26,14 @@ public abstract class Constants {
     // whitelist
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/users/verify",
-            "/login**",
+            "/login/**",
             "/oauth2/**",
-            "/h2-console/**"
+            "/h2-console/**",
+            "/error/**",
+    };
+
+    public static final String[] ONLY_GUEST = {
+            "/api/v1/users/signup/social",
+            "/api/v1/users/verify"
     };
 }

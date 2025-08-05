@@ -32,6 +32,8 @@ public enum ResponseCode {
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, "4030", "요청 리소스에 대한 액세스가 금지되었습니다."),
+    PENDING_EMAIL_VERIFICATION(HttpStatus.FORBIDDEN, "4031", "이메일 인증이 완료되지 않았습니다."),
+    NOT_YET_SIGNED_UP(HttpStatus.FORBIDDEN, "4032", "회원가입 절차가 완료되지 않았습니다."),
 
     // 404 Not Found
     NOT_FOUND(HttpStatus.NOT_FOUND, "4040", "요청 리소스를 찾을 수 없습니다."),

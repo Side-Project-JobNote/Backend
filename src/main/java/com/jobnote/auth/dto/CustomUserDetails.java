@@ -23,6 +23,11 @@ public class CustomUserDetails extends CustomPrincipal implements UserDetails {
     }
 
     @Override
+    public String getRole() {
+        return getAuthorities().iterator().next().getAuthority();
+    }
+
+    @Override
     public String getPassword() {
         return user.getPassword();
     }

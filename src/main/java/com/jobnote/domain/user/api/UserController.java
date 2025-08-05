@@ -4,6 +4,7 @@ import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
+import com.jobnote.domain.user.dto.SocialSignUpRequest;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.service.AuthTokenService;
 import com.jobnote.domain.user.service.UserService;
@@ -36,6 +37,13 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> signUp(@RequestBody @Valid final UserSignUpRequest request) {
         userService.signUp(request, LocalDateTime.now().plusDays(1));
         return ResponseEntity.status(ResponseCode.CREATED.getStatus()).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
+    }
+
+    /* SOCIAL LOGIN SIGN UP */
+    @PostMapping("/signup/social")
+    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomPrincipal principal) {
+        userService.socialSignUp(request, principal.getUserId());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
     /* EMAIL VERIFICATION */
