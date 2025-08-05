@@ -5,6 +5,7 @@ import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.SocialSignUpRequest;
+import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.service.AuthTokenService;
 import com.jobnote.domain.user.service.UserService;
@@ -61,5 +62,12 @@ public class UserController {
         tokenProvider.responseToken(response, token);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
+    /* GET PROFILE */
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(@LoginUser final CustomPrincipal principal) {
+        final UserProfileResponse response = userService.getProfile(principal.getUserId());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
 }
