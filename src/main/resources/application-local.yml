@@ -16,6 +16,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        highlight_sql: true
+
+logging:
+  level:
+    org:
+      hibernate.orm.jdbc.bind: trace
+      springframework.web: debug
 
 app:
   base-url: http://localhost:8080
+  frontend:
+    base-url: http://localhost:5173
