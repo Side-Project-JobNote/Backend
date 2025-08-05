@@ -41,7 +41,7 @@ public class UserController {
 
     /* SOCIAL LOGIN SIGN UP */
     @PostMapping("/signup/social")
-    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomPrincipal principal, final HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomPrincipal principal) {
         userService.socialSignUp(request, principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
