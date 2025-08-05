@@ -3,6 +3,7 @@ package com.jobnote.domain.user.service;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.SocialSignUpRequest;
+import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
@@ -82,13 +83,18 @@ public class UserService {
         verificationTokenRepository.delete(verificationToken);
     }
 
+    public UserProfileResponse getProfile(final Long userId) {
+        final User user = getUserById(userId);
+        return UserProfileResponse.from(user);
+    }
+
     /* HELPER METHOD */
-    public User getByIdOrThrow(final Long id) {
+    private User getByIdOrThrow(final Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
 
-    public User getByEmailOrThrow(final String email) {
+    private User getByEmailOrThrow(final String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
