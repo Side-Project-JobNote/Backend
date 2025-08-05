@@ -1,4 +1,4 @@
-package com.jobnote.domain.document.api;
+package com.jobnote.domain.document.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;

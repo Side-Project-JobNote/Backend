@@ -1,4 +1,4 @@
-package com.jobnote.domain.schedule.api;
+package com.jobnote.domain.schedule.controller;
 
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
