@@ -62,7 +62,7 @@ public class UserService {
     @Transactional
     public void socialSignUp(final SocialSignUpRequest request, final Long userId) {
         validateDuplicatedNickname(request.nickname());
-        final User user = userRepository.getByIdOrThrow(userId);
+        final User user = getUserById(userId);
         user.acceptSocial(request.nickname());
     }
 
