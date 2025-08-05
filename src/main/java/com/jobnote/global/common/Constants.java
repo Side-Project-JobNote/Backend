@@ -26,10 +26,10 @@ public abstract class Constants {
     // whitelist
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/users/verify",
-            "/login**",
+            "/login/**",
             "/oauth2/**",
-            "/h2-console/**"
+            "/h2-console/**",
+            "/error/**",
     };
 
     public static final String[] ONLY_GUEST = {
