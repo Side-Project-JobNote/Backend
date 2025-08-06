@@ -2,9 +2,7 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
-import com.jobnote.domain.user.dto.SocialSignUpRequest;
-import com.jobnote.domain.user.dto.UserProfileResponse;
-import com.jobnote.domain.user.dto.UserSignUpRequest;
+import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
 import com.jobnote.global.config.properties.AppProperties;
@@ -83,8 +81,25 @@ public class UserService {
         verificationTokenRepository.delete(verificationToken);
     }
 
+    /* GET PROFILE */
     public UserProfileResponse getProfile(final Long userId) {
         final User user = getUserById(userId);
+        return UserProfileResponse.from(user);
+    }
+
+    /* UPDATE PROFILE */
+    @Transactional
+    public UserProfileResponse updateAvatar(final Long userId, final UserAvatarRequest request) {
+        final User user = getUserById(userId);
+        user.updateAvatar(request.avatarUrl());
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public UserProfileResponse updateNickname(final Long userId, final UserNicknameRequest request) {
+        validateDuplicatedNickname(request.nickname());
+        final User user = getUserById(userId);
+        user.updateNickname(request.nickname());
         return UserProfileResponse.from(user);
     }
 

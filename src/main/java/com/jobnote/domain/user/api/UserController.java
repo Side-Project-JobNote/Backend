@@ -4,9 +4,7 @@ import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
-import com.jobnote.domain.user.dto.SocialSignUpRequest;
-import com.jobnote.domain.user.dto.UserProfileResponse;
-import com.jobnote.domain.user.dto.UserSignUpRequest;
+import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.user.service.AuthTokenService;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
@@ -68,6 +66,19 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(@LoginUser final CustomPrincipal principal) {
         final UserProfileResponse response = userService.getProfile(principal.getUserId());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
+    }
+
+    /* UPDATE PROFILE */
+    @PatchMapping("/avatar")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomPrincipal principal, @RequestBody @Valid UserAvatarRequest request) {
+        final UserProfileResponse response = userService.updateAvatar(principal.getUserId(), request);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
+    }
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateNickname(@LoginUser final CustomPrincipal principal, @RequestBody @Valid UserNicknameRequest request) {
+        final UserProfileResponse response = userService.updateNickname(principal.getUserId(), request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
 }
