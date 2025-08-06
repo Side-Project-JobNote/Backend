@@ -4,7 +4,6 @@ import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.infra.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
@@ -21,11 +20,8 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
-    private String username;
-
     public void sendMail(final MailMessageDto mailMessageDto) {
-        SimpleMailMessage message = createMailMessage(mailMessageDto);
+        final SimpleMailMessage message = createMailMessage(mailMessageDto);
 
         try {
             mailSender.send(message);
@@ -36,8 +32,8 @@ public class MailService {
     }
 
     private SimpleMailMessage createMailMessage(final MailMessageDto mailMessageDto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(username);
+        final SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailMessageDto.from());
         message.setTo(mailMessageDto.to());
         message.setSubject(mailMessageDto.subject());
         message.setText(mailMessageDto.text());
