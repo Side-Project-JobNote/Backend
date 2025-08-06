@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.mail.javamail.*;
@@ -20,6 +21,7 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
+    @Async
     public void sendMail(final MailMessageDto mailMessageDto) {
         final SimpleMailMessage message = createMailMessage(mailMessageDto);
 
