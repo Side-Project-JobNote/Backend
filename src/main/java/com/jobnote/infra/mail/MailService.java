@@ -1,7 +1,7 @@
-package com.jobnote.mail;
+package com.jobnote.infra.mail;
 
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.mail.dto.MailMessageDto;
+import com.jobnote.infra.mail.dto.MailMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
