@@ -91,6 +91,7 @@ public class UserService {
     }
 
     /* UPDATE PROFILE */
+    @Transactional
     public UserProfileResponse updateAvatar(final Long userId, final UserAvatarRequest request) {
         final User user = getUserById(userId);
         user.updateAvatar(request.avatarUrl());
