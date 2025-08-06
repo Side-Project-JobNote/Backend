@@ -65,11 +65,15 @@ public class User extends BaseTimeEntity {
     }
 
     public void acceptSocial(final String nickname) {
-        this.nickname = nickname;
+        updateNickname(nickname);
         this.accept();
     }
 
     public void updateAvatar(final String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public void updateNickname(final String nickname) {
+        this.nickname = nickname;
     }
 }
