@@ -27,6 +27,7 @@ public class DocumentVersion extends BaseTimeEntity {
     private String fileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
     @Builder

@@ -68,7 +68,7 @@ public class DocumentController implements DocumentApi {
             @PathVariable final Long documentId,
             @LoginUser final CustomPrincipal principal
     ) {
-        List<DocumentVersionResponse> documents = documentService.getAllVersions(documentId, principal.getUserId());
+        List<DocumentVersionResponse> documents = documentService.getAllVersions(principal.getUserId(), documentId);
         DocumentVersionListResponse listResponse = DocumentVersionListResponse.from(documents);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
