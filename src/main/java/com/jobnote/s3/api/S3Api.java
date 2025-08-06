@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "S3", description = "AWS S3 파일 API")
 public interface S3Api {
 
-    @Operation(summary = "PresignedUrl 획득")
+    @Operation(summary = "PresignedUrl 획득",
+               description = "파일 업로드 방법<br>" +
+                       "POST presigned로 받은 presignedUrl에 PUT으로 파일을 업로드합니다.<br>" +
+                       "이후 GET fileUrl으로 파일을 다운로드합니다.")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
                     responseClass = PresignedFileResponse.class,
