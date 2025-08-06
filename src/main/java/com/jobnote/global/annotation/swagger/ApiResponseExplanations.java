@@ -8,7 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiResponseExplanations {
-
     ApiSuccessResponseExplanation success() default @ApiSuccessResponseExplanation();
 
     ApiErrorResponseExplanation[] errors() default {};

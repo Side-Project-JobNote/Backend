@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SwaggerConfig {
 
-	private final ApiSuccessResponseHandler apiSuccessResponseHandler;
-	private final ApiErrorResponseHandler apiErrorResponseHandler;
+    private final ApiSuccessResponseHandler apiSuccessResponseHandler;
+    private final ApiErrorResponseHandler apiErrorResponseHandler;
 
     @Bean
     public OpenAPI openAPI() {
@@ -28,22 +28,22 @@ public class SwaggerConfig {
                 .info(info());
     }
 
-	@Bean
-	public OperationCustomizer customize() {
-		return (Operation operation, HandlerMethod handlerMethod) -> {
-			apiSuccessResponseHandler.handleApiSuccessResponse(operation, handlerMethod);
-			apiErrorResponseHandler.handleApiErrorResponse(operation, handlerMethod);
-			return operation;
-		};
-	}
+    @Bean
+    public OperationCustomizer customize() {
+        return (Operation operation, HandlerMethod handlerMethod) -> {
+            apiSuccessResponseHandler.handleApiSuccessResponse(operation, handlerMethod);
+            apiErrorResponseHandler.handleApiErrorResponse(operation, handlerMethod);
+            return operation;
+        };
+    }
 
-	@PostConstruct
-	public void customizeLocalDateTime() {
-		SpringDocUtils.getConfig().replaceWithSchema(LocalDateTime.class,
-				new StringSchema()
-						.example("2025-08-06T00:00:00")
-						.format("date-time"));
-	}
+    @PostConstruct
+    public void customizeLocalDateTime() {
+        SpringDocUtils.getConfig().replaceWithSchema(LocalDateTime.class,
+                new StringSchema()
+                        .example("2025-08-06T00:00:00")
+                        .format("date-time"));
+    }
 
     private Info info() {
         return new Info()

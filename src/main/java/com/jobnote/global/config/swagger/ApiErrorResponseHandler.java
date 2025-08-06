@@ -23,74 +23,78 @@ import lombok.Getter;
 @Component
 public class ApiErrorResponseHandler {
 
-	public void handleApiErrorResponse(Operation operation, HandlerMethod handlerMethod) {
-		ApiResponseExplanations apiResponseExplanations
-			= handlerMethod.getMethodAnnotation(ApiResponseExplanations.class);
+    public void handleApiErrorResponse(
+            Operation operation,
+            HandlerMethod handlerMethod
+    ) {
+        ApiResponseExplanations apiResponseExplanations = handlerMethod.getMethodAnnotation(ApiResponseExplanations.class);
 
-		if (apiResponseExplanations != null) {
-			generateResponseCodeResponseExample(operation, Arrays.asList(apiResponseExplanations.errors()));
-		}
-	}
+        if (apiResponseExplanations != null) {
+            generateResponseCodeResponseExample(operation, Arrays.asList(apiResponseExplanations.errors()));
+        }
+    }
 
-	private void generateResponseCodeResponseExample(Operation operation,
-		List<ApiErrorResponseExplanation> apiErrorResponseExamples) {
-		ApiResponses responses = operation.getResponses();
+    private void generateResponseCodeResponseExample(
+            Operation operation,
+            List<ApiErrorResponseExplanation> apiErrorResponseExamples
+    ) {
+        ApiResponses responses = operation.getResponses();
 
-		Map<Integer, List<ExampleHolder>> statusWithExampleHolders = apiErrorResponseExamples.stream()
-			.map(this::createExampleHolder)
-			.collect(Collectors.groupingBy(ExampleHolder::getHttpStatusCode));
+        Map<Integer, List<ExampleHolder>> statusWithExampleHolders = apiErrorResponseExamples.stream()
+                .map(this::createExampleHolder)
+                .collect(Collectors.groupingBy(ExampleHolder::getHttpStatusCode));
 
-		addExamplesToResponses(responses, statusWithExampleHolders);
-	}
+        addExamplesToResponses(responses, statusWithExampleHolders);
+    }
 
-	private ExampleHolder createExampleHolder(ApiErrorResponseExplanation apiErrorResponseExample) {
-		ResponseCode responseCode = apiErrorResponseExample.exceptionCode();
-		return ExampleHolder.builder()
-			.httpStatusCode(responseCode.getStatus().value())
-			.name(responseCode.name())
-			.errorCode(responseCode.getCode())
-			.description(responseCode.getMessage())
-			.holder(createSwaggerExample(responseCode, responseCode.getMessage()))
-			.build();
-	}
+    private ExampleHolder createExampleHolder(ApiErrorResponseExplanation apiErrorResponseExample) {
+        ResponseCode responseCode = apiErrorResponseExample.exceptionCode();
+        return ExampleHolder.builder()
+                .httpStatusCode(responseCode.getStatus().value())
+                .name(responseCode.name())
+                .errorCode(responseCode.getCode())
+                .description(responseCode.getMessage())
+                .holder(createSwaggerExample(responseCode, responseCode.getMessage()))
+                .build();
+    }
 
-	private Example createSwaggerExample(ResponseCode responseCode, String description) {
-		com.jobnote.global.common.ApiResponse<Object> apiResponse
-			= com.jobnote.global.common.ApiResponse.ofFail(responseCode);
+    private Example createSwaggerExample(ResponseCode responseCode, String description) {
+        com.jobnote.global.common.ApiResponse<Object> apiResponse
+                = com.jobnote.global.common.ApiResponse.ofFail(responseCode);
 
-		Example example = new Example();
-		example.setValue(apiResponse);
-		example.setDescription(description); // 설명을 예제에 추가
+        Example example = new Example();
+        example.setValue(apiResponse);
+        example.setDescription(description); // 설명을 예제에 추가
 
-		return example;
-	}
+        return example;
+    }
 
-	private void addExamplesToResponses(
-		ApiResponses responses,
-		Map<Integer, List<ExampleHolder>> statusWithExampleHolders
-	) {
-		statusWithExampleHolders.forEach((status, exampleHolders) -> {
-			Content content = new Content();
-			MediaType mediaType = new MediaType();
-			ApiResponse apiResponse = new ApiResponse();
+    private void addExamplesToResponses(
+            ApiResponses responses,
+            Map<Integer, List<ExampleHolder>> statusWithExampleHolders
+    ) {
+        statusWithExampleHolders.forEach((status, exampleHolders) -> {
+            Content content = new Content();
+            MediaType mediaType = new MediaType();
+            ApiResponse apiResponse = new ApiResponse();
 
-			exampleHolders.forEach(
-				exampleHolder -> mediaType.addExamples(exampleHolder.getName(), exampleHolder.getHolder())
-			);
+            exampleHolders.forEach(
+                    exampleHolder -> mediaType.addExamples(exampleHolder.getName(), exampleHolder.getHolder())
+            );
 
-			content.addMediaType("application/json", mediaType);
-			apiResponse.setContent(content);
-			responses.addApiResponse(String.valueOf(status), apiResponse);
-		});
-	}
+            content.addMediaType("application/json", mediaType);
+            apiResponse.setContent(content);
+            responses.addApiResponse(String.valueOf(status), apiResponse);
+        });
+    }
 
-	@Getter
-	@Builder
-	public static class ExampleHolder {
-		private final int httpStatusCode;
-		private final String name;
-		private final String errorCode;
-		private final String description;
-		private final Example holder;
-	}
+    @Getter
+    @Builder
+    public static class ExampleHolder {
+        private final int httpStatusCode;
+        private final String name;
+        private final String errorCode;
+        private final String description;
+        private final Example holder;
+    }
 }
