@@ -1,10 +1,9 @@
-package com.jobnote.domain.document.api;
+package com.jobnote.domain.document.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
-import com.jobnote.domain.document.dto.DocumentRequest;
-import com.jobnote.domain.document.dto.DocumentResponse;
-import com.jobnote.domain.document.dto.DocumentVersionResponse;
+import com.jobnote.domain.document.api.DocumentApi;
+import com.jobnote.domain.document.dto.*;
 import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
@@ -19,11 +18,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
-public class DocumentController {
+public class DocumentController implements DocumentApi {
 
     private final DocumentService documentService;
 
     /* CREATE */
+    @Override
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody final DocumentRequest request,
@@ -36,6 +36,7 @@ public class DocumentController {
         return ResponseEntity.created(location).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
     }
 
+    @Override
     @PostMapping("/upload/{documentId}")
     public ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
             @PathVariable final Long documentId,
@@ -50,26 +51,31 @@ public class DocumentController {
     }
 
     /* READ */
+    @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments(
+    public ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
             @LoginUser final CustomPrincipal principal
     ) {
         List<DocumentResponse> documents = documentService.getAll(principal.getUserId());
+        DocumentListResponse listResponse = DocumentListResponse.from(documents);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 
+    @Override
     @GetMapping("/{documentId}")
-    public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> getAllDocumentVersions(
+    public ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
             @PathVariable final Long documentId,
             @LoginUser final CustomPrincipal principal
     ) {
         List<DocumentVersionResponse> documents = documentService.getAllVersions(documentId, principal.getUserId());
+        DocumentVersionListResponse listResponse = DocumentVersionListResponse.from(documents);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 
     /* DELETE */
+    @Override
     @DeleteMapping("/{documentId}")
     public ResponseEntity<ApiResponse<Void>> deleteDocument(
             @PathVariable final Long documentId,

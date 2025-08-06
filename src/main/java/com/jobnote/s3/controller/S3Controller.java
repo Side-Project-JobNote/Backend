@@ -1,9 +1,10 @@
-package com.jobnote.s3.api;
+package com.jobnote.s3.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
+import com.jobnote.s3.api.S3Api;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import com.jobnote.s3.service.S3Service;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/s3")
 @RequiredArgsConstructor
-public class S3Controller {
+public class S3Controller implements S3Api {
 
     private final S3Service s3Service;
 
+    @Override
     @PostMapping("/presigned")
     public ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
             @RequestBody final PresignedFileRequest request,

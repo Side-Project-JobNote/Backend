@@ -1,16 +1,17 @@
-package com.jobnote.domain.schedule.api;
+package com.jobnote.domain.schedule.controller;
 
+import com.jobnote.auth.config.LoginUser;
+import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.domain.schedule.api.UserScheduleApi;
+import com.jobnote.domain.schedule.dto.ScheduleListResponse;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
-import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,20 +24,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/schedules")
 @RequiredArgsConstructor
-public class UserScheduleController {
+public class UserScheduleController implements UserScheduleApi {
 
     private final ScheduleService scheduleService;
-    private final UserService userService;
 
+    @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getAllSchedules(
+    public ResponseEntity<ApiResponse<ScheduleListResponse>> getAllSchedules(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
-            @AuthenticationPrincipal final UserDetails user
+            @LoginUser final CustomPrincipal principal
     ) {
-        Long userId = userService.getUserIdFromUserDetails(user);
-        List<ScheduleResponse> schedules = scheduleService.getAll(userId, startDate, endDate);
+        List<ScheduleResponse> schedules = scheduleService.getAll(principal.getUserId(), startDate, endDate);
+        ScheduleListResponse listResponse = ScheduleListResponse.from(schedules);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, schedules));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 }
