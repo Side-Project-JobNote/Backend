@@ -7,18 +7,17 @@ import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserNicknameRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
+import com.jobnote.domain.user.event.SignUpEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.user.repository.VerificationTokenRepository;
 import com.jobnote.global.common.ResponseCode;
-import com.jobnote.global.config.properties.AppProperties;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.infra.mail.MailService;
-import com.jobnote.infra.mail.dto.MailMessageDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -44,10 +43,7 @@ class UserServiceTest extends ServiceUnitTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Mock
-    private MailService mailService;
-
-    @Mock
-    private AppProperties appProperties;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -59,20 +55,28 @@ class UserServiceTest extends ServiceUnitTest {
         @DisplayName("성공")
         void success() {
             // given
-            final UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
-            final User user = User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname());
-            given(userRepository.existsByEmail(request.email())).willReturn(false);
-            given(userRepository.existsByNickname(request.nickname())).willReturn(false);
+            final String email = "testEmail@test.com";
+            final String nickname = "testNickname";
+            final String password = "testPassword";
+            final UserSignUpRequest request = new UserSignUpRequest(email, password, nickname);
+            final User user = User.signUp(email, password, nickname);
+            final String token = "testToken";
+            final VerificationToken verificationToken = VerificationToken.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
+
+            given(userRepository.existsByEmail(email)).willReturn(false);
+            given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
+            given(verificationTokenRepository.save(any(VerificationToken.class))).willReturn(verificationToken);
 
             // when
-            userService.signUp(request, LocalDateTime.now());
+            userService.signUp(request, LocalDateTime.of(2025, 8, 6 ,11, 31));
 
             // then
-            then(userRepository).should().existsByNickname(request.nickname());
+            then(userRepository).should().existsByEmail(email);
+            then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
             then(verificationTokenRepository).should().save(any(VerificationToken.class));
-            then(mailService).should().sendMail(any(MailMessageDto.class));
+            then(applicationEventPublisher).should().publishEvent(new SignUpEvent(email, token));
         }
 
         @Test
@@ -89,6 +93,8 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
+            then(verificationTokenRepository).should(never()).save(any(VerificationToken.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
 
         @Test
@@ -105,6 +111,7 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
     }
 
