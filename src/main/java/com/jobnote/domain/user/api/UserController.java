@@ -5,6 +5,7 @@ import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.SocialSignUpRequest;
+import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.service.AuthTokenService;
@@ -70,4 +71,10 @@ public class UserController {
         final UserProfileResponse response = userService.getProfile(principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
-}
+
+    /* UPDATE PROFILE */
+    @PatchMapping("/avatar")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomPrincipal principal, @RequestBody @Valid UserAvatarRequest request) {
+        final UserProfileResponse response = userService.updateAvatar(principal.getUserId(), request);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
+    }}
