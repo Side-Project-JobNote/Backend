@@ -48,7 +48,7 @@ public class ApiErrorResponseHandler {
 		return ExampleHolder.builder()
 			.httpStatusCode(responseCode.getStatus().value())
 			.name(responseCode.name())
-			.errorCode(Integer.parseInt(responseCode.getCode()))
+			.errorCode(responseCode.getCode())
 			.description(responseCode.getMessage())
 			.holder(createSwaggerExample(responseCode, responseCode.getMessage()))
 			.build();
@@ -89,7 +89,7 @@ public class ApiErrorResponseHandler {
 	public static class ExampleHolder {
 		private final int httpStatusCode;
 		private final String name;
-		private final int errorCode;
+		private final String errorCode;
 		private final String description;
 		private final Example holder;
 	}
