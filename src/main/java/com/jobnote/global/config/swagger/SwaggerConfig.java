@@ -1,5 +1,7 @@
 package com.jobnote.global.config.swagger;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.StringSchema;
 import jakarta.annotation.PostConstruct;
 import org.springdoc.core.customizers.OperationCustomizer;
@@ -20,6 +22,12 @@ public class SwaggerConfig {
 	private final ApiSuccessResponseHandler apiSuccessResponseHandler;
 	private final ApiErrorResponseHandler apiErrorResponseHandler;
 
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .info(info());
+    }
+
 	@Bean
 	public OperationCustomizer customize() {
 		return (Operation operation, HandlerMethod handlerMethod) -> {
@@ -36,4 +44,11 @@ public class SwaggerConfig {
 						.example("2025-08-06T00:00:00")
 						.format("date-time"));
 	}
+
+    private Info info() {
+        return new Info()
+                .title("백엔드 API 명세서")
+                .description("전체 예외(응답) 코드 목록은 Notion에서 확인하실 수 있습니다.")
+                .version("v1.0.0");
+    }
 }

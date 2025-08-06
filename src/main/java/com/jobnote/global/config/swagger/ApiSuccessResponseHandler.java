@@ -18,7 +18,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 public class ApiSuccessResponseHandler {
 
 	private static final String APPLICATION_JSON = "application/json";
-	private static final int SUCCESS_CODE = 2000;
+	private static final String SUCCESS_CODE = "2000";
 
 	public void handleApiSuccessResponse(Operation operation, HandlerMethod handlerMethod) {
 		ApiResponseExplanations apiResponseExplanations = handlerMethod.getMethodAnnotation(ApiResponseExplanations.class);
@@ -36,7 +36,7 @@ public class ApiSuccessResponseHandler {
 
 			Schema<?> responseSchema = new Schema<>()
 				.addProperty("code",
-					new Schema<>().type("integer").example(SUCCESS_CODE))
+					new Schema<>().example(SUCCESS_CODE))
 				.addProperty("message", new Schema<>().example(null))
 				.addProperty("data",
 					apiSuccessResponseExplanation.responseClass()
