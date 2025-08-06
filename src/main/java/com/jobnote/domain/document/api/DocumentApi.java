@@ -2,9 +2,7 @@ package com.jobnote.domain.document.api;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
-import com.jobnote.domain.document.dto.DocumentRequest;
-import com.jobnote.domain.document.dto.DocumentResponse;
-import com.jobnote.domain.document.dto.DocumentVersionResponse;
+import com.jobnote.domain.document.dto.*;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -16,8 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 @Tag(name = "Document", description = "문서 API")
 public interface DocumentApi {
@@ -45,22 +41,22 @@ public interface DocumentApi {
     @Operation(summary = "문서 목록 조회")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
-                    responseClass = DocumentResponse.class,
-                    description = "조회 성공(List임에 유의)"
+                    responseClass = DocumentListResponse.class,
+                    description = "조회 성공"
             )
     )
-    ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments(
+    ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 
     @Operation(summary = "문서의 모든 버전 목록 조회")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
-                    responseClass = DocumentVersionResponse.class,
-                    description = "조회 성공(List임에 유의)"
+                    responseClass = DocumentVersionListResponse.class,
+                    description = "조회 성공"
             )
     )
-    ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> getAllDocumentVersions(
+    ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
             @PathVariable final Long documentId,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );

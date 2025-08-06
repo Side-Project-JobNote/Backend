@@ -3,9 +3,7 @@ package com.jobnote.domain.document.controller;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.document.api.DocumentApi;
-import com.jobnote.domain.document.dto.DocumentRequest;
-import com.jobnote.domain.document.dto.DocumentResponse;
-import com.jobnote.domain.document.dto.DocumentVersionResponse;
+import com.jobnote.domain.document.dto.*;
 import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
@@ -55,23 +53,25 @@ public class DocumentController implements DocumentApi {
     /* READ */
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getAllDocuments(
+    public ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
             @LoginUser final CustomPrincipal principal
     ) {
         List<DocumentResponse> documents = documentService.getAll(principal.getUserId());
+        DocumentListResponse listResponse = DocumentListResponse.from(documents);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 
     @Override
     @GetMapping("/{documentId}")
-    public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> getAllDocumentVersions(
+    public ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
             @PathVariable final Long documentId,
             @LoginUser final CustomPrincipal principal
     ) {
         List<DocumentVersionResponse> documents = documentService.getAllVersions(documentId, principal.getUserId());
+        DocumentVersionListResponse listResponse = DocumentVersionListResponse.from(documents);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 
     /* DELETE */

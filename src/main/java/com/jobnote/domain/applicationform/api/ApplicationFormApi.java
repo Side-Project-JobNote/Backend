@@ -2,6 +2,7 @@ package com.jobnote.domain.applicationform.api;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.domain.applicationform.dto.ApplicationFormListResponse;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -16,8 +17,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 @Tag(name = "ApplicationForm", description = "지원서 API")
 public interface ApplicationFormApi {
@@ -48,11 +47,11 @@ public interface ApplicationFormApi {
     @Operation(summary = "지원서 목록 조회")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
-                    responseClass = ApplicationFormResponse.class,
-                    description = "조회 성공(List임에 유의)"
+                    responseClass = ApplicationFormListResponse.class,
+                    description = "조회 성공"
             )
     )
-    ResponseEntity<ApiResponse<List<ApplicationFormResponse>>> getAllApplicationForms(
+    ResponseEntity<ApiResponse<ApplicationFormListResponse>> getAllApplicationForms(
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 

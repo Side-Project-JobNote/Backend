@@ -3,6 +3,7 @@ package com.jobnote.domain.applicationform.controller;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.applicationform.api.ApplicationFormApi;
+import com.jobnote.domain.applicationform.dto.ApplicationFormListResponse;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
@@ -52,12 +53,13 @@ public class ApplicationFormController implements ApplicationFormApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ApplicationFormResponse>>> getAllApplicationForms(
+    public ResponseEntity<ApiResponse<ApplicationFormListResponse>> getAllApplicationForms(
             @LoginUser final CustomPrincipal principal
     ) {
         List<ApplicationFormResponse> forms = applicationFormService.getAll(principal.getUserId());
+        ApplicationFormListResponse listResponse = ApplicationFormListResponse.from(forms);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, forms));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 
     /* UPDATE */
