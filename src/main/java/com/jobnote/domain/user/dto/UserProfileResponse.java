@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public record UserProfileResponse(
         String email,
         String nickname,
+        String avatarUrl,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDateTime createdDate
@@ -20,6 +21,7 @@ public record UserProfileResponse(
                 return UserProfileResponse.builder()
                         .email(user.getEmail())
                         .nickname(user.getNickname())
+                        .avatarUrl(user.getAvatarUrl())
                         .createdDate(user.getCreatedDate())
                         .build();
         }

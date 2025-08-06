@@ -3,6 +3,7 @@ package com.jobnote.domain.user.service;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.SocialSignUpRequest;
+import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
@@ -83,8 +84,16 @@ public class UserService {
         verificationTokenRepository.delete(verificationToken);
     }
 
+    /* GET PROFILE */
     public UserProfileResponse getProfile(final Long userId) {
         final User user = getUserById(userId);
+        return UserProfileResponse.from(user);
+    }
+
+    /* UPDATE PROFILE */
+    public UserProfileResponse updateAvatar(final Long userId, final UserAvatarRequest request) {
+        final User user = getUserById(userId);
+        user.updateAvatar(request.avatarUrl());
         return UserProfileResponse.from(user);
     }
 
