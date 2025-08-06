@@ -3,6 +3,7 @@ package com.jobnote.domain.schedule.controller;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.domain.schedule.api.UserScheduleApi;
+import com.jobnote.domain.schedule.dto.ScheduleListResponse;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
 import com.jobnote.global.common.ApiResponse;
@@ -29,13 +30,14 @@ public class UserScheduleController implements UserScheduleApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getAllSchedules(
+    public ResponseEntity<ApiResponse<ScheduleListResponse>> getAllSchedules(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
             @LoginUser final CustomPrincipal principal
     ) {
         List<ScheduleResponse> schedules = scheduleService.getAll(principal.getUserId(), startDate, endDate);
+        ScheduleListResponse listResponse = ScheduleListResponse.from(schedules);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, schedules));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
     }
 }
