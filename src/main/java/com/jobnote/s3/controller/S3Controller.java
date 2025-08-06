@@ -8,6 +8,7 @@ import com.jobnote.s3.api.S3Api;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import com.jobnote.s3.service.S3Service;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class S3Controller implements S3Api {
     @Override
     @PostMapping("/presigned")
     public ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
-            @RequestBody final PresignedFileRequest request,
+            @RequestBody @Valid final PresignedFileRequest request,
             @LoginUser final CustomPrincipal principal
     ) {
         PresignedFileResponse signedUrl = s3Service.generatePresignedFile(principal.getUserId(), request);

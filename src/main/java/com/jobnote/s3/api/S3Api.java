@@ -10,6 +10,7 @@ import com.jobnote.s3.dto.PresignedFileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,7 +25,7 @@ public interface S3Api {
             )
     )
     ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
-            @RequestBody final PresignedFileRequest request,
+            @RequestBody @Valid final PresignedFileRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 }
