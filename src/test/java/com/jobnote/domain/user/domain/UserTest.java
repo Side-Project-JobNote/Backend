@@ -49,7 +49,7 @@ class UserTest {
 
     @Test
     @DisplayName("회원의 프로필 이미지를 수정한다")
-    void socialSignUp() {
+    void updateAvatar() {
         // given
         final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
         final User socialUser = User.socialSignUp("testEmail@test.com", "testSocailEmail@test.com", SocialProvider.GOOGLE, "testSocialId");
@@ -63,4 +63,22 @@ class UserTest {
         assertThat(user.getAvatarUrl()).isEqualTo(updatedAvatarUrl);
         assertThat(socialUser.getAvatarUrl()).isEqualTo(updatedAvatarUrl);
     }
+
+    @Test
+    @DisplayName("회원의 닉네임을 수정한다")
+    void updateNickname() {
+        // given
+        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+        final User socialUser = User.socialSignUp("testEmail@test.com", "testSocailEmail@test.com", SocialProvider.GOOGLE, "testSocialId");
+        final String updatedNickname = "updatedNickname";
+
+        // when
+        user.updateNickname(updatedNickname);
+        socialUser.updateNickname(updatedNickname);
+
+        // then
+        assertThat(user.getNickname()).isEqualTo(updatedNickname);
+        assertThat(socialUser.getNickname()).isEqualTo(updatedNickname);
+    }
+
 }
