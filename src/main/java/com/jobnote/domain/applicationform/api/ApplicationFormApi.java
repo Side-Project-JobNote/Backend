@@ -22,7 +22,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface ApplicationFormApi {
 
     @Operation(summary = "지원서 생성")
-    @ApiResponseExplanations
+    @ApiResponseExplanations(
+            success = @ApiSuccessResponseExplanation(
+                    responseCode = ResponseCode.CREATED,
+                    description = "생성 성공"
+            )
+    )
     ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid final ApplicationFormRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal

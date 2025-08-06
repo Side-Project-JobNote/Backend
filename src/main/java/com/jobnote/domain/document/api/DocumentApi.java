@@ -19,7 +19,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface DocumentApi {
 
     @Operation(summary = "문서 업로드(신규 문서 등록)")
-    @ApiResponseExplanations
+    @ApiResponseExplanations(
+            success = @ApiSuccessResponseExplanation(
+                    responseCode = ResponseCode.CREATED,
+                    description = "생성 성공"
+            )
+    )
     ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody final DocumentRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
@@ -27,6 +32,10 @@ public interface DocumentApi {
 
     @Operation(summary = "기존 문서의 새로운 버전 문서 업로드")
     @ApiResponseExplanations(
+            success = @ApiSuccessResponseExplanation(
+                    responseCode = ResponseCode.CREATED,
+                    description = "생성 성공"
+            ),
             errors = {
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.NOT_FOUND_DOCUMENT),
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.FORBIDDEN)

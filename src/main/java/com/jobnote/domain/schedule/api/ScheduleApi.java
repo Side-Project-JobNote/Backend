@@ -22,6 +22,10 @@ public interface ScheduleApi {
 
     @Operation(summary = "일정 생성")
     @ApiResponseExplanations(
+            success = @ApiSuccessResponseExplanation(
+                    responseCode = ResponseCode.CREATED,
+                    description = "생성 성공"
+            ),
             errors = {
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.NOT_FOUND_APPLICATION_FORM),
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.FORBIDDEN)
