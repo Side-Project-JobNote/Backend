@@ -20,7 +20,7 @@ public class SignUpEventListener {
     private String fromEmail;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void on(final SignUpEvent signUpEvent) {
+    public void onEvent(final SignUpEvent signUpEvent) {
         final MailMessageDto mailMessageDto = createMailMessageDto(signUpEvent.toEmail(), signUpEvent.verificationToken());
         mailService.sendMail(mailMessageDto);
     }
