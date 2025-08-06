@@ -4,6 +4,7 @@ import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserAvatarRequest;
+import com.jobnote.domain.user.dto.UserNicknameRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.repository.UserRepository;
@@ -136,6 +137,51 @@ class UserServiceTest extends ServiceUnitTest {
     }
 
     @Nested
+    @DisplayName("닉네임 업데이트")
+    class UpdateNickname {
+        @Test
+        @DisplayName("성공 - 닉네임만 업데이트된다.")
+        void success() {
+            // given
+            final Long userId = 1L;
+            final String existingEmail = "testEmail@test.com";
+            final String existingPassword = "testPassword";
+            final String existingNickname = "testNickname";
+            final User user = User.signUp(existingEmail, existingPassword, existingNickname);
+
+            final String updatedNickname = "updatedNickname";
+            final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
+
+            given(userRepository.existsByNickname(updatedNickname)).willReturn(false);
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            final UserProfileResponse result = userService.updateNickname(userId, request);
+
+            // then
+            assertThat(result.email()).isEqualTo(existingEmail);
+            assertThat(result.nickname()).isEqualTo(updatedNickname);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 존재하는 닉네임이면 예외가 발생한다.")
+        void fail_DuplicatedNickname() {
+            // given
+            final Long userId = 1L;
+            final String updatedNickname = "updatedNickname";
+            final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
+
+            given(userRepository.existsByNickname(updatedNickname)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.updateNickname(userId, request))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
+            then(userRepository).should(never()).findById(userId);
+        }
+    }
+
+    @Nested
     @DisplayName("id로 회원 조회")
     class GetUser {
         @Test
@@ -151,7 +197,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when
-            User result = userService.getUserById(userId);
+            final User result = userService.getUserById(userId);
 
             // then
             assertThat(result).isEqualTo(user);
