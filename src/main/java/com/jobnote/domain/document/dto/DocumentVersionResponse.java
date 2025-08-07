@@ -9,16 +9,16 @@ public record DocumentVersionResponse(
     Long id,
     int version,
     String fileName,
-    Long fileSize,
-    String fileUrl
+    String fileUrl,
+    Long fileSize
 ) {
-    public static DocumentVersionResponse from(final DocumentVersion documentVersion) {
+    public static DocumentVersionResponse of(final DocumentVersion documentVersion, final String fileUrl) {
         return DocumentVersionResponse.builder()
                 .id(documentVersion.getId())
                 .version(documentVersion.getVersion())
-                .fileName(documentVersion.getFileName())
+                .fileName(documentVersion.getOriginFileName())
+                .fileUrl(fileUrl)
                 .fileSize(documentVersion.getFileSize())
-                .fileUrl(documentVersion.getFileUrl())
                 .build();
     }
 }

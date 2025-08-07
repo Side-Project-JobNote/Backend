@@ -6,7 +6,7 @@ import com.jobnote.domain.user.domain.User;
 
 public record DocumentRequest(
         String fileName,
-        String fileUrl,
+        String fileKey,
         DocumentType fileType,
         Long fileSize
 ) {

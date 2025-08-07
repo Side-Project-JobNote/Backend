@@ -1,7 +1,6 @@
 package com.jobnote.domain.document.repository;
 
 import com.jobnote.domain.document.domain.DocumentVersion;
-import com.jobnote.domain.document.dto.DocumentVersionResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

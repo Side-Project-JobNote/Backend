@@ -11,6 +11,7 @@ import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.s3.service.S3Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,10 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
     private final UserService userService;
+    private final S3Service s3Service;
 
     @PersistenceContext
     private final EntityManager entityManager;
-
-    @Value("${file.quota.per-user}")
-    private DataSize maxUploadSize;
 
     @Transactional
     public Long uploadNewDocument(final Long userId, final DocumentRequest request) {
@@ -46,8 +45,8 @@ public class DocumentService {
 
         DocumentVersion documentVersion = DocumentVersion.builder()
                 .version(1)
-                .fileName(request.fileName())
-                .fileUrl(request.fileUrl())
+                .originFileName(request.fileName())
+                .fileKey(request.fileKey())
                 .fileSize(request.fileSize())
                 .document(document)
                 .build();
@@ -65,8 +64,8 @@ public class DocumentService {
         int version = documentVersionRepository.findMaxVersionByDocumentId(documentId).orElse(1);
         DocumentVersion documentVersion = DocumentVersion.builder()
                 .version(version + 1)
-                .fileName(request.fileName())
-                .fileUrl(request.fileUrl())
+                .originFileName(request.fileName())
+                .fileKey(request.fileKey())
                 .fileSize(request.fileSize())
                 .document(document)
                 .build();
@@ -83,7 +82,9 @@ public class DocumentService {
 
     public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {
         return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
-                .map(DocumentVersionResponse::from).toList();
+                .map(docVer ->
+                        DocumentVersionResponse.of(docVer, s3Service.generateFileUrl(docVer.getFileKey())))
+                .toList();
     }
 
     @Transactional
@@ -97,14 +98,6 @@ public class DocumentService {
         documentVersionRepository.deleteAll(allByDocumentId);
         entityManager.flush();
         documentRepository.delete(document);
-    }
-
-    public void validateTotalStorageQuota(final Long userId, final Long fileSize) {
-        long currentSize = documentVersionRepository.getTotalFileSizeByUserId(userId);
-
-        if (currentSize + fileSize > maxUploadSize.toBytes()) {
-            throw new JobNoteException(ResponseCode.UPLOAD_SIZE_LIMIT_EXCEEDED);
-        }
     }
 
     /* HELPER METHOD */

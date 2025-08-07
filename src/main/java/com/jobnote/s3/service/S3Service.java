@@ -1,6 +1,6 @@
 package com.jobnote.s3.service;
 
-import com.jobnote.domain.document.service.DocumentService;
+import com.jobnote.domain.document.util.DocumentStoragePolicyUtil;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class S3Service {
 
     private final S3Presigner s3Presigner;
-    private final DocumentService documentService;
+    private final DocumentStoragePolicyUtil documentStoragePolicyUtil;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -32,11 +32,15 @@ public class S3Service {
 
     public PresignedFileResponse generatePresignedFile(final Long userId, final PresignedFileRequest request) {
         // 총 업로드 허용 용량을 초과하지 않는지 검증
-        documentService.validateTotalStorageQuota(userId, request.fileSize());
+        documentStoragePolicyUtil.validateTotalStorageQuota(userId, request.fileSize());
 
         // Url 발급
         String key = createUniqueFileName(userId, request.fileName());
-        return new PresignedFileResponse(request.fileName(), generatePresignedUrl(key, request.contentType()), generateFileUrl(key));
+        return new PresignedFileResponse(request.fileName(), generatePresignedUrl(key, request.contentType()), key);
+    }
+
+    public String generateFileUrl(final String key) {
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
 
     /* HELPER METHOD */
@@ -54,10 +58,6 @@ public class S3Service {
 
         PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
         return presigned.url();
-    }
-
-    private String generateFileUrl(final String key) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
 
     private String createUniqueFileName(final Long userId, final String originalFileName) {
