@@ -7,13 +7,13 @@ import jakarta.validation.constraints.*;
 
 public record DocumentRequest(
         @NotBlank(message = "파일 이름은 비어있을 수 없습니다.")
-        @Pattern(regexp = "^[\\w\\-. 가-힣]+$",
+        @Pattern(regexp = "^[^/:*?\"<>|]+$",
                  message = "파일 이름에는 한글, 영문자, 숫자, 점(.), 하이픈(-), 언더 스코어(_) 및 공백만 사용할 수 있습니다.")
         @Size(max = 100, message = "파일 이름은 100자 이하여야 합니다.")
         String fileName,
 
         @NotBlank(message = "파일 key는 비어있을 수 없습니다.")
-        @Pattern(regexp = "^\\\\d+/[\\\\w.\\\\-가-힣]+$", // userId/uuid_fileName.type 형식 검사
+        @Pattern(regexp = "^\\d+/[^/:*?\"<>|]+$", // userId/uuid_fileName.type 형식 검사
                  message = "올바른 파일 key를 입력해주세요.")
         String fileKey,
 
