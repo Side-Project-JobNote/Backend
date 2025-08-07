@@ -2,9 +2,11 @@ package com.jobnote.s3.api;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
 import com.jobnote.global.common.ApiResponse;
+import com.jobnote.global.common.ResponseCode;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +27,10 @@ public interface S3Api {
             success = @ApiSuccessResponseExplanation(
                     responseClass = PresignedFileResponse.class,
                     description = "요청 성공"
-            )
+            ),
+            errors = {
+                    @ApiErrorResponseExplanation(exceptionCode = ResponseCode.UPLOAD_SIZE_LIMIT_EXCEEDED)
+            }
     )
     ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
             @RequestBody @Valid final PresignedFileRequest request,

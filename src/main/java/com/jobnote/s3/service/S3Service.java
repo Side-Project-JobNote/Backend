@@ -1,5 +1,6 @@
 package com.jobnote.s3.service;
 
+import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,13 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.UUID;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
     private final S3Presigner s3Presigner;
+    private final DocumentService documentService;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -30,14 +31,15 @@ public class S3Service {
     private String region;
 
     public PresignedFileResponse generatePresignedFile(final Long userId, final PresignedFileRequest request) {
-        return generatePresignedFileResponse(userId, request);
-    }
+        // 총 업로드 허용 용량을 초과하지 않는지 검증
+        documentService.validateTotalStorageQuota(userId, request.fileSize());
 
-    private PresignedFileResponse generatePresignedFileResponse(final Long  userId, final PresignedFileRequest request) {
+        // Url 발급
         String key = createUniqueFileName(userId, request.fileName());
         return new PresignedFileResponse(request.fileName(), generatePresignedUrl(key, request.contentType()), generateFileUrl(key));
     }
 
+    /* HELPER METHOD */
     private URL generatePresignedUrl(final String key, final String contentType) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)

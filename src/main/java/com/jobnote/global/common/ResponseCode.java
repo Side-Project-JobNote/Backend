@@ -52,6 +52,9 @@ public enum ResponseCode {
     DUPLICATED_USER_NICKNAME(HttpStatus.CONFLICT, "4091", "이미 사용중인 닉네임입니다."),
     DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, "4091", "이미 가입된 이메일입니다."),
 
+    // 413 Payload Too Large
+    UPLOAD_SIZE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "4130", "총 업로드 허용 용량 100MB을 초과했습니다."),
+
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "서버에 에러가 발생했습니다."),
     UNABLE_TO_SEND_MAIL(HttpStatus.INTERNAL_SERVER_ERROR, "5001", "메일을 전송하지 못했습니다."),

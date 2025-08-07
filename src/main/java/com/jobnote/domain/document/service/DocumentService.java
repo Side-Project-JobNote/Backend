@@ -9,12 +9,15 @@ import com.jobnote.domain.document.repository.DocumentRepository;
 import com.jobnote.domain.document.repository.DocumentVersionRepository;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
+import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.unit.DataSize;
 
 import java.util.List;
 
@@ -31,6 +34,9 @@ public class DocumentService {
 
     @PersistenceContext
     private final EntityManager entityManager;
+
+    @Value("${file.quota.per-user}")
+    private DataSize maxUploadSize;
 
     @Transactional
     public Long uploadNewDocument(final Long userId, final DocumentRequest request) {
@@ -91,6 +97,14 @@ public class DocumentService {
         documentVersionRepository.deleteAll(allByDocumentId);
         entityManager.flush();
         documentRepository.delete(document);
+    }
+
+    public void validateTotalStorageQuota(final Long userId, final Long fileSize) {
+        long currentSize = documentVersionRepository.getTotalFileSizeByUserId(userId);
+
+        if (currentSize + fileSize > maxUploadSize.toBytes()) {
+            throw new JobNoteException(ResponseCode.UPLOAD_SIZE_LIMIT_EXCEEDED);
+        }
     }
 
     /* HELPER METHOD */

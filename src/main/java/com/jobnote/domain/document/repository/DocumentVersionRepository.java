@@ -14,4 +14,7 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     @Query("select v from DocumentVersion v join fetch v.document d join d.user u where u.id = :userId and d.id = :documentId order by v.version desc")
     List<DocumentVersion> findAllByUserIdAndDocumentId(final Long userId, final Long documentId);
+
+    @Query("select COALESCE(SUM(v.fileSize), 0) from DocumentVersion v join v.document d where d.user.id = :userId")
+    Long getTotalFileSizeByUserId(final Long userId);
 }
