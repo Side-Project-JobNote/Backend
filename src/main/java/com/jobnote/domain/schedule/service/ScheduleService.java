@@ -141,7 +141,7 @@ public class ScheduleService {
     }
 
     /* HELPER METHOD */
-    public Schedule getByIdOrThrow(final Long scheduleId) {
+    private Schedule getByIdOrThrow(final Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_SCHEDULE));
     }

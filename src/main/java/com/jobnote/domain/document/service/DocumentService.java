@@ -83,7 +83,7 @@ public class DocumentService {
     }
 
     /* HELPER METHOD */
-    public Document getByIdOrThrow(final Long docId) {
+    private Document getByIdOrThrow(final Long docId) {
         return documentRepository.findById(docId)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_DOCUMENT));
     }
