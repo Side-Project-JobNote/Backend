@@ -82,6 +82,14 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
+    @Transactional
+    public void deleteAllDocuments(final Long userId) {
+        List<Document> documents = documentRepository.findAllByUserId(userId);
+        for (Document document : documents) {
+            deleteDocument(userId, document.getId());
+        }
+    }
+
     /* HELPER METHOD */
     private Document getByIdOrThrow(final Long docId) {
         return documentRepository.findById(docId)
