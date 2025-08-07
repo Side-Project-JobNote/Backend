@@ -1,11 +1,11 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.user.domain.User;
-import com.jobnote.domain.user.domain.VerificationToken;
+import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.user.event.SignUpEvent;
 import com.jobnote.domain.user.repository.UserRepository;
-import com.jobnote.domain.user.repository.VerificationTokenRepository;
+import com.jobnote.domain.verificationtoken.repository.VerificationTokenRepository;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;

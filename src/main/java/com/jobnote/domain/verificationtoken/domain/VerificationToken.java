@@ -1,5 +1,6 @@
-package com.jobnote.domain.user.domain;
+package com.jobnote.domain.verificationtoken.domain;
 
+import com.jobnote.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 

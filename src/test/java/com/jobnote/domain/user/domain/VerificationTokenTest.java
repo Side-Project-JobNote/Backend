@@ -1,5 +1,6 @@
 package com.jobnote.domain.user.domain;
 
+import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
