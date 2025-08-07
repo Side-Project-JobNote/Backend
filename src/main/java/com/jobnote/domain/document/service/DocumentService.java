@@ -9,16 +9,13 @@ import com.jobnote.domain.document.repository.DocumentRepository;
 import com.jobnote.domain.document.repository.DocumentVersionRepository;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
-import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.s3.service.S3Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.unit.DataSize;
 
 import java.util.List;
 
@@ -92,9 +89,13 @@ public class DocumentService {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
-        //todo s3에서 문서 삭제
-
+        // s3에서 삭제
         List<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByUserIdAndDocumentId(userId, document.getId());
+        for (DocumentVersion documentVersion : allByDocumentId) {
+            s3Service.deleteFile(documentVersion.getFileKey());
+        }
+
+        // 엔티티 삭제
         documentVersionRepository.deleteAll(allByDocumentId);
         entityManager.flush();
         documentRepository.delete(document);
