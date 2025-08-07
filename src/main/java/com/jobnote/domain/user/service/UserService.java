@@ -66,17 +66,14 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new JobNoteException(NOT_FOUND_VERIFICATION_TOKEN));
-        User user = verificationToken.getUser();
+        final VerificationToken verificationToken = getVerificationTokenOrThrow(token);
+        final User user = verificationToken.getUser();
 
-        if (verificationToken.validateExpiration(currentDate)) {
-            verificationTokenRepository.delete(verificationToken);
-            throw new JobNoteException(EXPIRED_VERIFICATION_TOKEN);
-        }
+        verificationToken.validateExpired(currentDate);
+        verificationToken.validateVerified();
 
         user.accept();
-        verificationTokenRepository.delete(verificationToken);
+        verificationToken.complete();
     }
 
     /* GET PROFILE */
@@ -122,5 +119,10 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new JobNoteException(DUPLICATED_USER_EMAIL);
         }
+    }
+
+    private VerificationToken getVerificationTokenOrThrow(final String token) {
+        return verificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_VERIFICATION_TOKEN));
     }
 }
