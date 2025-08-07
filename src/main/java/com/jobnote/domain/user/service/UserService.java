@@ -5,7 +5,7 @@ import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.user.event.SignUpEvent;
 import com.jobnote.domain.user.repository.UserRepository;
-import com.jobnote.domain.verificationtoken.repository.VerificationTokenRepository;
+import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.*;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
@@ -28,7 +27,7 @@ import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final VerificationTokenRepository verificationTokenRepository;
+    private final VerificationTokenService verificationTokenService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -50,7 +49,7 @@ public class UserService {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        final VerificationToken savedVerificationToken = verificationTokenRepository.save(VerificationToken.create(UUID.randomUUID().toString(), savedUser, emailVerificationExpiryDate));
+        final VerificationToken savedVerificationToken = verificationTokenService.save(savedUser, emailVerificationExpiryDate);
 
         eventPublisher.publishEvent(new SignUpEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
     }
@@ -66,7 +65,7 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationToken verificationToken = getVerificationTokenOrThrow(token);
+        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
         final User user = verificationToken.getUser();
 
         verificationToken.validateExpired(currentDate);
@@ -119,10 +118,5 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new JobNoteException(DUPLICATED_USER_EMAIL);
         }
-    }
-
-    private VerificationToken getVerificationTokenOrThrow(final String token) {
-        return verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new JobNoteException(NOT_FOUND_VERIFICATION_TOKEN));
     }
 }
