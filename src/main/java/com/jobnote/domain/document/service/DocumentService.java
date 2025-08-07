@@ -40,17 +40,7 @@ public class DocumentService {
         Document document = request.toEntity(user);
         documentRepository.save(document);
 
-        DocumentVersion documentVersion = DocumentVersion.builder()
-                .version(1)
-                .originFileName(request.fileName())
-                .fileKey(request.fileKey())
-                .fileSize(request.fileSize())
-                .document(document)
-                .build();
-
-        documentVersionRepository.save(documentVersion);
-
-        return document.getId();
+        return saveDocumentVersion(userId, document, request, 1);
     }
 
     @Transactional
@@ -58,18 +48,9 @@ public class DocumentService {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
-        int version = documentVersionRepository.findMaxVersionByDocumentId(documentId).orElse(1);
-        DocumentVersion documentVersion = DocumentVersion.builder()
-                .version(version + 1)
-                .originFileName(request.fileName())
-                .fileKey(request.fileKey())
-                .fileSize(request.fileSize())
-                .document(document)
-                .build();
+        int version = documentVersionRepository.findMaxVersionByDocumentId(documentId).orElse(0) + 1;
 
-        DocumentVersion savedDocumentVersion = documentVersionRepository.save(documentVersion);
-
-        return savedDocumentVersion.getId();
+        return saveDocumentVersion(userId, document, request, version);
     }
 
     public List<DocumentResponse> getAll(final Long userId) {
@@ -105,5 +86,20 @@ public class DocumentService {
     public Document getByIdOrThrow(final Long docId) {
         return documentRepository.findById(docId)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_DOCUMENT));
+    }
+
+    private Long saveDocumentVersion(final Long userId, final Document document, final DocumentRequest request, final int version) {
+        s3Service.validateIsOwner(userId, request.fileKey());
+        long fileSize = s3Service.getFileSize(request.fileKey());
+
+        DocumentVersion documentVersion = DocumentVersion.builder()
+                .version(version)
+                .originFileName(request.fileName())
+                .fileKey(request.fileKey())
+                .fileSize(fileSize)
+                .document(document)
+                .build();
+
+        return documentVersionRepository.save(documentVersion).getId();
     }
 }

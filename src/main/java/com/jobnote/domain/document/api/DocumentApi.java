@@ -18,19 +18,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "Document", description = "문서 API")
 public interface DocumentApi {
 
-    @Operation(summary = "문서 업로드(신규 문서 등록)")
+    @Operation(summary = "문서 업로드(신규 문서 등록)",
+               description = "NOT_FOUND_S3_FILE : PresignedUrl을 통해 등록된 파일이 아닌 경우<br>" +
+                             "FORBIDDEN : 다른 유저의 파일에 접근한 경우")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
                     responseCode = ResponseCode.CREATED,
                     description = "생성 성공"
-            )
+            ),
+            errors = {
+                    @ApiErrorResponseExplanation(exceptionCode = ResponseCode.NOT_FOUND_S3_FILE),
+                    @ApiErrorResponseExplanation(exceptionCode = ResponseCode.FORBIDDEN)
+            }
     )
     ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody final DocumentRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 
-    @Operation(summary = "기존 문서의 새로운 버전 문서 업로드")
+    @Operation(summary = "기존 문서의 새로운 버전 문서 업로드",
+               description = "NOT_FOUND_DOCUMENT : 존재하지 않는 문서에 새로운 버전을 등록하려고 하는 경우<br>" +
+                             "NOT_FOUND_S3_FILE : PresignedUrl을 통해 등록된 파일이 아닌 경우<br>" +
+                             "FORBIDDEN : 다른 유저의 파일에 접근한 경우")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
                     responseCode = ResponseCode.CREATED,

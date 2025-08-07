@@ -1,6 +1,8 @@
 package com.jobnote.s3.service;
 
 import com.jobnote.domain.document.util.DocumentStoragePolicyUtil;
+import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.s3.dto.PresignedFileRequest;
 import com.jobnote.s3.dto.PresignedFileResponse;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -46,13 +47,37 @@ public class S3Service {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
 
+    public void validateIsOwner(final Long userId, final String key) {
+        String prefix = key.substring(0, key.indexOf('/'));
+        Long ownerId = Long.parseLong(prefix);
+        if (!userId.equals(ownerId)) {
+            throw new JobNoteException(ResponseCode.FORBIDDEN);
+        }
+    }
+
+    public long getFileSize(final String key) {
+        try {
+            HeadObjectRequest request = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key).build();
+
+            HeadObjectResponse response = s3Client.headObject(request);
+            return response.contentLength();
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) {
+                throw new JobNoteException(ResponseCode.NOT_FOUND_S3_FILE);
+            }
+            throw e;
+        }
+    }
+
     public void deleteFile(final String key) {
-        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+        DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
                 .build();
 
-        s3Client.deleteObject(deleteObjectRequest);
+        s3Client.deleteObject(request);
     }
 
     /* HELPER METHOD */

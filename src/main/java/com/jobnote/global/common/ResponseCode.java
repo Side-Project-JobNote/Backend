@@ -43,6 +43,7 @@ public enum ResponseCode {
     NOT_FOUND_VERIFICATION_TOKEN(HttpStatus.NOT_FOUND, "4044", "해당 이메일 검증 토큰을 찾을 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "4045", "해당 리프레시 토큰을 찾을 수 없습니다."),
     NOT_FOUND_DOCUMENT(HttpStatus.NOT_FOUND, "4046", "해당 문서를 찾을 수 없습니다."),
+    NOT_FOUND_S3_FILE(HttpStatus.NOT_FOUND, "4047", "업로드된 문서가 아닙니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),
