@@ -11,6 +11,7 @@ import com.jobnote.global.common.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,7 @@ public interface DocumentApi {
             }
     )
     ResponseEntity<ApiResponse<Void>> uploadNewDocument(
-            @RequestBody final DocumentRequest request,
+            @RequestBody @Valid final DocumentRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 
@@ -52,7 +53,7 @@ public interface DocumentApi {
     )
     ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
             @PathVariable final Long documentId,
-            @RequestBody final DocumentRequest request,
+            @RequestBody @Valid final DocumentRequest request,
             @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
     );
 

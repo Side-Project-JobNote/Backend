@@ -7,6 +7,7 @@ import com.jobnote.domain.document.dto.*;
 import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class DocumentController implements DocumentApi {
     @Override
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<Void>> uploadNewDocument(
-            @RequestBody final DocumentRequest request,
+            @RequestBody @Valid final DocumentRequest request,
             @LoginUser final CustomPrincipal principal
     ) {
         Long savedId = documentService.uploadNewDocument(principal.getUserId(), request);
@@ -40,7 +41,7 @@ public class DocumentController implements DocumentApi {
     @PostMapping("/upload/{documentId}")
     public ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
             @PathVariable final Long documentId,
-            @RequestBody final DocumentRequest request,
+            @RequestBody @Valid final DocumentRequest request,
             @LoginUser final CustomPrincipal principal
     ) {
         Long savedId = documentService.uploadNewVersionDocument(principal.getUserId(), documentId, request);
