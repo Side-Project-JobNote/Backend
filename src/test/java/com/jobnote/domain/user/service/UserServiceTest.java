@@ -2,6 +2,7 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserNicknameRequest;
@@ -9,6 +10,7 @@ import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.event.SignUpEvent;
 import com.jobnote.domain.user.repository.UserRepository;
+import com.jobnote.domain.verificationtoken.domain.VerificationTokenStatus;
 import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
@@ -223,6 +226,30 @@ class UserServiceTest extends ServiceUnitTest {
             assertThatThrownBy(() -> userService.getUserById(userId))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(ResponseCode.NOT_FOUND_USER.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증")
+    class EmailVerification {
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
+            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
+            final String token = UUID.randomUUID().toString();
+            final VerificationToken verificationToken = VerificationToken.create(token, user, expiryDate);
+
+            given(verificationTokenService.getVerificationTokenByToken(token)).willReturn(verificationToken);
+
+            // when
+            userService.verifyEmail(token, currentDate);
+
+            // then
+            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
         }
     }
 }
