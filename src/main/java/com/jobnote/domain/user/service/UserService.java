@@ -51,7 +51,7 @@ public class UserService {
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
         final VerificationToken savedVerificationToken = verificationTokenService.save(savedUser, emailVerificationExpiryDate);
 
-        eventPublisher.publishEvent(new EmailVerificationEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
+        eventPublisher.publishEvent(EmailVerificationEvent.signUp(savedUser.getEmail(), savedVerificationToken.getToken()));
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -95,6 +95,15 @@ public class UserService {
         final User user = getUserById(userId);
         user.updateNickname(request.nickname());
         return UserProfileResponse.from(user);
+    }
+
+    /* RESET PASSWORD */
+    @Transactional
+    public void sendResetPasswordEmail(final Long userId, final LocalDateTime emailVerificationExpiryDate) {
+        final User user = getUserById(userId);
+        final VerificationToken savedVerificationToken = verificationTokenService.save(user, emailVerificationExpiryDate);
+
+        eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
     }
 
     /* HELPER METHOD */

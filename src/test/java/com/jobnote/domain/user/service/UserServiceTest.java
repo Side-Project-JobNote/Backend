@@ -80,7 +80,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
             then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
-            then(applicationEventPublisher).should().publishEvent(new EmailVerificationEvent(email, token));
+            then(applicationEventPublisher).should().publishEvent(EmailVerificationEvent.signUp(email, token));
         }
 
         @Test
