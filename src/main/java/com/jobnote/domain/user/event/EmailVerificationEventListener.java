@@ -22,7 +22,6 @@ public class EmailVerificationEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onEvent(final EmailVerificationEvent emailVerificationEvent) {
         final MailMessageDto mailMessageDto = createMailMessageDto(emailVerificationEvent);
-        System.out.println(mailMessageDto);
         mailService.sendMail(mailMessageDto);
     }
 
