@@ -101,6 +101,10 @@ public class UserService {
         eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
     }
 
+    public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
+        verificationTokenService.verifyToken(token, currentDate);
+    }
+
     /* HELPER METHOD */
     private User getByIdOrThrow(final Long id) {
         return userRepository.findById(id)
