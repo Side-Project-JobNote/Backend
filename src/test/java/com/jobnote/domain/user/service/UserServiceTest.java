@@ -3,11 +3,8 @@ package com.jobnote.domain.user.service;
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.UserRole;
+import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.verificationtoken.domain.VerificationToken;
-import com.jobnote.domain.user.dto.UserAvatarRequest;
-import com.jobnote.domain.user.dto.UserNicknameRequest;
-import com.jobnote.domain.user.dto.UserProfileResponse;
-import com.jobnote.domain.user.dto.UserSignUpRequest;
 import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.verificationtoken.domain.VerificationTokenStatus;
@@ -26,8 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
-import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
+import static com.jobnote.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -250,6 +246,51 @@ class UserServiceTest extends ServiceUnitTest {
             // then
             assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
             assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 재설정 이메일 전송")
+    class ResetPasswordEmail {
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            final String email = "testEmail@test.com";
+            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
+            final User user = User.signUp(email, "testPassword", "testNickname");
+            final String token = "testToken";
+            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
+            final VerificationToken verificationToken = VerificationToken.create(token, user, emailVerificationExpiryDate);
+
+            given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+            given(verificationTokenService.save(user, emailVerificationExpiryDate)).willReturn(verificationToken);
+
+            // when
+            userService.sendResetPasswordEmail(request, emailVerificationExpiryDate);
+
+            // then
+            then(userRepository).should().findByEmail(email);
+            then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
+            then(applicationEventPublisher).should().publishEvent(EmailVerificationEvent.resetPassword(email, token));
+        }
+
+        @Test
+        @DisplayName("실패 - 이메일이 존재하지 않는다.")
+        void fail_DuplicatedEmail() {
+            // given
+            final String email = "testEmail@test.com";
+            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
+            given(userRepository.findByEmail(email)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.sendResetPasswordEmail(request, LocalDateTime.now()))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(NOT_FOUND_USER.getMessage());
+
+            then(userRepository).should().findByEmail(email);
+            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
         }
     }
 }
