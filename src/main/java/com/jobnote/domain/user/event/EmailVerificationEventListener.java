@@ -11,7 +11,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @RequiredArgsConstructor
 @Component
-public class SignUpEventListener {
+public class EmailVerificationEventListener {
 
     private final MailService mailService;
     private final AppProperties appProperties;
@@ -21,23 +21,24 @@ public class SignUpEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onEvent(final EmailVerificationEvent emailVerificationEvent) {
-        final MailMessageDto mailMessageDto = createMailMessageDto(emailVerificationEvent.toEmail(), emailVerificationEvent.token());
+        final MailMessageDto mailMessageDto = createMailMessageDto(emailVerificationEvent);
+        System.out.println(mailMessageDto);
         mailService.sendMail(mailMessageDto);
     }
 
-    private MailMessageDto createMailMessageDto(final String email, final String verificationToken) {
-        final String link = appProperties.baseUrl() + appProperties.emailVerificationPath().signUp() + "?token=" + verificationToken;
-        final String subject = "JobNote 회원가입 이메일 인증";
+    private MailMessageDto createMailMessageDto(final EmailVerificationEvent event) {
+        final String link = appProperties.baseUrl() + event.emailType().getPath(appProperties.emailVerificationPath()) + "?token=" + event.token();
+        final String subject = String.format("JobNote %s 이메일 인증", event.emailType().getTitle());
         final String text = String.format("""
                 JobNote를 이용해주셔서 감사합니다.
-                아래 이메일 인증 링크를 클릭하여 회원가입을 완료해 주세요.
+                아래 이메일 인증 링크를 클릭하여 %s을 완료해 주세요.
                 감사합니다.
                 %s
-                """, link);
+                """, event.emailType().getTitle(), link);
 
         return MailMessageDto.builder()
                 .from(fromEmail)
-                .to(email)
+                .to(event.toEmail())
                 .subject(subject)
                 .text(text)
                 .build();
