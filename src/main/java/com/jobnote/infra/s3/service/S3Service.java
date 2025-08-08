@@ -1,10 +1,10 @@
-package com.jobnote.s3.service;
+package com.jobnote.infra.s3.service;
 
 import com.jobnote.domain.document.util.DocumentStoragePolicyUtil;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.s3.dto.PresignedFileRequest;
-import com.jobnote.s3.dto.PresignedFileResponse;
+import com.jobnote.infra.s3.dto.PresignedFileRequest;
+import com.jobnote.infra.s3.dto.PresignedFileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

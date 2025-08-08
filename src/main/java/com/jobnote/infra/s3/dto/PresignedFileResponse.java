@@ -1,4 +1,4 @@
-package com.jobnote.s3.dto;
+package com.jobnote.infra.s3.dto;
 
 import java.net.URL;
 

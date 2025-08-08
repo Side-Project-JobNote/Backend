@@ -10,7 +10,7 @@ import com.jobnote.domain.document.repository.DocumentVersionRepository;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.s3.service.S3Service;
+import com.jobnote.infra.s3.service.S3Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;

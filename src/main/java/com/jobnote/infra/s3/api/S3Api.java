@@ -1,4 +1,4 @@
-package com.jobnote.s3.api;
+package com.jobnote.infra.s3.api;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
@@ -7,8 +7,8 @@ import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
-import com.jobnote.s3.dto.PresignedFileRequest;
-import com.jobnote.s3.dto.PresignedFileResponse;
+import com.jobnote.infra.s3.dto.PresignedFileRequest;
+import com.jobnote.infra.s3.dto.PresignedFileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
