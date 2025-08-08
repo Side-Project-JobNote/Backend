@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.*;
 
 import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
@@ -61,6 +60,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
-        return new HashSet<>(List.of(WHITELIST)).contains(request.getRequestURI());
+        return TOKEN_FILTER_WHITELIST.stream()
+                .anyMatch((path) -> request.getRequestURI().startsWith(path));
     }
 }
