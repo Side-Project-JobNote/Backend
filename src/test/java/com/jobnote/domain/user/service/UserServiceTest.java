@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -38,7 +38,7 @@ class UserServiceTest extends ServiceUnitTest {
     private VerificationTokenService verificationTokenService;
 
     @Mock
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -290,5 +290,27 @@ class UserServiceTest extends ServiceUnitTest {
             then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
             then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
         }
+    }
+
+    @Test
+    @DisplayName("비밀번호 재설정")
+    void resetPassword() {
+        // given
+        final String newPassword = "testNewPassword";
+        final String newEncodedPassword = "testNewEncodedPassword";
+        final String token = "testToken";
+        final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
+        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+        final VerificationToken verificationToken = VerificationToken.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
+        verificationToken.verify();
+
+        given(verificationTokenService.getVerificationTokenByToken(token)).willReturn(verificationToken);
+        given(passwordEncoder.encode(newPassword)).willReturn(newEncodedPassword);
+
+        // when
+        userService.resetPassword(request, token);
+
+        // then
+        assertThat(user.getPassword()).isEqualTo(newEncodedPassword);
     }
 }
