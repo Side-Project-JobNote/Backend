@@ -3,7 +3,7 @@ package com.jobnote.domain.user.service;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.*;
-import com.jobnote.domain.user.event.SignUpEvent;
+import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
 import com.jobnote.global.exception.JobNoteException;
@@ -51,7 +51,7 @@ public class UserService {
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
         final VerificationToken savedVerificationToken = verificationTokenService.save(savedUser, emailVerificationExpiryDate);
 
-        eventPublisher.publishEvent(new SignUpEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
+        eventPublisher.publishEvent(new EmailVerificationEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
     }
 
     /* SOCIAL LOGIN SIGN UP */

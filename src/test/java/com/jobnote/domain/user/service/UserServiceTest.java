@@ -8,7 +8,7 @@ import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserNicknameRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
-import com.jobnote.domain.user.event.SignUpEvent;
+import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.verificationtoken.domain.VerificationTokenStatus;
 import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
@@ -80,7 +80,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
             then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
-            then(applicationEventPublisher).should().publishEvent(new SignUpEvent(email, token));
+            then(applicationEventPublisher).should().publishEvent(new EmailVerificationEvent(email, token));
         }
 
         @Test
@@ -98,7 +98,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
             then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
-            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
         }
 
         @Test
@@ -116,7 +116,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
             then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
-            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
         }
     }
 
