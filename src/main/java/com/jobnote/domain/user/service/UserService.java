@@ -101,8 +101,17 @@ public class UserService {
         eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
     }
 
+    @Transactional
     public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
         verificationTokenService.verifyToken(token, currentDate);
+    }
+
+    @Transactional
+    public void resetPassword(final UserResetPasswordRequest request, final String token) {
+        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
+        verificationToken.validateVerified();
+        final User user = verificationToken.getUser();
+        user.resetPassword(passwordEncoder.encode(request.newPassword()));
     }
 
     /* HELPER METHOD */
