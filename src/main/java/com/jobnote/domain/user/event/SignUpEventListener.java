@@ -26,7 +26,7 @@ public class SignUpEventListener {
     }
 
     private MailMessageDto createMailMessageDto(final String email, final String verificationToken) {
-        final String link = appProperties.baseUrl() + appProperties.emailVerificationPath() + "?token=" + verificationToken;
+        final String link = appProperties.baseUrl() + appProperties.emailVerificationPath().signUp() + "?token=" + verificationToken;
         final String subject = "JobNote 회원가입 이메일 인증";
         final String text = String.format("""
                 JobNote를 이용해주셔서 감사합니다.
