@@ -29,8 +29,7 @@ public class VerificationTokenService {
         final VerificationToken verificationToken = getVerificationTokenByToken(token);
 
         verificationToken.validateExpired(currentDate);
-        verificationToken.validateVerified();
-        verificationToken.complete();
+        verificationToken.verify();
 
         return verificationToken;
     }
