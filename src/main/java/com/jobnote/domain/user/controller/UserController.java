@@ -88,4 +88,10 @@ public class UserController {
         userService.sendResetPasswordEmail(request, LocalDateTime.now().plusDays(1));
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
+
+    @GetMapping("/reset-password/verify")
+    public ResponseEntity<ApiResponse<Void>> verifyResetPasswordEmail(@RequestParam("token") final String token) {
+        userService.verifyResetPasswordEmail(token, LocalDateTime.now());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
 }
