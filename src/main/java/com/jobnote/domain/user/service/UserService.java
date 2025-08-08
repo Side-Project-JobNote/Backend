@@ -99,8 +99,8 @@ public class UserService {
 
     /* RESET PASSWORD */
     @Transactional
-    public void sendResetPasswordEmail(final Long userId, final LocalDateTime emailVerificationExpiryDate) {
-        final User user = getUserById(userId);
+    public void sendResetPasswordEmail(final UserResetPasswordEmailRequest request, final LocalDateTime emailVerificationExpiryDate) {
+        final User user = getUserByEmail(request.email());
         final VerificationToken savedVerificationToken = verificationTokenService.save(user, emailVerificationExpiryDate);
 
         eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
