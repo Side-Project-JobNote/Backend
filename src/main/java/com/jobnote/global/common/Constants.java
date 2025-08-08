@@ -27,6 +27,7 @@ public abstract class Constants {
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
             "/api/v1/users/verify",
+            "/api/v1/users/reset-password/**",
             "/login/**",
             "/oauth2/**",
             "/h2-console/**",
