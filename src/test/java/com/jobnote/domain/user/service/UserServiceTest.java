@@ -2,27 +2,29 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
-import com.jobnote.domain.user.domain.VerificationToken;
+import com.jobnote.domain.user.domain.UserRole;
+import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.UserAvatarRequest;
 import com.jobnote.domain.user.dto.UserNicknameRequest;
 import com.jobnote.domain.user.dto.UserProfileResponse;
 import com.jobnote.domain.user.dto.UserSignUpRequest;
+import com.jobnote.domain.user.event.SignUpEvent;
 import com.jobnote.domain.user.repository.UserRepository;
-import com.jobnote.domain.user.repository.VerificationTokenRepository;
+import com.jobnote.domain.verificationtoken.domain.VerificationTokenStatus;
+import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
 import com.jobnote.global.common.ResponseCode;
-import com.jobnote.global.config.properties.AppProperties;
 import com.jobnote.global.exception.JobNoteException;
-import com.jobnote.mail.MailService;
-import com.jobnote.mail.dto.MailMessageDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_EMAIL;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
@@ -38,16 +40,13 @@ class UserServiceTest extends ServiceUnitTest {
     private UserRepository userRepository;
 
     @Mock
-    private VerificationTokenRepository verificationTokenRepository;
+    private VerificationTokenService verificationTokenService;
 
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Mock
-    private MailService mailService;
-
-    @Mock
-    private AppProperties appProperties;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -59,20 +58,29 @@ class UserServiceTest extends ServiceUnitTest {
         @DisplayName("성공")
         void success() {
             // given
-            final UserSignUpRequest request = new UserSignUpRequest("testEmail@test.com", "testPassword", "testNickname");
-            final User user = User.signUp(request.email(), bCryptPasswordEncoder.encode(request.password()), request.nickname());
-            given(userRepository.existsByEmail(request.email())).willReturn(false);
-            given(userRepository.existsByNickname(request.nickname())).willReturn(false);
+            final String email = "testEmail@test.com";
+            final String nickname = "testNickname";
+            final String password = "testPassword";
+            final UserSignUpRequest request = new UserSignUpRequest(email, password, nickname);
+            final User user = User.signUp(email, password, nickname);
+            final String token = "testToken";
+            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
+            final VerificationToken verificationToken = VerificationToken.create(token, user, emailVerificationExpiryDate);
+
+            given(userRepository.existsByEmail(email)).willReturn(false);
+            given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
+            given(verificationTokenService.save(user, emailVerificationExpiryDate)).willReturn(verificationToken);
 
             // when
-            userService.signUp(request, LocalDateTime.now());
+            userService.signUp(request, emailVerificationExpiryDate);
 
             // then
-            then(userRepository).should().existsByNickname(request.nickname());
+            then(userRepository).should().existsByEmail(email);
+            then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
-            then(verificationTokenRepository).should().save(any(VerificationToken.class));
-            then(mailService).should().sendMail(any(MailMessageDto.class));
+            then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
+            then(applicationEventPublisher).should().publishEvent(new SignUpEvent(email, token));
         }
 
         @Test
@@ -89,6 +97,8 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
+            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
 
         @Test
@@ -105,6 +115,8 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
+            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
+            then(applicationEventPublisher).should(never()).publishEvent(any(SignUpEvent.class));
         }
     }
 
@@ -214,6 +226,30 @@ class UserServiceTest extends ServiceUnitTest {
             assertThatThrownBy(() -> userService.getUserById(userId))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(ResponseCode.NOT_FOUND_USER.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("이메일 인증")
+    class EmailVerification {
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
+            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
+            final String token = UUID.randomUUID().toString();
+            final VerificationToken verificationToken = VerificationToken.create(token, user, expiryDate);
+
+            given(verificationTokenService.getVerificationTokenByToken(token)).willReturn(verificationToken);
+
+            // when
+            userService.verifyEmail(token, currentDate);
+
+            // then
+            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
         }
     }
 }

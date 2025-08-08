@@ -18,6 +18,7 @@ public enum ResponseCode {
     INVALID_SCHEDULE_FORM_ASSOCIATION(HttpStatus.BAD_REQUEST, "4002", "일정이 지정한 지원서에 속하지 않습니다."),
     NOT_SUPPORTED_SOCIAL_PROVIDER(HttpStatus.BAD_REQUEST, "4003", "해당 소셜 로그인은 지원되지 않습니다."),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "4004", "올바르지 않은 토큰 타입입니다."),
+    ALREADY_VERIFIED_TOKEN(HttpStatus.BAD_REQUEST, "4005", "이미 인증이 완료된 토큰입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
