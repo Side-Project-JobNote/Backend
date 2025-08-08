@@ -65,14 +65,9 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
+        final VerificationToken verificationToken = verificationTokenService.verifyToken(token, currentDate);
         final User user = verificationToken.getUser();
-
-        verificationToken.validateExpired(currentDate);
-        verificationToken.validateVerified();
-
         user.accept();
-        verificationToken.complete();
     }
 
     /* GET PROFILE */
