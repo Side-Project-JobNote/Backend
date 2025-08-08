@@ -81,4 +81,19 @@ class UserTest {
         assertThat(socialUser.getNickname()).isEqualTo(updatedNickname);
     }
 
+    @Test
+    @DisplayName("비밀번호를 재설정한다")
+    void resetPassword() {
+        // given
+        final String existingPassword = "testPassword";
+        final String newPassword = "testNewPassword";
+        final User user = User.signUp("testEmail@test.com", existingPassword, "testNickname");
+
+        // when
+        user.resetPassword(newPassword);
+
+        // then
+        assertThat(user.getPassword()).isEqualTo(newPassword);
+        assertThat(user.getPassword()).isNotEqualTo(existingPassword);
+    }
 }
