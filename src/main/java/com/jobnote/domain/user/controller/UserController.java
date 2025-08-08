@@ -94,4 +94,10 @@ public class UserController {
         userService.verifyResetPasswordEmail(token, LocalDateTime.now());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid final UserResetPasswordRequest request, @RequestParam("token") final String token) {
+        userService.resetPassword(request, token);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
 }
