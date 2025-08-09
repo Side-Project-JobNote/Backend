@@ -226,7 +226,7 @@ class UserServiceTest extends ServiceUnitTest {
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final String token = UUID.randomUUID().toString();
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 
             given(verificationEmailService.verify(token, currentDate)).willReturn(verificationEmail);
 
@@ -247,7 +247,7 @@ class UserServiceTest extends ServiceUnitTest {
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
         final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
+        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31), VerificationEmailType.RESET_PASSWORD);
         verificationEmail.verify();
 
         given(verificationEmailService.validateVerified(token)).willReturn(verificationEmail);

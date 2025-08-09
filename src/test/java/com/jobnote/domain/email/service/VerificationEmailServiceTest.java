@@ -47,7 +47,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final User user = mock(User.class);
             final String token = "testToken";
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
 
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
@@ -83,7 +83,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final String token = "testToken";
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
 
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
@@ -104,7 +104,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         final String token = "testToken";
         final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
         final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate);
+        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 
         given(verificationEmailRepository.save(any(VerificationEmail.class))).willReturn(verificationEmail);
 

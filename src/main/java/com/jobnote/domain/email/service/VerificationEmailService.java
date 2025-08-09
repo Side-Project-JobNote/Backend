@@ -42,7 +42,7 @@ public class VerificationEmailService {
     /* SEND */
     @Transactional
     public void send(final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
-        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate));
+        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, type));
         eventPublisher.publishEvent(EmailVerificationEvent.of(user.getEmail(), savedVerificationEmail.getToken(), type));
     }
 

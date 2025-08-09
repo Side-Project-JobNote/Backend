@@ -36,12 +36,17 @@ public class VerificationEmail {
     @Column(nullable = false)
     private VerificationEmailStatus status;
 
-    public static VerificationEmail create(final String token, final User user, final LocalDateTime expiryDate) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VerificationEmailType type;
+
+    public static VerificationEmail create(final String token, final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
         return VerificationEmail.builder()
                 .token(token)
                 .user(user)
                 .expiryDate(expiryDate)
                 .status(VerificationEmailStatus.PENDING)
+                .type(type)
                 .build();
     }
 

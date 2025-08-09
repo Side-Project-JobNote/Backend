@@ -23,7 +23,7 @@ class VerificationEmailTest {
         final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
 
         // when
-        final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+        final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
 
         // then
         assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.PENDING);
@@ -39,7 +39,7 @@ class VerificationEmailTest {
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.minusMinutes(1);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
 
             // when
             verificationEmail.validateExpired(currentDate);
@@ -55,7 +55,7 @@ class VerificationEmailTest {
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.plusMinutes(1);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
 
             // when & then
             assertThatThrownBy(() -> verificationEmail.validateExpired(currentDate))
@@ -74,7 +74,7 @@ class VerificationEmailTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
             verificationEmail.verify();
 
             // when
@@ -90,7 +90,7 @@ class VerificationEmailTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
 
             // when & then
             assertThatThrownBy(verificationEmail::validateVerified)
@@ -109,7 +109,7 @@ class VerificationEmailTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
 
             // when
             verificationEmail.verify();
@@ -124,7 +124,7 @@ class VerificationEmailTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
             verificationEmail.verify();
 
             // when & then
