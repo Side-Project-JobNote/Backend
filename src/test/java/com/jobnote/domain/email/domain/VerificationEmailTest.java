@@ -1,4 +1,4 @@
-package com.jobnote.domain.verificationtoken.domain;
+package com.jobnote.domain.email.domain;
 
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.global.exception.JobNoteException;
@@ -13,7 +13,7 @@ import static com.jobnote.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class VerificationTokenTest {
+class VerificationEmailTest {
 
     @Test
     @DisplayName("토큰 생성 시 상태는 PENDING이다.")
@@ -23,10 +23,10 @@ class VerificationTokenTest {
         final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
 
         // when
-        final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
+        final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
 
         // then
-        assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.PENDING);
+        assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.PENDING);
     }
 
     @Nested
@@ -39,13 +39,13 @@ class VerificationTokenTest {
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.minusMinutes(1);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
 
             // when
-            verificationToken.validateExpired(currentDate);
+            verificationEmail.validateExpired(currentDate);
 
             // then
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.PENDING);
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.PENDING);
         }
 
         @Test
@@ -55,13 +55,13 @@ class VerificationTokenTest {
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.plusMinutes(1);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
 
             // when & then
-            assertThatThrownBy(() -> verificationToken.validateExpired(currentDate))
+            assertThatThrownBy(() -> verificationEmail.validateExpired(currentDate))
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(EXPIRED_VERIFICATION_TOKEN.getMessage());
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.EXPIRED);
+                    .hasMessage(EXPIRED_VERIFICATION_EMAIL.getMessage());
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.EXPIRED);
         }
     }
 
@@ -74,14 +74,14 @@ class VerificationTokenTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
-            verificationToken.verify();
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            verificationEmail.verify();
 
             // when
-            verificationToken.validateVerified();
+            verificationEmail.validateVerified();
 
             // then
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.VERIFIED);
         }
 
         @Test
@@ -90,13 +90,13 @@ class VerificationTokenTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
 
             // when & then
-            assertThatThrownBy(verificationToken::validateVerified)
+            assertThatThrownBy(verificationEmail::validateVerified)
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_YET_VERIFIED_TOKEN.getMessage());
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.PENDING);
+                    .hasMessage(VERIFICATION_EMAIL_NOT_YET_VERIFIED.getMessage());
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.PENDING);
         }
     }
 
@@ -109,13 +109,13 @@ class VerificationTokenTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
 
             // when
-            verificationToken.verify();
+            verificationEmail.verify();
 
             // then
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.VERIFIED);
         }
 
         @Test
@@ -124,14 +124,14 @@ class VerificationTokenTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationToken verificationToken = VerificationToken.create(UUID.randomUUID().toString(), user, expiryDate);
-            verificationToken.verify();
+            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate);
+            verificationEmail.verify();
 
             // when & then
-            assertThatThrownBy(verificationToken::verify)
+            assertThatThrownBy(verificationEmail::verify)
                     .isInstanceOf(JobNoteException.class)
-                    .hasMessage(ALREADY_VERIFIED_TOKEN.getMessage());
-            assertThat(verificationToken.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
+                    .hasMessage(VERIFICATION_EMAIL_ALREADY_VERIFIED.getMessage());
+            assertThat(verificationEmail.getStatus()).isEqualTo(VerificationEmailStatus.VERIFIED);
         }
     }
 }
