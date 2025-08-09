@@ -1,14 +1,13 @@
 package com.jobnote.domain.user.service;
 
+import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.dto.*;
-import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,9 +26,8 @@ import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final VerificationEmailService verificationEmailService;
     private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher eventPublisher;
+    private final VerificationEmailService verificationEmailService;
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
@@ -49,9 +47,7 @@ public class UserService {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        final VerificationEmail savedVerificationEmail = verificationEmailService.save(savedUser, emailVerificationExpiryDate);
-
-        eventPublisher.publishEvent(EmailVerificationEvent.signUp(savedUser.getEmail(), savedVerificationEmail.getToken()));
+        verificationEmailService.send(savedUser, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -65,7 +61,7 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationEmail verificationEmail = verificationEmailService.verifyToken(token, currentDate);
+        final VerificationEmail verificationEmail = verificationEmailService.verify(token, currentDate);
         final User user = verificationEmail.getUser();
         user.accept();
     }
@@ -96,20 +92,17 @@ public class UserService {
     @Transactional
     public void sendResetPasswordEmail(final UserResetPasswordEmailRequest request, final LocalDateTime emailVerificationExpiryDate) {
         final User user = getUserByEmail(request.email());
-        final VerificationEmail savedVerificationEmail = verificationEmailService.save(user, emailVerificationExpiryDate);
-
-        eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationEmail.getToken()));
+        verificationEmailService.send(user, emailVerificationExpiryDate, VerificationEmailType.RESET_PASSWORD);
     }
 
     @Transactional
     public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
-        verificationEmailService.verifyToken(token, currentDate);
+        verificationEmailService.verify(token, currentDate);
     }
 
     @Transactional
     public void resetPassword(final UserResetPasswordRequest request, final String token) {
-        final VerificationEmail verificationEmail = verificationEmailService.getVerificationEmailByToken(token);
-        verificationEmail.validateVerified();
+        final VerificationEmail verificationEmail = verificationEmailService.validateVerified(token);
         final User user = verificationEmail.getUser();
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
     }

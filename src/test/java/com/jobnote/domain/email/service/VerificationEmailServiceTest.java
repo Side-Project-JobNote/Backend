@@ -80,7 +80,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
             // when
-            final VerificationEmail result = verificationEmailService.verifyToken(token, currentDate);
+            final VerificationEmail result = verificationEmailService.verify(token, currentDate);
 
             // then
             assertThat(result).isEqualTo(verificationEmail);
