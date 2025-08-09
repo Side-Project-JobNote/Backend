@@ -1,6 +1,7 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.email.domain.VerificationEmailType;
+import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.dto.*;
@@ -43,11 +44,11 @@ public class UserService {
 
     /* SIGN UP */
     @Transactional
-    public void signUp(final UserSignUpRequest request, final LocalDateTime emailVerificationExpiryDate) {
+    public void signUp(final UserSignUpRequest request, final LocalDateTime expiryDate) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        verificationEmailService.send(savedUser, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+        verificationEmailService.send(savedUser, expiryDate, VerificationEmailType.SIGN_UP);
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -60,10 +61,14 @@ public class UserService {
 
     /* EMAIL VERIFICATION */
     @Transactional
-    public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationEmail verificationEmail = verificationEmailService.verify(token, currentDate);
+    public void verifySignUp(final String token, final LocalDateTime currentDate) {
+        final VerificationEmail verificationEmail = verifyEmail(token, currentDate);
         final User user = verificationEmail.getUser();
         user.accept();
+    }
+
+    public VerificationEmail verifyEmail(final String token, final LocalDateTime currentDate) {
+        return verificationEmailService.verify(token, currentDate);
     }
 
     /* GET PROFILE */
@@ -90,21 +95,15 @@ public class UserService {
 
     /* RESET PASSWORD */
     @Transactional
-    public void sendResetPasswordEmail(final UserResetPasswordEmailRequest request, final LocalDateTime emailVerificationExpiryDate) {
-        final User user = getUserByEmail(request.email());
-        verificationEmailService.send(user, emailVerificationExpiryDate, VerificationEmailType.RESET_PASSWORD);
-    }
-
-    @Transactional
-    public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
-        verificationEmailService.verify(token, currentDate);
-    }
-
-    @Transactional
     public void resetPassword(final UserResetPasswordRequest request, final String token) {
         final VerificationEmail verificationEmail = verificationEmailService.validateVerified(token);
         final User user = verificationEmail.getUser();
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
+    }
+
+    public void sendVerificationEmail(final VerificationEmailRequest request, final LocalDateTime expiryDate) {
+        final User user = getUserByEmail(request.email());
+        verificationEmailService.send(user, expiryDate, request.type());
     }
 
     /* HELPER METHOD */

@@ -231,51 +231,10 @@ class UserServiceTest extends ServiceUnitTest {
             given(verificationEmailService.verify(token, currentDate)).willReturn(verificationEmail);
 
             // when
-            userService.verifyEmail(token, currentDate);
+            userService.verifySignUp(token, currentDate);
 
             // then
             assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
-        }
-    }
-
-    @Nested
-    @DisplayName("비밀번호 재설정 이메일 전송")
-    class ResetPasswordEmail {
-        @Test
-        @DisplayName("성공")
-        void success() {
-            // given
-            final String email = "testEmail@test.com";
-            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
-            final User user = User.signUp(email, "testPassword", "testNickname");
-            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-
-            given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
-            willDoNothing().given(verificationEmailService).send(user, emailVerificationExpiryDate, VerificationEmailType.RESET_PASSWORD);
-
-            // when
-            userService.sendResetPasswordEmail(request, emailVerificationExpiryDate);
-
-            // then
-            then(userRepository).should().findByEmail(email);
-            then(verificationEmailService).should().send(user, emailVerificationExpiryDate, VerificationEmailType.RESET_PASSWORD);
-        }
-
-        @Test
-        @DisplayName("실패 - 이메일이 존재하지 않는다.")
-        void fail_DuplicatedEmail() {
-            // given
-            final String email = "testEmail@test.com";
-            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
-            given(userRepository.findByEmail(email)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.sendResetPasswordEmail(request, LocalDateTime.now()))
-                    .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_FOUND_USER.getMessage());
-
-            then(userRepository).should().findByEmail(email);
-            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
         }
     }
 
