@@ -61,6 +61,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
         return TOKEN_FILTER_WHITELIST.stream()
-                .anyMatch((path) -> request.getRequestURI().startsWith(path));
+                .anyMatch(path -> request.getRequestURI().startsWith(path));
     }
 }
