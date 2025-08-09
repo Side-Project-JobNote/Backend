@@ -6,6 +6,7 @@ import com.jobnote.domain.verificationtoken.repository.VerificationTokenReposito
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_TOKEN;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class VerificationTokenService {
 
@@ -22,7 +24,18 @@ public class VerificationTokenService {
         return getByTokenOrThrow(token);
     }
 
+    @Transactional
+    public VerificationToken verifyToken(final String token, final LocalDateTime currentDate) {
+        final VerificationToken verificationToken = getVerificationTokenByToken(token);
+
+        verificationToken.validateExpired(currentDate);
+        verificationToken.verify();
+
+        return verificationToken;
+    }
+
     /* CREATE */
+    @Transactional
     public VerificationToken save(final User user, final LocalDateTime emailVerificationExpiryDate) {
         return verificationTokenRepository.save(VerificationToken.create(UUID.randomUUID().toString(), user, emailVerificationExpiryDate));
     }

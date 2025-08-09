@@ -1,5 +1,7 @@
 package com.jobnote.global.common;
 
+import java.util.List;
+
 public abstract class Constants {
 
     // uri
@@ -27,11 +29,22 @@ public abstract class Constants {
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
             "/api/v1/users/verify",
+            "/api/v1/users/reset-password/**",
             "/login/**",
             "/oauth2/**",
             "/h2-console/**",
             "/error/**",
     };
+
+    public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
+            "/api/v1/users/signup",
+            "/api/v1/users/verify",
+            "/api/v1/users/reset-password",
+            "/login",
+            "/oauth2",
+            "/h2-console",
+            "/error"
+    );
 
     public static final String[] ONLY_GUEST = {
             "/api/v1/users/signup/social",

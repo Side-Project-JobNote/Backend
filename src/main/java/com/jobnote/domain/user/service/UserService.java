@@ -3,7 +3,7 @@ package com.jobnote.domain.user.service;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import com.jobnote.domain.user.dto.*;
-import com.jobnote.domain.user.event.SignUpEvent;
+import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
 import com.jobnote.global.exception.JobNoteException;
@@ -51,7 +51,7 @@ public class UserService {
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
         final VerificationToken savedVerificationToken = verificationTokenService.save(savedUser, emailVerificationExpiryDate);
 
-        eventPublisher.publishEvent(new SignUpEvent(savedUser.getEmail(), savedVerificationToken.getToken()));
+        eventPublisher.publishEvent(EmailVerificationEvent.signUp(savedUser.getEmail(), savedVerificationToken.getToken()));
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -65,14 +65,9 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
+        final VerificationToken verificationToken = verificationTokenService.verifyToken(token, currentDate);
         final User user = verificationToken.getUser();
-
-        verificationToken.validateExpired(currentDate);
-        verificationToken.validateVerified();
-
         user.accept();
-        verificationToken.complete();
     }
 
     /* GET PROFILE */
@@ -95,6 +90,28 @@ public class UserService {
         final User user = getUserById(userId);
         user.updateNickname(request.nickname());
         return UserProfileResponse.from(user);
+    }
+
+    /* RESET PASSWORD */
+    @Transactional
+    public void sendResetPasswordEmail(final UserResetPasswordEmailRequest request, final LocalDateTime emailVerificationExpiryDate) {
+        final User user = getUserByEmail(request.email());
+        final VerificationToken savedVerificationToken = verificationTokenService.save(user, emailVerificationExpiryDate);
+
+        eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
+    }
+
+    @Transactional
+    public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
+        verificationTokenService.verifyToken(token, currentDate);
+    }
+
+    @Transactional
+    public void resetPassword(final UserResetPasswordRequest request, final String token) {
+        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
+        verificationToken.validateVerified();
+        final User user = verificationToken.getUser();
+        user.resetPassword(passwordEncoder.encode(request.newPassword()));
     }
 
     /* HELPER METHOD */

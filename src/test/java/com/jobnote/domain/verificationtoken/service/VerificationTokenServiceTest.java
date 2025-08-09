@@ -3,6 +3,7 @@ package com.jobnote.domain.verificationtoken.service;
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.verificationtoken.domain.VerificationToken;
+import com.jobnote.domain.verificationtoken.domain.VerificationTokenStatus;
 import com.jobnote.domain.verificationtoken.repository.VerificationTokenRepository;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
@@ -60,6 +61,30 @@ class VerificationTokenServiceTest extends ServiceUnitTest {
             assertThatThrownBy(() -> verificationTokenService.getVerificationTokenByToken(token))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(NOT_FOUND_VERIFICATION_TOKEN.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("토큰 검증")
+    class VerifyToken {
+        @Test
+        @DisplayName("성공 - 검증 토큰의 상태는 VERIFIED가 된다.")
+        void success() {
+            // given
+            final User user = mock(User.class);
+            final String token = "testToken";
+            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
+            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
+            final VerificationToken verificationToken = VerificationToken.create(token, user, emailVerificationExpiryDate);
+
+            given(verificationTokenRepository.findByToken(token)).willReturn(Optional.of(verificationToken));
+
+            // when
+            final VerificationToken result = verificationTokenService.verifyToken(token, currentDate);
+
+            // then
+            assertThat(result).isEqualTo(verificationToken);
+            assertThat(result.getStatus()).isEqualTo(VerificationTokenStatus.VERIFIED);
         }
     }
 }

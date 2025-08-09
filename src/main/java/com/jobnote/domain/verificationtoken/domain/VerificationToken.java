@@ -7,8 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-import static com.jobnote.global.common.ResponseCode.ALREADY_VERIFIED_TOKEN;
-import static com.jobnote.global.common.ResponseCode.EXPIRED_VERIFICATION_TOKEN;
+import static com.jobnote.global.common.ResponseCode.*;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -26,7 +25,7 @@ public class VerificationToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -54,12 +53,15 @@ public class VerificationToken {
     }
 
     public void validateVerified() {
-        if (VerificationTokenStatus.VERIFIED.equals(this.status)) {
-            throw new JobNoteException(ALREADY_VERIFIED_TOKEN);
+        if (!VerificationTokenStatus.VERIFIED.equals(this.status)) {
+            throw new JobNoteException(NOT_YET_VERIFIED_TOKEN);
         }
     }
 
-    public void complete() {
+    public void verify() {
+        if (VerificationTokenStatus.VERIFIED.equals(this.status)) {
+            throw new JobNoteException(ALREADY_VERIFIED_TOKEN);
+        }
         this.status = VerificationTokenStatus.VERIFIED;
     }
 }

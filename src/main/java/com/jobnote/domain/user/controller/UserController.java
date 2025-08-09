@@ -1,4 +1,4 @@
-package com.jobnote.domain.user.api;
+package com.jobnote.domain.user.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomPrincipal;
@@ -71,14 +71,33 @@ public class UserController {
 
     /* UPDATE PROFILE */
     @PatchMapping("/avatar")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomPrincipal principal, @RequestBody @Valid UserAvatarRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomPrincipal principal, @RequestBody @Valid final UserAvatarRequest request) {
         final UserProfileResponse response = userService.updateAvatar(principal.getUserId(), request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
 
     @PatchMapping("/nickname")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateNickname(@LoginUser final CustomPrincipal principal, @RequestBody @Valid UserNicknameRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateNickname(@LoginUser final CustomPrincipal principal, @RequestBody @Valid final UserNicknameRequest request) {
         final UserProfileResponse response = userService.updateNickname(principal.getUserId(), request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
+    }
+
+    /* RESET PASSWORD */
+    @PostMapping("/reset-password/email")
+    public ResponseEntity<ApiResponse<Void>> sendResetPasswordEmail(@RequestBody @Valid final UserResetPasswordEmailRequest request) {
+        userService.sendResetPasswordEmail(request, LocalDateTime.now().plusDays(1));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
+    @GetMapping("/reset-password/verify")
+    public ResponseEntity<ApiResponse<Void>> verifyResetPasswordEmail(@RequestParam("token") final String token) {
+        userService.verifyResetPasswordEmail(token, LocalDateTime.now());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid final UserResetPasswordRequest request, @RequestParam("token") final String token) {
+        userService.resetPassword(request, token);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 }
