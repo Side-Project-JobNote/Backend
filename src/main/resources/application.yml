@@ -39,7 +39,9 @@ spring:
             user-name-attribute: id
 
 app:
-  email-verification-path: /api/v1/users/verify
+  email-verification-path:
+    sign-up: /api/v1/users/verify
+    reset-password: /api/v1/users/reset-password/verify
 
 file:
   quota:

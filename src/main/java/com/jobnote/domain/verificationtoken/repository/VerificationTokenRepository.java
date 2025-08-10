@@ -1,6 +1,6 @@
-package com.jobnote.domain.user.repository;
+package com.jobnote.domain.verificationtoken.repository;
 
-import com.jobnote.domain.user.domain.VerificationToken;
+import com.jobnote.domain.verificationtoken.domain.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
