@@ -11,8 +11,6 @@ import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.infra.s3.service.S3Service;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +28,6 @@ public class DocumentService {
     private final DocumentVersionRepository documentVersionRepository;
     private final UserService userService;
     private final S3Service s3Service;
-
-    @PersistenceContext
-    private final EntityManager entityManager;
 
     @Transactional
     public Long uploadNewDocument(final Long userId, final DocumentRequest request) {
@@ -71,14 +66,13 @@ public class DocumentService {
         document.validateOwner(userId);
 
         // s3에서 삭제
-        List<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByUserIdAndDocumentId(userId, document.getId());
+        List<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId);
         for (DocumentVersion documentVersion : allByDocumentId) {
             s3Service.deleteFile(documentVersion.getFileKey());
         }
 
         // 엔티티 삭제
-        documentVersionRepository.deleteAll(allByDocumentId);
-        entityManager.flush();
+        documentVersionRepository.deleteAllByDocumentId(documentId);
         documentRepository.delete(document);
     }
 
