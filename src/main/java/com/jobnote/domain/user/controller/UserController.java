@@ -45,13 +45,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
-    /* EMAIL VERIFICATION */
-    @GetMapping("/verify")
-    public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") final String token) {
-        userService.verifyEmail(token, LocalDateTime.now());
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
-    }
-
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
@@ -83,18 +76,6 @@ public class UserController {
     }
 
     /* RESET PASSWORD */
-    @PostMapping("/reset-password/email")
-    public ResponseEntity<ApiResponse<Void>> sendResetPasswordEmail(@RequestBody @Valid final UserResetPasswordEmailRequest request) {
-        userService.sendResetPasswordEmail(request, LocalDateTime.now().plusDays(1));
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
-    }
-
-    @GetMapping("/reset-password/verify")
-    public ResponseEntity<ApiResponse<Void>> verifyResetPasswordEmail(@RequestParam("token") final String token) {
-        userService.verifyResetPasswordEmail(token, LocalDateTime.now());
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
-    }
-
     @PatchMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid final UserResetPasswordRequest request, @RequestParam("token") final String token) {
         userService.resetPassword(request, token);

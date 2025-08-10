@@ -1,4 +1,4 @@
-package com.jobnote.domain.verificationtoken.domain;
+package com.jobnote.domain.email.domain;
 
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.global.exception.JobNoteException;
@@ -15,7 +15,7 @@ import static com.jobnote.global.common.ResponseCode.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "verification_tokens")
 @Entity
-public class VerificationToken {
+public class VerificationEmail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,34 +34,39 @@ public class VerificationToken {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private VerificationTokenStatus status;
+    private VerificationEmailStatus status;
 
-    public static VerificationToken create(final String token, final User user, final LocalDateTime expiryDate) {
-        return VerificationToken.builder()
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VerificationEmailType type;
+
+    public static VerificationEmail create(final String token, final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
+        return VerificationEmail.builder()
                 .token(token)
                 .user(user)
                 .expiryDate(expiryDate)
-                .status(VerificationTokenStatus.PENDING)
+                .status(VerificationEmailStatus.PENDING)
+                .type(type)
                 .build();
     }
 
     public void validateExpired(final LocalDateTime currentDate) {
-        if (VerificationTokenStatus.EXPIRED.equals(this.status) || this.expiryDate.isBefore(currentDate)) {
-            this.status = VerificationTokenStatus.EXPIRED;
-            throw new JobNoteException(EXPIRED_VERIFICATION_TOKEN);
+        if (VerificationEmailStatus.EXPIRED.equals(this.status) || this.expiryDate.isBefore(currentDate)) {
+            this.status = VerificationEmailStatus.EXPIRED;
+            throw new JobNoteException(EXPIRED_VERIFICATION_EMAIL);
         }
     }
 
     public void validateVerified() {
-        if (!VerificationTokenStatus.VERIFIED.equals(this.status)) {
-            throw new JobNoteException(NOT_YET_VERIFIED_TOKEN);
+        if (!VerificationEmailStatus.VERIFIED.equals(this.status)) {
+            throw new JobNoteException(VERIFICATION_EMAIL_NOT_YET_VERIFIED);
         }
     }
 
     public void verify() {
-        if (VerificationTokenStatus.VERIFIED.equals(this.status)) {
-            throw new JobNoteException(ALREADY_VERIFIED_TOKEN);
+        if (VerificationEmailStatus.VERIFIED.equals(this.status)) {
+            throw new JobNoteException(VERIFICATION_EMAIL_ALREADY_VERIFIED);
         }
-        this.status = VerificationTokenStatus.VERIFIED;
+        this.status = VerificationEmailStatus.VERIFIED;
     }
 }

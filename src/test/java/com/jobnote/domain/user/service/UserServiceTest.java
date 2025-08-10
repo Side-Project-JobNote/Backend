@@ -1,13 +1,13 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
+import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.dto.*;
-import com.jobnote.domain.verificationtoken.domain.VerificationToken;
-import com.jobnote.domain.user.event.EmailVerificationEvent;
+import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.repository.UserRepository;
-import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
+import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -35,13 +34,10 @@ class UserServiceTest extends ServiceUnitTest {
     private UserRepository userRepository;
 
     @Mock
-    private VerificationTokenService verificationTokenService;
+    private VerificationEmailService verificationEmailService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -58,14 +54,12 @@ class UserServiceTest extends ServiceUnitTest {
             final String password = "testPassword";
             final UserSignUpRequest request = new UserSignUpRequest(email, password, nickname);
             final User user = User.signUp(email, password, nickname);
-            final String token = "testToken";
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationToken verificationToken = VerificationToken.create(token, user, emailVerificationExpiryDate);
 
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
-            given(verificationTokenService.save(user, emailVerificationExpiryDate)).willReturn(verificationToken);
+            willDoNothing().given(verificationEmailService).send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
 
             // when
             userService.signUp(request, emailVerificationExpiryDate);
@@ -74,8 +68,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByEmail(email);
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
-            then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
-            then(applicationEventPublisher).should().publishEvent(EmailVerificationEvent.signUp(email, token));
+            then(verificationEmailService).should().send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
         }
 
         @Test
@@ -92,8 +85,7 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
-            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
         }
 
         @Test
@@ -110,8 +102,7 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
-            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
         }
     }
 
@@ -235,60 +226,15 @@ class UserServiceTest extends ServiceUnitTest {
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final String token = UUID.randomUUID().toString();
-            final VerificationToken verificationToken = VerificationToken.create(token, user, expiryDate);
+            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 
-            given(verificationTokenService.verifyToken(token, currentDate)).willReturn(verificationToken);
+            given(verificationEmailService.verify(token, currentDate)).willReturn(verificationEmail);
 
             // when
-            userService.verifyEmail(token, currentDate);
+            userService.verifySignUp(token, currentDate);
 
             // then
             assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
-        }
-    }
-
-    @Nested
-    @DisplayName("비밀번호 재설정 이메일 전송")
-    class ResetPasswordEmail {
-        @Test
-        @DisplayName("성공")
-        void success() {
-            // given
-            final String email = "testEmail@test.com";
-            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
-            final User user = User.signUp(email, "testPassword", "testNickname");
-            final String token = "testToken";
-            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationToken verificationToken = VerificationToken.create(token, user, emailVerificationExpiryDate);
-
-            given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
-            given(verificationTokenService.save(user, emailVerificationExpiryDate)).willReturn(verificationToken);
-
-            // when
-            userService.sendResetPasswordEmail(request, emailVerificationExpiryDate);
-
-            // then
-            then(userRepository).should().findByEmail(email);
-            then(verificationTokenService).should().save(user, emailVerificationExpiryDate);
-            then(applicationEventPublisher).should().publishEvent(EmailVerificationEvent.resetPassword(email, token));
-        }
-
-        @Test
-        @DisplayName("실패 - 이메일이 존재하지 않는다.")
-        void fail_DuplicatedEmail() {
-            // given
-            final String email = "testEmail@test.com";
-            final UserResetPasswordEmailRequest request = new UserResetPasswordEmailRequest(email);
-            given(userRepository.findByEmail(email)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.sendResetPasswordEmail(request, LocalDateTime.now()))
-                    .isInstanceOf(JobNoteException.class)
-                    .hasMessage(NOT_FOUND_USER.getMessage());
-
-            then(userRepository).should().findByEmail(email);
-            then(verificationTokenService).should(never()).save(any(User.class), any(LocalDateTime.class));
-            then(applicationEventPublisher).should(never()).publishEvent(any(EmailVerificationEvent.class));
         }
     }
 
@@ -301,10 +247,10 @@ class UserServiceTest extends ServiceUnitTest {
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
         final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-        final VerificationToken verificationToken = VerificationToken.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
-        verificationToken.verify();
+        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31), VerificationEmailType.RESET_PASSWORD);
+        verificationEmail.verify();
 
-        given(verificationTokenService.getVerificationTokenByToken(token)).willReturn(verificationToken);
+        given(verificationEmailService.validateVerified(token)).willReturn(verificationEmail);
         given(passwordEncoder.encode(newPassword)).willReturn(newEncodedPassword);
 
         // when

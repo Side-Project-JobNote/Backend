@@ -1,14 +1,14 @@
 package com.jobnote.domain.user.service;
 
+import com.jobnote.domain.email.domain.VerificationEmailType;
+import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.domain.User;
-import com.jobnote.domain.verificationtoken.domain.VerificationToken;
+import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.dto.*;
-import com.jobnote.domain.user.event.EmailVerificationEvent;
 import com.jobnote.domain.user.repository.UserRepository;
-import com.jobnote.domain.verificationtoken.service.VerificationTokenService;
+import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,9 +27,8 @@ import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final VerificationTokenService verificationTokenService;
     private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher eventPublisher;
+    private final VerificationEmailService verificationEmailService;
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
@@ -45,13 +44,11 @@ public class UserService {
 
     /* SIGN UP */
     @Transactional
-    public void signUp(final UserSignUpRequest request, final LocalDateTime emailVerificationExpiryDate) {
+    public void signUp(final UserSignUpRequest request, final LocalDateTime expiryDate) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        final VerificationToken savedVerificationToken = verificationTokenService.save(savedUser, emailVerificationExpiryDate);
-
-        eventPublisher.publishEvent(EmailVerificationEvent.signUp(savedUser.getEmail(), savedVerificationToken.getToken()));
+        verificationEmailService.send(savedUser, expiryDate, VerificationEmailType.SIGN_UP);
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -64,10 +61,14 @@ public class UserService {
 
     /* EMAIL VERIFICATION */
     @Transactional
-    public void verifyEmail(final String token, final LocalDateTime currentDate) {
-        final VerificationToken verificationToken = verificationTokenService.verifyToken(token, currentDate);
-        final User user = verificationToken.getUser();
+    public void verifySignUp(final String token, final LocalDateTime currentDate) {
+        final VerificationEmail verificationEmail = verifyEmail(token, currentDate);
+        final User user = verificationEmail.getUser();
         user.accept();
+    }
+
+    public VerificationEmail verifyEmail(final String token, final LocalDateTime currentDate) {
+        return verificationEmailService.verify(token, currentDate);
     }
 
     /* GET PROFILE */
@@ -94,24 +95,15 @@ public class UserService {
 
     /* RESET PASSWORD */
     @Transactional
-    public void sendResetPasswordEmail(final UserResetPasswordEmailRequest request, final LocalDateTime emailVerificationExpiryDate) {
-        final User user = getUserByEmail(request.email());
-        final VerificationToken savedVerificationToken = verificationTokenService.save(user, emailVerificationExpiryDate);
-
-        eventPublisher.publishEvent(EmailVerificationEvent.resetPassword(user.getEmail(), savedVerificationToken.getToken()));
-    }
-
-    @Transactional
-    public void verifyResetPasswordEmail(final String token, final LocalDateTime currentDate) {
-        verificationTokenService.verifyToken(token, currentDate);
-    }
-
-    @Transactional
     public void resetPassword(final UserResetPasswordRequest request, final String token) {
-        final VerificationToken verificationToken = verificationTokenService.getVerificationTokenByToken(token);
-        verificationToken.validateVerified();
-        final User user = verificationToken.getUser();
+        final VerificationEmail verificationEmail = verificationEmailService.validateVerified(token);
+        final User user = verificationEmail.getUser();
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
+    }
+
+    public void sendVerificationEmail(final VerificationEmailRequest request, final LocalDateTime expiryDate) {
+        final User user = getUserByEmail(request.email());
+        verificationEmailService.send(user, expiryDate, request.type());
     }
 
     /* HELPER METHOD */
