@@ -1,6 +1,6 @@
 package com.jobnote.global.annotation.swagger;
 
-import org.springframework.http.HttpStatus;
+import com.jobnote.global.common.ResponseCode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiSuccessResponseExplanation {
-	HttpStatus status() default HttpStatus.OK;
+	ResponseCode responseCode() default ResponseCode.OK;
 
 	Class<?> responseClass() default EmptyClass.class;
 

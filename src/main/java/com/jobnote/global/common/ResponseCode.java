@@ -45,6 +45,7 @@ public enum ResponseCode {
     NOT_FOUND_VERIFICATION_EMAIL(HttpStatus.NOT_FOUND, "4044", "해당 인증 이메일을 찾을 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "4045", "해당 리프레시 토큰을 찾을 수 없습니다."),
     NOT_FOUND_DOCUMENT(HttpStatus.NOT_FOUND, "4046", "해당 문서를 찾을 수 없습니다."),
+    NOT_FOUND_S3_FILE(HttpStatus.NOT_FOUND, "4047", "업로드된 문서가 아닙니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),
@@ -53,6 +54,9 @@ public enum ResponseCode {
     CONFLICT(HttpStatus.CONFLICT, "4090", "요청이 서버의 상태와 충돌했습니다."),
     DUPLICATED_USER_NICKNAME(HttpStatus.CONFLICT, "4091", "이미 사용중인 닉네임입니다."),
     DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, "4091", "이미 가입된 이메일입니다."),
+
+    // 413 Payload Too Large
+    UPLOAD_SIZE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "4130", "총 업로드 허용 용량 100MB을 초과했습니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "서버에 에러가 발생했습니다."),

@@ -20,27 +20,28 @@ public class DocumentVersion extends BaseTimeEntity {
 
     private int version;
 
-    private String fileName;
+    private String originFileName;
+
+    private String fileKey;
 
     private Long fileSize;
 
-    private String fileUrl;
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
     @Builder
     public DocumentVersion(
             final int version,
-            final String fileName,
+            final String originFileName,
+            final String fileKey,
             final Long fileSize,
-            final String fileUrl,
             final Document document
     ) {
         this.version = version;
-        this.fileName = fileName;
+        this.originFileName = originFileName;
+        this.fileKey = fileKey;
         this.fileSize = fileSize;
-        this.fileUrl = fileUrl;
         this.document = document;
     }
 }

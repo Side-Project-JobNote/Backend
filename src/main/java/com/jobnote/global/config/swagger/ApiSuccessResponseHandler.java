@@ -18,7 +18,6 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 public class ApiSuccessResponseHandler {
 
     private static final String APPLICATION_JSON = "application/json";
-    private static final String SUCCESS_CODE = "2000";
 
     public void handleApiSuccessResponse(Operation operation, HandlerMethod handlerMethod) {
         ApiResponseExplanations apiResponseExplanations = handlerMethod.getMethodAnnotation(ApiResponseExplanations.class);
@@ -35,8 +34,8 @@ public class ApiSuccessResponseHandler {
             responses.remove("200");
 
             Schema<?> responseSchema = new Schema<>()
-                    .addProperty("code", new Schema<>().example(SUCCESS_CODE))
-                    .addProperty("message", new Schema<>().example(null))
+                    .addProperty("code", new Schema<>().example(apiSuccessResponseExplanation.responseCode().getCode()))
+                    .addProperty("message", new Schema<>().example(apiSuccessResponseExplanation.responseCode().getMessage()))
                     .addProperty("data",
                             apiSuccessResponseExplanation.responseClass()
                                     .isAssignableFrom(ApiSuccessResponseExplanation.EmptyClass.class)
@@ -56,7 +55,7 @@ public class ApiSuccessResponseHandler {
                                             new MediaType().schema(responseSchema)
                                     )
                     );
-            responses.addApiResponse(String.valueOf(apiSuccessResponseExplanation.status().value()), apiResponse);
+            responses.addApiResponse(String.valueOf(apiSuccessResponseExplanation.responseCode().getStatus().value()), apiResponse);
         }
     }
 }
