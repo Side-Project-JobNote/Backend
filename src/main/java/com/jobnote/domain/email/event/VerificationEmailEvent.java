@@ -1,17 +1,17 @@
-package com.jobnote.domain.user.event;
+package com.jobnote.domain.email.event;
 
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
-public record EmailVerificationEvent(
+public record VerificationEmailEvent(
         String toEmail,
         String token,
         VerificationEmailType type
 ) {
-    public static EmailVerificationEvent of(final String toEmail, final String token, VerificationEmailType type) {
-        return EmailVerificationEvent.builder()
+    public static VerificationEmailEvent of(final String toEmail, final String token, VerificationEmailType type) {
+        return VerificationEmailEvent.builder()
                 .toEmail(toEmail)
                 .token(token)
                 .type(type)

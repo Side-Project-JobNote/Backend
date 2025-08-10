@@ -6,7 +6,7 @@ import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.email.domain.VerificationEmailStatus;
 import com.jobnote.domain.email.repository.VerificationEmailRepository;
-import com.jobnote.domain.user.event.EmailVerificationEvent;
+import com.jobnote.domain.email.event.VerificationEmailEvent;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -112,7 +112,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         verificationEmailService.send(user, currentDate, VerificationEmailType.SIGN_UP);
 
         // then
-        then(eventPublisher).should().publishEvent(EmailVerificationEvent.of(user.getEmail(), verificationEmail.getToken(), VerificationEmailType.SIGN_UP));
+        then(eventPublisher).should().publishEvent(VerificationEmailEvent.of(user.getEmail(), verificationEmail.getToken(), VerificationEmailType.SIGN_UP));
     }
 
 }

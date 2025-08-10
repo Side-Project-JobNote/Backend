@@ -1,4 +1,4 @@
-package com.jobnote.domain.user.event;
+package com.jobnote.domain.email.event;
 
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.global.config.properties.AppProperties;
@@ -12,7 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @RequiredArgsConstructor
 @Component
-public class EmailVerificationEventListener {
+public class VerificationEmailEventListener {
 
     private final MailService mailService;
     private final AppProperties appProperties;
@@ -21,18 +21,18 @@ public class EmailVerificationEventListener {
     private String fromEmail;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onEvent(final EmailVerificationEvent emailVerificationEvent) {
+    public void onEvent(final VerificationEmailEvent verificationEmailEvent) {
         final MailMessageDto mailMessageDto;
-        if (VerificationEmailType.SIGN_UP.equals(emailVerificationEvent.type())) {
-            mailMessageDto = createSignUpMailMessageDto(emailVerificationEvent);
+        if (VerificationEmailType.SIGN_UP.equals(verificationEmailEvent.type())) {
+            mailMessageDto = createSignUpMailMessageDto(verificationEmailEvent);
         } else {
-            mailMessageDto = createResetPasswordMailMessageDto(emailVerificationEvent);
+            mailMessageDto = createResetPasswordMailMessageDto(verificationEmailEvent);
         }
 
         mailService.sendMail(mailMessageDto);
     }
 
-    private MailMessageDto createSignUpMailMessageDto(final EmailVerificationEvent event) {
+    private MailMessageDto createSignUpMailMessageDto(final VerificationEmailEvent event) {
         final String link = appProperties.baseUrl() + appProperties.emailVerificationPath().signUp() + "?token=" + event.token();
         final String subject = "JobNote 회원가입 이메일 인증";
         final String text = String.format("""
@@ -50,7 +50,7 @@ public class EmailVerificationEventListener {
                 .build();
     }
 
-    private MailMessageDto createResetPasswordMailMessageDto(final EmailVerificationEvent event) {
+    private MailMessageDto createResetPasswordMailMessageDto(final VerificationEmailEvent event) {
         final String link = appProperties.baseUrl() + appProperties.emailVerificationPath().resetPassword() + "?token=" + event.token();
         final String subject = "JobNote 비밀번호 재설정 이메일 인증";
         final String text = String.format("""

@@ -4,7 +4,7 @@ import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.email.repository.VerificationEmailRepository;
-import com.jobnote.domain.user.event.EmailVerificationEvent;
+import com.jobnote.domain.email.event.VerificationEmailEvent;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,7 +43,7 @@ public class VerificationEmailService {
     @Transactional
     public void send(final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
         final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, type));
-        eventPublisher.publishEvent(EmailVerificationEvent.of(user.getEmail(), savedVerificationEmail.getToken(), type));
+        eventPublisher.publishEvent(VerificationEmailEvent.of(user.getEmail(), savedVerificationEmail.getToken(), type));
     }
 
     /* VALIDATE */
