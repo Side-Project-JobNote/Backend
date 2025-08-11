@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import static com.jobnote.global.common.ResponseCode.USER_ALREADY_WITHDRAWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
 class UserTest {
 
@@ -127,9 +126,10 @@ class UserTest {
         void fail_AlreadyWithdrawn_ThrowsException() {
             // given
             final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime deletedDate = LocalDateTime.of(2025, 8, 11, 21, 30, 0);
 
             // when & then
-            assertThatThrownBy(() -> user.withdraw(any(LocalDateTime.class)))
+            assertThatThrownBy(() -> user.withdraw(deletedDate))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(USER_ALREADY_WITHDRAWN.getMessage());
         }
