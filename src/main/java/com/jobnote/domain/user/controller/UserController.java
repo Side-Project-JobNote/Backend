@@ -81,4 +81,11 @@ public class UserController {
         userService.resetPassword(request, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
+
+    /* WITHDRAW */
+    @PostMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(@LoginUser final CustomPrincipal principal) {
+        userService.withdraw(principal.getUserId());
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
 }
