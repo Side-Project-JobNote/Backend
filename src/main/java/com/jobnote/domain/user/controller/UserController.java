@@ -83,7 +83,7 @@ public class UserController {
     }
 
     /* WITHDRAW */
-    @PostMapping("/withdraw")
+    @DeleteMapping("/withdraw")
     public ResponseEntity<ApiResponse<Void>> withdraw(@LoginUser final CustomPrincipal principal) {
         userService.withdraw(principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
