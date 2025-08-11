@@ -87,4 +87,9 @@ public class User extends BaseTimeEntity {
     public void resetPassword(final String newPassword) {
         this.password = newPassword;
     }
+
+    public void withdraw(final LocalDateTime deletedDate) {
+        this.isDeleted = true;
+        this.deletedDate = deletedDate;
+    }
 }
