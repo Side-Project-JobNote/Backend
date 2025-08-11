@@ -38,8 +38,8 @@ public abstract class Constants {
 
     public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
             "/api/v1/users/signup",
-            "/api/v1/users/verify",
-            "/api/v1/users/reset-password",
+            "/api/v1/verification-emails/signup/verify",
+            "/api/v1/verification-emails/reset-password",
             "/login",
             "/oauth2",
             "/h2-console",
