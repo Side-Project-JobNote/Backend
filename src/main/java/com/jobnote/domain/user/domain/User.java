@@ -36,7 +36,7 @@ public class User extends BaseTimeEntity {
     private UserRole role;
 
     @Column(nullable = false)
-    private boolean isDeleted = false;
+    private boolean isDeleted;
 
     private String socialEmail;
 
