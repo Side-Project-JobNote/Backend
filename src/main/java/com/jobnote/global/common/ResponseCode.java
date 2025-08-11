@@ -53,7 +53,8 @@ public enum ResponseCode {
     // 409 Conflict
     CONFLICT(HttpStatus.CONFLICT, "4090", "요청이 서버의 상태와 충돌했습니다."),
     DUPLICATED_USER_NICKNAME(HttpStatus.CONFLICT, "4091", "이미 사용중인 닉네임입니다."),
-    DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, "4091", "이미 가입된 이메일입니다."),
+    DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, "4092", "이미 가입된 이메일입니다."),
+    USER_ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "4093", "이미 탈퇴된 회원입니다."),
 
     // 413 Payload Too Large
     UPLOAD_SIZE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "4130", "총 업로드 허용 용량 100MB을 초과했습니다."),

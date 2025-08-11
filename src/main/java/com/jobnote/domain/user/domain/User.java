@@ -1,10 +1,13 @@
 package com.jobnote.domain.user.domain;
 
 import com.jobnote.domain.common.BaseTimeEntity;
+import com.jobnote.global.exception.JobNoteException;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
+import static com.jobnote.global.common.ResponseCode.USER_ALREADY_WITHDRAWN;
 
 @Entity
 @Getter
@@ -89,6 +92,9 @@ public class User extends BaseTimeEntity {
     }
 
     public void withdraw(final LocalDateTime deletedDate) {
+        if (this.isDeleted) {
+            throw new JobNoteException(USER_ALREADY_WITHDRAWN);
+        }
         this.isDeleted = true;
         this.deletedDate = deletedDate;
     }
