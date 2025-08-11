@@ -1,5 +1,6 @@
 package com.jobnote.domain.user.service;
 
+import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.domain.User;
@@ -29,6 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationEmailService verificationEmailService;
+    private final Time time;
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
@@ -104,6 +106,13 @@ public class UserService {
     public void sendVerificationEmail(final VerificationEmailRequest request, final LocalDateTime expiryDate) {
         final User user = getUserByEmail(request.email());
         verificationEmailService.send(user, expiryDate, request.type());
+    }
+
+    /* WITHDRAW */
+    @Transactional
+    public void withdraw(final Long userId) {
+        final User user = this.getUserById(userId);
+        user.withdraw(this.time.now());
     }
 
     /* HELPER METHOD */
