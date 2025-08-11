@@ -40,8 +40,8 @@ spring:
 
 app:
   email-verification-path:
-    sign-up: /api/v1/users/verify
-    reset-password: /api/v1/users/reset-password/verify
+    sign-up: /api/v1/verification-emails/signup/verify
+    reset-password: /api/v1/verification-emails/reset-password/verify
 
 file:
   quota:
