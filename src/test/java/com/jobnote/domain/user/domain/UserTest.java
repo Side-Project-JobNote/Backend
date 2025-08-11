@@ -3,6 +3,8 @@ package com.jobnote.domain.user.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserTest {
@@ -95,5 +97,20 @@ class UserTest {
         // then
         assertThat(user.getPassword()).isEqualTo(newPassword);
         assertThat(user.getPassword()).isNotEqualTo(existingPassword);
+    }
+
+    @Test
+    @DisplayName("회원을 탈퇴한다.")
+    void withdraw() {
+        // given
+        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+        final LocalDateTime deletedDate = LocalDateTime.of(2025, 8, 11, 21, 30, 0);
+
+        // when
+        user.withdraw(deletedDate);
+
+        // then
+        assertThat(user.isDeleted()).isTrue();
+        assertThat(user.getDeletedDate()).isEqualTo(deletedDate);
     }
 }
