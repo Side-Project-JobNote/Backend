@@ -4,6 +4,8 @@ import com.jobnote.domain.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Table(name = "users")
@@ -30,12 +32,17 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
     private String socialEmail;
 
     @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;
 
     private String socialId;
+
+    private LocalDateTime deletedDate;
 
     public static User signUp(final String email, final String password, final String nickname) {
         return User.builder()
