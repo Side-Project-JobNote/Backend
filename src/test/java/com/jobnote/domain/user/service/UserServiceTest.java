@@ -1,8 +1,10 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
+import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.UserFixture;
 import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.email.domain.VerificationEmail;
@@ -38,6 +40,9 @@ class UserServiceTest extends ServiceUnitTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private Time time;
 
     @InjectMocks
     private UserService userService;
@@ -258,5 +263,44 @@ class UserServiceTest extends ServiceUnitTest {
 
         // then
         assertThat(user.getPassword()).isEqualTo(newEncodedPassword);
+    }
+
+    @Nested
+    @DisplayName("회원탈퇴")
+    class Withdraw {
+        @Test
+        @DisplayName("성공 - 회원탈퇴하지 않은 회원의 요청은 성공한다.")
+        void success() {
+            // given
+            final long userId = 1L;
+            final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(time.now()).willReturn(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
+
+            // when
+            userService.withdraw(userId);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(time).should().now();
+            assertThat(user.isDeleted()).isTrue();
+            assertThat(user.getDeletedDate()).isEqualTo(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 탈퇴한 회원의 요청은 예외를 발생한다")
+        void fail_AlreadyWithdrawn_ThrowsException() {
+            // given
+            final long userId = 1L;
+            final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.withdraw(userId))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(USER_ALREADY_WITHDRAWN.getMessage());
+            then(userRepository).should().findById(userId);
+            then(time).should().now();
+        }
     }
 }

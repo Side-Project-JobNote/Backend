@@ -1,13 +1,18 @@
 package com.jobnote.domain.user.domain;
 
 import com.jobnote.domain.common.BaseTimeEntity;
+import com.jobnote.global.exception.JobNoteException;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+
+import static com.jobnote.global.common.ResponseCode.USER_ALREADY_WITHDRAWN;
 
 @Entity
 @Getter
 @Table(name = "users")
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
@@ -30,12 +35,17 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(nullable = false)
+    private boolean isDeleted;
+
     private String socialEmail;
 
     @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;
 
     private String socialId;
+
+    private LocalDateTime deletedDate;
 
     public static User signUp(final String email, final String password, final String nickname) {
         return User.builder()
@@ -79,5 +89,13 @@ public class User extends BaseTimeEntity {
 
     public void resetPassword(final String newPassword) {
         this.password = newPassword;
+    }
+
+    public void withdraw(final LocalDateTime deletedDate) {
+        if (this.isDeleted) {
+            throw new JobNoteException(USER_ALREADY_WITHDRAWN);
+        }
+        this.isDeleted = true;
+        this.deletedDate = deletedDate;
     }
 }

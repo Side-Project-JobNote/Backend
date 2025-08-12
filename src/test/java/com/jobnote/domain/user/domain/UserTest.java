@@ -1,9 +1,15 @@
 package com.jobnote.domain.user.domain;
 
+import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
+import static com.jobnote.global.common.ResponseCode.USER_ALREADY_WITHDRAWN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserTest {
 
@@ -95,5 +101,37 @@ class UserTest {
         // then
         assertThat(user.getPassword()).isEqualTo(newPassword);
         assertThat(user.getPassword()).isNotEqualTo(existingPassword);
+    }
+
+    @Nested
+    @DisplayName("회원탈퇴")
+    class Withdraw {
+        @Test
+        @DisplayName("성공 - 회원탈퇴하지 않은 회원의 요청은 성공한다.")
+        void success() {
+            // given
+            final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime deletedDate = LocalDateTime.of(2025, 8, 11, 21, 30, 0);
+
+            // when
+            user.withdraw(deletedDate);
+
+            // then
+            assertThat(user.isDeleted()).isTrue();
+            assertThat(user.getDeletedDate()).isEqualTo(deletedDate);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 탈퇴한 회원의 요청은 예외를 발생한다")
+        void fail_AlreadyWithdrawn_ThrowsException() {
+            // given
+            final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime deletedDate = LocalDateTime.of(2025, 8, 11, 21, 30, 0);
+
+            // when & then
+            assertThatThrownBy(() -> user.withdraw(deletedDate))
+                    .isInstanceOf(JobNoteException.class)
+                    .hasMessage(USER_ALREADY_WITHDRAWN.getMessage());
+        }
     }
 }
