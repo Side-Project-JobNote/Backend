@@ -2,6 +2,7 @@ package com.jobnote.auth.token;
 
 import com.jobnote.domain.common.Time;
 import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.global.util.CookieUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -59,5 +60,10 @@ public class TokenProvider {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    public void addInvalidateCookie(final HttpServletResponse response) {
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_REFRESH_TOKEN).toString());
     }
 }

@@ -53,6 +53,14 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
+    /* LOGOUT */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(final HttpServletRequest request, final HttpServletResponse response) {
+        authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        tokenProvider.addInvalidateCookie(response);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) {

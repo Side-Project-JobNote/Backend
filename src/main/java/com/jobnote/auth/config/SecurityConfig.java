@@ -1,6 +1,5 @@
 package com.jobnote.auth.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
 import com.jobnote.auth.handler.*;
 import com.jobnote.auth.service.CustomOAuth2UserService;
@@ -23,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import static com.jobnote.domain.user.domain.UserRole.*;
 import static com.jobnote.domain.user.domain.UserRole.GUEST;
 import static com.jobnote.global.common.Constants.*;
-import static com.jobnote.global.util.ResponseUtil.responseOk;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -31,12 +29,10 @@ import static com.jobnote.global.util.ResponseUtil.responseOk;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
-    private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-    private final CustomLogoutHandler customLogoutHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
@@ -65,11 +61,6 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler));
-
-        http
-                .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer
-                        .addLogoutHandler(customLogoutHandler)
-                        .logoutSuccessHandler(((request, response, authentication) -> responseOk(response, objectMapper))));
 
         http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
