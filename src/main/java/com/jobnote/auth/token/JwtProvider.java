@@ -1,6 +1,5 @@
 package com.jobnote.auth.token;
 
-import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
@@ -15,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.jobnote.global.common.Constants.*;
-import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN_TYPE;
+import static com.jobnote.global.common.ResponseCode.*;
 
 @Component
 class JwtProvider {
@@ -66,15 +65,13 @@ class JwtProvider {
             }
             return payload;
         } catch (SignatureException e) {
-            throw new JobNoteException(ResponseCode.INVALID_TOKEN_SIGNATURE);
-        } catch (ExpiredJwtException e) {
-            throw new JobNoteException(ResponseCode.EXPIRED_TOKEN);
+            throw new JobNoteException(INVALID_TOKEN_SIGNATURE);
         } catch (MalformedKeyException e) {
-            throw new JobNoteException(ResponseCode.MALFORMED_TOKEN);
+            throw new JobNoteException(MALFORMED_TOKEN);
         } catch (UnsupportedJwtException e) {
-            throw new JobNoteException(ResponseCode.UNSUPPORTED_TOKEN);
+            throw new JobNoteException(UNSUPPORTED_TOKEN);
         } catch (JwtException e) {
-            throw new JobNoteException(ResponseCode.INVALID_TOKEN);
+            throw new JobNoteException(INVALID_TOKEN);
         }
     }
 }

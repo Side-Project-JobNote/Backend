@@ -1,5 +1,7 @@
 package com.jobnote.auth.token;
 
+import com.jobnote.domain.common.Time;
+import com.jobnote.global.exception.JobNoteException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.jobnote.global.common.Constants.*;
+import static com.jobnote.global.common.ResponseCode.EXPIRED_TOKEN;
 import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 public class TokenProvider {
 
     private final JwtProvider jwtProvider;
+    private final Time time;
 
     public Token issueToken(final TokenClaim tokenClaim) {
         return Token.builder()
@@ -33,6 +37,7 @@ public class TokenProvider {
 
     public void validateRefreshToken(final String refreshToken) {
         jwtProvider.validateAndGetTokenPayload(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
+        this.validateExpired(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
     }
 
     public LocalDateTime getExpiration(final String token, final String tokenType) {
@@ -40,6 +45,12 @@ public class TokenProvider {
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+
+    public void validateExpired(final String token, final String tokenType) {
+        if (this.getExpiration(token, tokenType).isBefore(time.now())) {
+            throw new JobNoteException(EXPIRED_TOKEN);
+        }
     }
 
     public void addTokenToCookie(final HttpServletResponse response, final Token token) {

@@ -31,9 +31,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (URI_USER_REISSUE.equals(request.getRequestURI())) {
                 validateRefreshToken(request);
-            } else {
-                authenticate(request);
             }
+            authenticate(request);
         } catch (JobNoteException e) {
             request.setAttribute(ATTRIBUTE_EXCEPTION, e);
         }
