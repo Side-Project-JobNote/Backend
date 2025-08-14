@@ -1,14 +1,12 @@
 package com.jobnote.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.auth.filter.LoginFilter;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
 import com.jobnote.auth.handler.*;
 import com.jobnote.auth.service.CustomOAuth2UserService;
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
 import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
-import com.jobnote.domain.user.domain.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,12 +31,9 @@ import static com.jobnote.global.util.ResponseUtil.responseOk;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final LoginSuccessHandler loginSuccessHandler;
-    private final LoginFailureHandler loginFailureHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomLogoutHandler customLogoutHandler;
@@ -83,15 +78,8 @@ public class SecurityConfig {
                         .requestMatchers(ONLY_GUEST).hasRole(GUEST.name())
                         .anyRequest().hasAnyRole(MEMBER.name(), ADMIN.name()));
 
-        final LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), objectMapper);
-        loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
-        loginFilter.setAuthenticationFailureHandler(loginFailureHandler);
-
         http
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http
-                .addFilterAfter(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), LoginFilter.class);
+                .addFilterAfter(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
