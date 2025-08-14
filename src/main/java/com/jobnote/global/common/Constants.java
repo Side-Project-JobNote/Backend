@@ -28,9 +28,9 @@ public abstract class Constants {
     // whitelist
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/verification-emails/signup/verify",
-            "/api/v1/verification-emails/reset-password/**",
-            "/login/**",
+            "/api/v1/users/login",
+            "/api/v1/users/reset-password",
+            "/api/v1/verification-emails/**",
             "/oauth2/**",
             "/h2-console/**",
             "/error/**",
@@ -38,9 +38,9 @@ public abstract class Constants {
 
     public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
             "/api/v1/users/signup",
-            "/api/v1/verification-emails/signup/verify",
-            "/api/v1/verification-emails/reset-password",
-            "/login",
+            "/api/v1/users/login",
+            "/api/v1/users/reset-password",
+            "/api/v1/verification-emails",
             "/oauth2",
             "/h2-console",
             "/error"
