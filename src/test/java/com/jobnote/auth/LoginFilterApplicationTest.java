@@ -24,7 +24,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final String LOGIN_URI = "/login";
+    private final String LOGIN_URI = "/api/v1/users/login";
 
     @Nested
     @DisplayName("로그인")
