@@ -1,14 +1,11 @@
 package com.jobnote.auth.token;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.global.util.ResponseUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,7 +19,6 @@ import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 public class TokenProvider {
 
     private final JwtProvider jwtProvider;
-    private final ObjectMapper objectMapper;
 
     public Token issueToken(final TokenClaim tokenClaim) {
         return Token.builder()
@@ -44,11 +40,6 @@ public class TokenProvider {
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
-    }
-
-    public void responseToken(final HttpServletResponse response, final Token token) throws IOException {
-        addTokenToCookie(response, token);
-        ResponseUtil.responseOk(response, objectMapper);
     }
 
     public void addTokenToCookie(final HttpServletResponse response, final Token token) {
