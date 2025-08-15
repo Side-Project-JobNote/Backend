@@ -70,7 +70,7 @@ public class SecurityConfig {
                         .anyRequest().hasAnyRole(MEMBER.name(), ADMIN.name()));
 
         http
-                .addFilterAfter(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
