@@ -34,6 +34,8 @@ public abstract class Constants {
             "/oauth2/**",
             "/h2-console/**",
             "/error/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
     };
 
     public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
@@ -43,7 +45,9 @@ public abstract class Constants {
             "/api/v1/verification-emails",
             "/oauth2",
             "/h2-console",
-            "/error"
+            "/error",
+            "/swagger-ui",
+            "/v3/api-docs"
     );
 
     public static final String[] ONLY_GUEST = {
