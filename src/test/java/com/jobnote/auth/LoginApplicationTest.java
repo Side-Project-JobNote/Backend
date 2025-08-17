@@ -16,7 +16,7 @@ import static com.jobnote.global.common.ResponseCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class LoginFilterApplicationTest extends JobnoteApplicationTests {
+class LoginApplicationTest extends JobnoteApplicationTests {
 
     @Autowired
     private UserRepository userRepository;
