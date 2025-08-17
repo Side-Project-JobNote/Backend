@@ -16,9 +16,6 @@ public abstract class Constants {
     // header
     public static final String CHARACTER_ENCODING = "UTF-8";
 
-    // http request
-    public static final String ATTRIBUTE_EXCEPTION = "exception";
-
     // cookie
     public static final String COOKIE_NAME_ACCESS_TOKEN = "access_token";
     public static final String COOKIE_NAME_REFRESH_TOKEN = "refresh_token";
