@@ -1,11 +1,10 @@
 package com.jobnote.auth.config;
 
+import com.jobnote.auth.exception.CustomAccessDeniedHandler;
 import com.jobnote.auth.filter.TokenAuthenticationFilter;
 import com.jobnote.auth.handler.*;
 import com.jobnote.auth.service.CustomOAuth2UserService;
 import com.jobnote.auth.exception.CustomAuthenticationEntryPoint;
-import com.jobnote.auth.service.CustomUserDetailsService;
-import com.jobnote.auth.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,12 +33,12 @@ import static com.jobnote.global.common.Constants.*;
 @Configuration
 public class SecurityConfig {
 
-    private final TokenProvider tokenProvider;
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Value("${app.frontend.base-url}")
     private String frontendBaseUrl;
@@ -83,11 +82,12 @@ public class SecurityConfig {
                         .anyRequest().hasAnyRole(MEMBER.name(), ADMIN.name()));
 
         http
-                .addFilterBefore(new TokenAuthenticationFilter(tokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
-                        .authenticationEntryPoint(customAuthenticationEntryPoint));
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler));
 
         http
                 .sessionManagement(session -> session.
