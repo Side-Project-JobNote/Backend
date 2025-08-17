@@ -1,17 +1,21 @@
 package com.jobnote.auth.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobnote.auth.dto.CustomPrincipal;
 import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.global.util.ResponseUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,28 +24,26 @@ import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
 import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
 
+@Slf4j
 @RequiredArgsConstructor
+@Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         try {
-            if (URI_USER_REISSUE.equals(request.getRequestURI())) {
-                validateRefreshToken(request);
-            }
             authenticate(request);
         } catch (JobNoteException e) {
-            request.setAttribute(ATTRIBUTE_EXCEPTION, e);
+            log.warn("TokenAuthenticationFilter Exception: ", e);
+            ResponseUtil.responseError(response, objectMapper, e.getResponseCode());
+            return;
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private void validateRefreshToken(final HttpServletRequest request) {
-        tokenProvider.validateRefreshToken(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
     }
 
     private void authenticate(final HttpServletRequest request) {
