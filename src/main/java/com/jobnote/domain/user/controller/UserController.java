@@ -6,6 +6,7 @@ import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.user.service.AuthTokenService;
+import com.jobnote.domain.user.service.LoginService;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
@@ -29,6 +29,7 @@ public class UserController {
 
     private final UserService userService;
     private final AuthTokenService authTokenService;
+    private final LoginService loginService;
     private final TokenProvider tokenProvider;
 
     /* SIGN UP */
@@ -38,20 +39,33 @@ public class UserController {
         return ResponseEntity.status(ResponseCode.CREATED.getStatus()).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
     }
 
-    /* SOCIAL LOGIN SIGN UP */
     @PostMapping("/signup/social")
     public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomPrincipal principal) {
         userService.socialSignUp(request, principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
+    /* LOGIN */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Void>> login(@RequestBody @Valid final UserLoginRequest request, final HttpServletResponse response) {
+        final Token token = loginService.login(request);
+        tokenProvider.addTokenToCookie(response, token);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
+    /* LOGOUT */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(final HttpServletRequest request, final HttpServletResponse response) {
+        authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        tokenProvider.addInvalidateCookie(response);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) {
         final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
-
-        tokenProvider.responseToken(response, token);
-
+        tokenProvider.addTokenToCookie(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 

@@ -37,6 +37,7 @@ public class AuthTokenService {
 
     @Transactional
     public Token reissue(final Long userId, final String existingRefreshToken) {
+        tokenProvider.validateRefreshToken(existingRefreshToken);
         invalidate(existingRefreshToken);
         return saveAndGetToken(userId);
     }

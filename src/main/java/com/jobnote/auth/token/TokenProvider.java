@@ -1,20 +1,21 @@
 package com.jobnote.auth.token;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.global.util.ResponseUtil;
+import com.jobnote.domain.common.Time;
+import com.jobnote.global.exception.JobNoteException;
+import com.jobnote.global.util.CookieUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.jobnote.global.common.Constants.*;
+import static com.jobnote.global.common.ResponseCode.EXPIRED_TOKEN;
 import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 public class TokenProvider {
 
     private final JwtProvider jwtProvider;
-    private final ObjectMapper objectMapper;
+    private final Time time;
 
     public Token issueToken(final TokenClaim tokenClaim) {
         return Token.builder()
@@ -37,6 +38,7 @@ public class TokenProvider {
 
     public void validateRefreshToken(final String refreshToken) {
         jwtProvider.validateAndGetTokenPayload(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
+        this.validateExpired(refreshToken, CLAIM_VALUE_REFRESH_TOKEN);
     }
 
     public LocalDateTime getExpiration(final String token, final String tokenType) {
@@ -46,9 +48,10 @@ public class TokenProvider {
                 .toLocalDateTime();
     }
 
-    public void responseToken(final HttpServletResponse response, final Token token) throws IOException {
-        addTokenToCookie(response, token);
-        ResponseUtil.responseOk(response, objectMapper);
+    public void validateExpired(final String token, final String tokenType) {
+        if (this.getExpiration(token, tokenType).isBefore(time.now())) {
+            throw new JobNoteException(EXPIRED_TOKEN);
+        }
     }
 
     public void addTokenToCookie(final HttpServletResponse response, final Token token) {
@@ -57,5 +60,10 @@ public class TokenProvider {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    public void addInvalidateCookie(final HttpServletResponse response) {
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_REFRESH_TOKEN).toString());
     }
 }

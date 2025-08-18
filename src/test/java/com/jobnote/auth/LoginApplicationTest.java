@@ -16,7 +16,7 @@ import static com.jobnote.global.common.ResponseCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class LoginFilterApplicationTest extends JobnoteApplicationTests {
+class LoginApplicationTest extends JobnoteApplicationTests {
 
     @Autowired
     private UserRepository userRepository;
@@ -24,7 +24,7 @@ class LoginFilterApplicationTest extends JobnoteApplicationTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final String LOGIN_URI = "/login";
+    private final String LOGIN_URI = "/api/v1/users/login";
 
     @Nested
     @DisplayName("로그인")

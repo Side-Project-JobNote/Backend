@@ -16,9 +16,6 @@ public abstract class Constants {
     // header
     public static final String CHARACTER_ENCODING = "UTF-8";
 
-    // http request
-    public static final String ATTRIBUTE_EXCEPTION = "exception";
-
     // cookie
     public static final String COOKIE_NAME_ACCESS_TOKEN = "access_token";
     public static final String COOKIE_NAME_REFRESH_TOKEN = "refresh_token";
@@ -28,22 +25,26 @@ public abstract class Constants {
     // whitelist
     public static final String[] WHITELIST = {
             "/api/v1/users/signup",
-            "/api/v1/verification-emails/signup/verify",
-            "/api/v1/verification-emails/reset-password/**",
-            "/login/**",
+            "/api/v1/users/login",
+            "/api/v1/users/reset-password",
+            "/api/v1/verification-emails/**",
             "/oauth2/**",
             "/h2-console/**",
             "/error/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
     };
 
     public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
             "/api/v1/users/signup",
-            "/api/v1/verification-emails/signup/verify",
-            "/api/v1/verification-emails/reset-password",
-            "/login",
+            "/api/v1/users/login",
+            "/api/v1/users/reset-password",
+            "/api/v1/verification-emails",
             "/oauth2",
             "/h2-console",
-            "/error"
+            "/error",
+            "/swagger-ui",
+            "/v3/api-docs"
     );
 
     public static final String[] ONLY_GUEST = {
