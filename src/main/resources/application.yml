@@ -24,6 +24,7 @@ spring:
           kakao:
             client-name: kakao
             authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
             scope:
               - account_email
         provider:
