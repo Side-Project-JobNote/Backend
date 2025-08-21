@@ -22,7 +22,7 @@ public abstract class OAuth2Attributes {
     abstract public String getEmail();
 
     public String getProviderId() {
-        return (String) attributes.get(userNameAttributeKey);
+        return String.valueOf(attributes.get(userNameAttributeKey));
     }
 
     public static OAuth2Attributes of(final String registrationId, final Map<String, Object> attributes, final String userNameAttributeKey) {

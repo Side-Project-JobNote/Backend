@@ -17,6 +17,6 @@ public class NaverOAuth2Attributes extends OAuth2Attributes {
 
     @Override
     public String getEmail() {
-        return (String) getAttributes().get("email");
+        return String.valueOf(getAttributes().get("email"));
     }
 }
