@@ -2,6 +2,7 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.common.Time;
+import com.jobnote.domain.email.domain.VerificationEmailFixture;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.UserFixture;
@@ -229,7 +230,7 @@ class UserServiceTest extends ServiceUnitTest {
             final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final String token = UUID.randomUUID().toString();
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedSignUp(token, user, expiryDate);
 
             given(verificationEmailService.verify(token)).willReturn(verificationEmail);
 
@@ -250,8 +251,7 @@ class UserServiceTest extends ServiceUnitTest {
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
         final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31), VerificationEmailType.RESET_PASSWORD);
-        verificationEmail.verify();
+        final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedResetPassword(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
 
         given(verificationEmailService.validateVerified(token)).willReturn(verificationEmail);
         given(passwordEncoder.encode(newPassword)).willReturn(newEncodedPassword);

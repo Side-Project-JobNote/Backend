@@ -2,6 +2,7 @@ package com.jobnote.domain.email.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.common.Time;
+import com.jobnote.domain.email.domain.VerificationEmailFixture;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
@@ -51,7 +52,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final User user = mock(User.class);
             final String token = "testToken";
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
@@ -87,7 +88,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final String token = "testToken";
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
             given(time.now()).willReturn(currentDate);
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
@@ -108,8 +109,8 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         final User user = mock(User.class);
         final String token = "testToken";
         final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
-        final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
+        final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
+        final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
         given(time.now()).willReturn(currentDate);
         given(verificationEmailRepository.save(any(VerificationEmail.class))).willReturn(verificationEmail);

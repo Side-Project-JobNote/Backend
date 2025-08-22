@@ -25,4 +25,14 @@ public class VerificationEmailFixture {
                 .type(VerificationEmailType.SIGN_UP)
                 .build();
     }
+
+    public static VerificationEmail createPendingSignUp(final String token, final User user, final LocalDateTime expiryDate) {
+        return VerificationEmail.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(expiryDate)
+                .status(VerificationEmailStatus.PENDING)
+                .type(VerificationEmailType.SIGN_UP)
+                .build();
+    }
 }
