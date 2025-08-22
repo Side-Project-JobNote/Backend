@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static com.jobnote.global.common.ResponseCode.*;
 
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "verification_tokens")
