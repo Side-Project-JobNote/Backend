@@ -10,7 +10,6 @@ import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
