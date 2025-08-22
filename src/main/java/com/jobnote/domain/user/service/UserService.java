@@ -40,10 +40,6 @@ public class UserService {
         return getByEmailOrThrow(email);
     }
 
-    public Long getUserIdFromUserDetails(final UserDetails user) {
-        return getUserByEmail(user.getUsername()).getId();
-    }
-
     /* SIGN UP */
     @Transactional
     public void signUp(final UserSignUpRequest request, final LocalDateTime expiryDate) {

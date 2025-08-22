@@ -27,11 +27,11 @@ public class LoginService {
 
     /* LOGIN */
     public Token login(final UserLoginRequest request) {
-        final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
+        final Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(request.email(), request.password());
 
         try {
-            final Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            final CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+            final Authentication authenticationResponse = authenticationManager.authenticate(authenticationRequest);
+            final CustomPrincipal principal = (CustomPrincipal) authenticationResponse.getPrincipal();
 
             if (UserRole.GUEST.getKey().equals(principal.getRole())) {
                 throw new JobNoteException(PENDING_EMAIL_VERIFICATION);
