@@ -34,13 +34,13 @@ public class VerificationEmailController {
     /* VERIFY VERIFICATION EMAIL */
     @GetMapping("/signup/verify")
     public void verifySignUpEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
-        userService.verifySignUp(token, LocalDateTime.now());
+        userService.verifySignUp(token);
         response.sendRedirect(frontendBaseUrl);
     }
 
     @GetMapping("/reset-password/verify")
     public void verifyResetPasswordEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
-        userService.verifyEmail(token, LocalDateTime.now());
+        userService.verifyEmail(token);
         response.sendRedirect(frontendBaseUrl);
     }
 }

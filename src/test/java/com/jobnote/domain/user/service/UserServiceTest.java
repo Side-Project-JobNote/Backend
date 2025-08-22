@@ -233,10 +233,10 @@ class UserServiceTest extends ServiceUnitTest {
             final String token = UUID.randomUUID().toString();
             final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 
-            given(verificationEmailService.verify(token, currentDate)).willReturn(verificationEmail);
+            given(verificationEmailService.verify(token)).willReturn(verificationEmail);
 
             // when
-            userService.verifySignUp(token, currentDate);
+            userService.verifySignUp(token);
 
             // then
             assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);

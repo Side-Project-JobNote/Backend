@@ -58,14 +58,14 @@ public class UserService {
 
     /* EMAIL VERIFICATION */
     @Transactional
-    public void verifySignUp(final String token, final LocalDateTime currentDate) {
-        final VerificationEmail verificationEmail = verifyEmail(token, currentDate);
+    public void verifySignUp(final String token) {
+        final VerificationEmail verificationEmail = verifyEmail(token);
         final User user = verificationEmail.getUser();
         user.accept();
     }
 
-    public VerificationEmail verifyEmail(final String token, final LocalDateTime currentDate) {
-        return verificationEmailService.verify(token, currentDate);
+    public VerificationEmail verifyEmail(final String token) {
+        return verificationEmailService.verify(token);
     }
 
     /* GET PROFILE */

@@ -1,5 +1,6 @@
 package com.jobnote.domain.email.service;
 
+import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
@@ -23,6 +24,7 @@ public class VerificationEmailService {
 
     private final VerificationEmailRepository verificationEmailRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final Time time;
 
     public VerificationEmail getVerificationEmailByToken(final String token) {
         return getByTokenOrThrow(token);
@@ -30,10 +32,10 @@ public class VerificationEmailService {
 
     /* VERIFY */
     @Transactional
-    public VerificationEmail verify(final String token, final LocalDateTime currentDate) {
+    public VerificationEmail verify(final String token) {
         final VerificationEmail verificationEmail = getVerificationEmailByToken(token);
 
-        verificationEmail.validateExpired(currentDate);
+        verificationEmail.validateExpired(time.now());
         verificationEmail.verify();
 
         return verificationEmail;

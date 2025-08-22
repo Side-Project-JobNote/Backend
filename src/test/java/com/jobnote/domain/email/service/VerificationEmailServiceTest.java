@@ -1,6 +1,7 @@
 package com.jobnote.domain.email.service;
 
 import com.jobnote.ServiceUnitTest;
+import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
@@ -33,6 +34,9 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private Time time;
 
     @InjectMocks
     private VerificationEmailService verificationEmailService;
@@ -85,10 +89,11 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
             final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
 
+            given(time.now()).willReturn(currentDate);
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
             // when
-            final VerificationEmail result = verificationEmailService.verify(token, currentDate);
+            final VerificationEmail result = verificationEmailService.verify(token);
 
             // then
             assertThat(result).isEqualTo(verificationEmail);
