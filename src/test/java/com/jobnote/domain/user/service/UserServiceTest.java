@@ -121,10 +121,10 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = User.signUp(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
 
             final String updatedAvatarUrl = "updatedAvatarUrl";
-            final UserAvatarRequest request = UserAvatarRequest.builder().avatarUrl(updatedAvatarUrl).build();
+            final UserAvatarRequest request = new UserAvatarRequest(updatedAvatarUrl);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -149,7 +149,7 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = User.signUp(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
 
             final String updatedNickname = "updatedNickname";
             final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
@@ -194,7 +194,7 @@ class UserServiceTest extends ServiceUnitTest {
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final String nickname = "testNickname";
-            final User user = User.signUp(email, password, nickname);
+            final User user = UserFixture.createMember(email, password, nickname);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -226,7 +226,7 @@ class UserServiceTest extends ServiceUnitTest {
         @DisplayName("성공 - 회원의 Role은 MEMBER가 된다.")
         void success() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final String token = UUID.randomUUID().toString();
             final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
@@ -249,7 +249,7 @@ class UserServiceTest extends ServiceUnitTest {
         final String newEncodedPassword = "testNewEncodedPassword";
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
         final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31), VerificationEmailType.RESET_PASSWORD);
         verificationEmail.verify();
 

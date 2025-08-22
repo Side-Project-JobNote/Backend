@@ -20,4 +20,13 @@ public class UserFixture {
                 .isDeleted(true)
                 .build();
     }
+
+    public static User createGuest(final String email, final String password, final String nickname) {
+        return User.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .role(UserRole.GUEST)
+                .build();
+    }
 }
