@@ -63,8 +63,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
-            given(time.now()).willReturn(LocalDateTime.of(2025, 8, 6, 11, 31));
-            willDoNothing().given(verificationEmailService).send(user, LocalDateTime.of(2025, 8, 7, 11, 31), VerificationEmailType.SIGN_UP);
+            willDoNothing().given(verificationEmailService).send(user, VerificationEmailType.SIGN_UP);
 
             // when
             userService.signUp(request);
@@ -73,7 +72,7 @@ class UserServiceTest extends ServiceUnitTest {
             then(userRepository).should().existsByEmail(email);
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
-            then(verificationEmailService).should().send(user, LocalDateTime.of(2025, 8, 7, 11, 31), VerificationEmailType.SIGN_UP);
+            then(verificationEmailService).should().send(user, VerificationEmailType.SIGN_UP);
         }
 
         @Test
@@ -90,7 +89,7 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(VerificationEmailType.class));
         }
 
         @Test
@@ -107,7 +106,7 @@ class UserServiceTest extends ServiceUnitTest {
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(VerificationEmailType.class));
         }
     }
 
@@ -229,7 +228,6 @@ class UserServiceTest extends ServiceUnitTest {
             // given
             final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final String token = UUID.randomUUID().toString();
             final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 

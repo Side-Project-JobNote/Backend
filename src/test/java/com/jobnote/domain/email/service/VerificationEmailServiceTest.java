@@ -111,10 +111,11 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
         final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
 
+        given(time.now()).willReturn(currentDate);
         given(verificationEmailRepository.save(any(VerificationEmail.class))).willReturn(verificationEmail);
 
         // when
-        verificationEmailService.send(user, currentDate, VerificationEmailType.SIGN_UP);
+        verificationEmailService.send(user, VerificationEmailType.SIGN_UP);
 
         // then
         then(eventPublisher).should().publishEvent(VerificationEmailEvent.of(user.getEmail(), verificationEmail.getToken(), VerificationEmailType.SIGN_UP));

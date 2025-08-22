@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_EMAIL;
@@ -43,8 +42,9 @@ public class VerificationEmailService {
 
     /* SEND */
     @Transactional
-    public void send(final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
-        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, type));
+    public void send(final User user, final VerificationEmailType type) {
+        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(
+                VerificationEmail.create(UUID.randomUUID().toString(), user, time.now().plusDays(1), type));
         eventPublisher.publishEvent(VerificationEmailEvent.of(user.getEmail(), savedVerificationEmail.getToken(), type));
     }
 

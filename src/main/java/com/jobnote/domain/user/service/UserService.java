@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 import static com.jobnote.global.common.ResponseCode.*;
 import static com.jobnote.global.common.ResponseCode.DUPLICATED_USER_NICKNAME;
 
@@ -45,7 +43,7 @@ public class UserService {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        verificationEmailService.send(savedUser, time.now().plusDays(1), VerificationEmailType.SIGN_UP);
+        verificationEmailService.send(savedUser, VerificationEmailType.SIGN_UP);
     }
 
     /* SOCIAL LOGIN SIGN UP */
@@ -98,9 +96,9 @@ public class UserService {
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
     }
 
-    public void sendVerificationEmail(final VerificationEmailRequest request, final LocalDateTime expiryDate) {
+    public void sendVerificationEmail(final VerificationEmailRequest request) {
         final User user = getUserByEmail(request.email());
-        verificationEmailService.send(user, expiryDate, request.type());
+        verificationEmailService.send(user, request.type());
     }
 
     /* WITHDRAW */

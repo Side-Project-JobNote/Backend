@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/verification-emails")
@@ -27,7 +26,7 @@ public class VerificationEmailController {
     /* SEND VERIFICATION EMAIL */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> sendVerificationEmail(@RequestBody @Valid final VerificationEmailRequest request) {
-        userService.sendVerificationEmail(request, LocalDateTime.now().plusDays(1));
+        userService.sendVerificationEmail(request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
