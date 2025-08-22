@@ -42,11 +42,11 @@ public class UserService {
 
     /* SIGN UP */
     @Transactional
-    public void signUp(final UserSignUpRequest request, final LocalDateTime expiryDate) {
+    public void signUp(final UserSignUpRequest request) {
         validateDuplicatedEmail(request.email());
         validateDuplicatedNickname(request.nickname());
         final User savedUser = userRepository.save(User.signUp(request.email(), passwordEncoder.encode(request.password()), request.nickname()));
-        verificationEmailService.send(savedUser, expiryDate, VerificationEmailType.SIGN_UP);
+        verificationEmailService.send(savedUser, time.now().plusDays(1), VerificationEmailType.SIGN_UP);
     }
 
     /* SOCIAL LOGIN SIGN UP */

@@ -59,21 +59,21 @@ class UserServiceTest extends ServiceUnitTest {
             final String password = "testPassword";
             final UserSignUpRequest request = new UserSignUpRequest(email, password, nickname);
             final User user = User.signUp(email, password, nickname);
-            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
 
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
-            willDoNothing().given(verificationEmailService).send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            given(time.now()).willReturn(LocalDateTime.of(2025, 8, 6, 11, 31));
+            willDoNothing().given(verificationEmailService).send(user, LocalDateTime.of(2025, 8, 7, 11, 31), VerificationEmailType.SIGN_UP);
 
             // when
-            userService.signUp(request, emailVerificationExpiryDate);
+            userService.signUp(request);
 
             // then
             then(userRepository).should().existsByEmail(email);
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
-            then(verificationEmailService).should().send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            then(verificationEmailService).should().send(user, LocalDateTime.of(2025, 8, 7, 11, 31), VerificationEmailType.SIGN_UP);
         }
 
         @Test
@@ -84,7 +84,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByEmail(request.email())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
+            assertThatThrownBy(() -> userService.signUp(request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_EMAIL.getMessage());
 
@@ -101,7 +101,7 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByNickname(request.nickname())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
+            assertThatThrownBy(() -> userService.signUp(request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
 

@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
 import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
 
@@ -35,7 +33,7 @@ public class UserController {
     /* SIGN UP */
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signUp(@RequestBody @Valid final UserSignUpRequest request) {
-        userService.signUp(request, LocalDateTime.now().plusDays(1));
+        userService.signUp(request);
         return ResponseEntity.status(ResponseCode.CREATED.getStatus()).body(ApiResponse.ofSuccess(ResponseCode.CREATED));
     }
 
