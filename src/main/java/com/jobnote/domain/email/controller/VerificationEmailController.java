@@ -32,7 +32,7 @@ public class VerificationEmailController {
     /* VERIFY VERIFICATION EMAIL */
     @GetMapping("/signup/verify")
     public void verifySignUpEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
-        userService.verifySignUp(token);
+        verificationEmailService.verifySignUp(token);
         ResponseUtil.redirectToFrontend(response);
     }
 

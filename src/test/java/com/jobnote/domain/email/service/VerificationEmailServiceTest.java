@@ -9,6 +9,8 @@ import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.email.domain.VerificationEmailStatus;
 import com.jobnote.domain.email.repository.VerificationEmailRepository;
 import com.jobnote.domain.email.event.VerificationEmailEvent;
+import com.jobnote.domain.user.domain.UserFixture;
+import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,4 +125,27 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         then(eventPublisher).should().publishEvent(VerificationEmailEvent.of(user.getEmail(), verificationEmail.getToken(), VerificationEmailType.SIGN_UP));
     }
 
+    @Nested
+    @DisplayName("회원가입 이메일 인증")
+    class EmailVerification {
+        @Test
+        @DisplayName("성공 - 회원의 Role은 MEMBER가 된다.")
+        void success() {
+            // given
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
+            final String token = UUID.randomUUID().toString();
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, expiryDate);
+
+            given(time.now()).willReturn(currentDate);
+            given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
+
+            // when
+            verificationEmailService.verifySignUp(token);
+
+            // then
+            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+        }
+    }
 }

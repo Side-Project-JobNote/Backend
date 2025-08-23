@@ -40,6 +40,13 @@ public class VerificationEmailService {
         return verificationEmail;
     }
 
+    @Transactional
+    public void verifySignUp(final String token) {
+        final VerificationEmail verificationEmail = verify(token);
+        final User user = verificationEmail.getUser();
+        user.accept();
+    }
+
     /* SEND */
     @Transactional
     public void send(final User user, final VerificationEmailType type) {

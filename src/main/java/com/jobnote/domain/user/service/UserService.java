@@ -54,14 +54,6 @@ public class UserService {
         user.acceptSocial(request.nickname());
     }
 
-    /* EMAIL VERIFICATION */
-    @Transactional
-    public void verifySignUp(final String token) {
-        final VerificationEmail verificationEmail = verificationEmailService.verify(token);
-        final User user = verificationEmail.getUser();
-        user.accept();
-    }
-
     /* GET PROFILE */
     public UserProfileResponse getProfile(final Long userId) {
         final User user = getUserById(userId);
