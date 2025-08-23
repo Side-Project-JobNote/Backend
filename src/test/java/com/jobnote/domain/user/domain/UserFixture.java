@@ -29,4 +29,24 @@ public class UserFixture {
                 .role(UserRole.GUEST)
                 .build();
     }
+
+    public static User createGuestKakao(final String email, final String socialEmail, final String socialId) {
+        return User.builder()
+                .email(email)
+                .socialEmail(socialEmail)
+                .socialId(socialId)
+                .socialProvider(SocialProvider.KAKAO)
+                .role(UserRole.GUEST)
+                .build();
+    }
+
+    public static User createMemberKakao(final String email, final String socialEmail, final String socialId) {
+        return User.builder()
+                .email(email)
+                .socialEmail(socialEmail)
+                .socialId(socialId)
+                .socialProvider(SocialProvider.KAKAO)
+                .role(UserRole.MEMBER)
+                .build();
+    }
 }

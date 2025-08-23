@@ -35,4 +35,14 @@ public class VerificationEmailFixture {
                 .type(VerificationEmailType.SIGN_UP)
                 .build();
     }
+
+    public static VerificationEmail createExpiredSignUp(final String token, final User user, final LocalDateTime expiryDate) {
+        return VerificationEmail.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(expiryDate)
+                .status(VerificationEmailStatus.EXPIRED)
+                .type(VerificationEmailType.SIGN_UP)
+                .build();
+    }
 }

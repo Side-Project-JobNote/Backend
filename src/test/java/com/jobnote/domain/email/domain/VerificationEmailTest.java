@@ -1,6 +1,7 @@
 package com.jobnote.domain.email.domain;
 
 import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.UserFixture;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +20,7 @@ class VerificationEmailTest {
     @DisplayName("토큰 생성 시 상태는 PENDING이다.")
     void created_StatusIsPending() {
         // given
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+        final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
         final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
 
         // when
@@ -36,10 +37,10 @@ class VerificationEmailTest {
         @DisplayName("토큰이 만료되지 않았으면 아무일도 일어나지 않는다.")
         void notExpired() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.minusMinutes(1);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when
             verificationEmail.validateExpired(currentDate);
@@ -52,10 +53,10 @@ class VerificationEmailTest {
         @DisplayName("토큰이 만료되었으면 예외를 발생하고 상태는 EXPIRED로 변경된다.")
         void expired_ThrowsException_ChangeStatus() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final LocalDateTime currentDate = expiryDate.plusMinutes(1);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createExpiredSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when & then
             assertThatThrownBy(() -> verificationEmail.validateExpired(currentDate))
@@ -72,10 +73,9 @@ class VerificationEmailTest {
         @DisplayName("토큰이 검증되었으면 아무일도 일어나지 않는다.")
         void verified() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
-            verificationEmail.verify();
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when
             verificationEmail.validateVerified();
@@ -88,9 +88,9 @@ class VerificationEmailTest {
         @DisplayName("토큰이 검증되지 않았으면 예외를 발생한다.")
         void notVerified_ThrowsException() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when & then
             assertThatThrownBy(verificationEmail::validateVerified)
@@ -107,9 +107,9 @@ class VerificationEmailTest {
         @DisplayName("성공 - 토큰의 상태가 VERIFIED로 변경된다.")
         void success() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when
             verificationEmail.verify();
@@ -122,10 +122,9 @@ class VerificationEmailTest {
         @DisplayName("토큰이 이미 검증되었으면 예외를 발생한다.")
         void fail_AlreadyVerified_ThrowsException() {
             // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final VerificationEmail verificationEmail = VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, VerificationEmailType.SIGN_UP);
-            verificationEmail.verify();
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedSignUp(UUID.randomUUID().toString(), user, expiryDate);
 
             // when & then
             assertThatThrownBy(verificationEmail::verify)
