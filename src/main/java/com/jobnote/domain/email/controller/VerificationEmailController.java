@@ -4,10 +4,10 @@ import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.util.ResponseUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +20,6 @@ public class VerificationEmailController {
 
     private final UserService userService;
 
-    @Value("${app.frontend.base-url}")
-    private String frontendBaseUrl;
-
     /* SEND VERIFICATION EMAIL */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> sendVerificationEmail(@RequestBody @Valid final VerificationEmailRequest request) {
@@ -34,12 +31,12 @@ public class VerificationEmailController {
     @GetMapping("/signup/verify")
     public void verifySignUpEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
         userService.verifySignUp(token);
-        response.sendRedirect(frontendBaseUrl);
+        ResponseUtil.redirectToFrontend(response);
     }
 
     @GetMapping("/reset-password/verify")
     public void verifyResetPasswordEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
         userService.verifyEmail(token);
-        response.sendRedirect(frontendBaseUrl);
+        ResponseUtil.redirectToFrontend(response);
     }
 }
