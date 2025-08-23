@@ -1,6 +1,7 @@
 package com.jobnote.domain.email.controller;
 
 import com.jobnote.domain.email.dto.VerificationEmailRequest;
+import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class VerificationEmailController {
 
     private final UserService userService;
+    private final VerificationEmailService verificationEmailService;
 
     /* SEND VERIFICATION EMAIL */
     @PostMapping
@@ -36,7 +38,7 @@ public class VerificationEmailController {
 
     @GetMapping("/reset-password/verify")
     public void verifyResetPasswordEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
-        userService.verifyEmail(token);
+        verificationEmailService.verify(token);
         ResponseUtil.redirectToFrontend(response);
     }
 }

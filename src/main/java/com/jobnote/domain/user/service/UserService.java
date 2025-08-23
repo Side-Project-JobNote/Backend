@@ -57,13 +57,9 @@ public class UserService {
     /* EMAIL VERIFICATION */
     @Transactional
     public void verifySignUp(final String token) {
-        final VerificationEmail verificationEmail = verifyEmail(token);
+        final VerificationEmail verificationEmail = verificationEmailService.verify(token);
         final User user = verificationEmail.getUser();
         user.accept();
-    }
-
-    public VerificationEmail verifyEmail(final String token) {
-        return verificationEmailService.verify(token);
     }
 
     /* GET PROFILE */
