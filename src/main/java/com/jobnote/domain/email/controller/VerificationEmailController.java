@@ -2,7 +2,6 @@ package com.jobnote.domain.email.controller;
 
 import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.email.service.VerificationEmailService;
-import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.util.ResponseUtil;
@@ -19,13 +18,12 @@ import java.io.IOException;
 @RestController
 public class VerificationEmailController {
 
-    private final UserService userService;
     private final VerificationEmailService verificationEmailService;
 
     /* SEND VERIFICATION EMAIL */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> sendVerificationEmail(@RequestBody @Valid final VerificationEmailRequest request) {
-        userService.sendVerificationEmail(request);
+        verificationEmailService.send(request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 

@@ -2,7 +2,6 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
-import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.dto.*;
@@ -31,10 +30,6 @@ public class UserService {
 
     public User getUserById(final Long id) {
         return getByIdOrThrow(id);
-    }
-
-    public User getUserByEmail(final String email) {
-        return getByEmailOrThrow(email);
     }
 
     /* SIGN UP */
@@ -84,11 +79,6 @@ public class UserService {
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
     }
 
-    public void sendVerificationEmail(final VerificationEmailRequest request) {
-        final User user = getUserByEmail(request.email());
-        verificationEmailService.send(user, request.type());
-    }
-
     /* WITHDRAW */
     @Transactional
     public void withdraw(final Long userId) {
@@ -99,11 +89,6 @@ public class UserService {
     /* HELPER METHOD */
     private User getByIdOrThrow(final Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
-    }
-
-    private User getByEmailOrThrow(final String email) {
-        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_USER));
     }
 

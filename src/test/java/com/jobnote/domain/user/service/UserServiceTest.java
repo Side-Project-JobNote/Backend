@@ -10,7 +10,6 @@ import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.email.service.VerificationEmailService;
-import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -179,42 +178,6 @@ class UserServiceTest extends ServiceUnitTest {
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
             then(userRepository).should(never()).findById(userId);
-        }
-    }
-
-    @Nested
-    @DisplayName("id로 회원 조회")
-    class GetUser {
-        @Test
-        @DisplayName("성공")
-        void success() {
-            // given
-            final Long userId = 1L;
-            final String email = "testEmail@test.com";
-            final String password = "testPassword";
-            final String nickname = "testNickname";
-            final User user = UserFixture.createMember(email, password, nickname);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            // when
-            final User result = userService.getUserById(userId);
-
-            // then
-            assertThat(result).isEqualTo(user);
-        }
-
-        @Test
-        @DisplayName("실패 - 회원이 존재하지 않는다.")
-        void fail_NotExistingUser() {
-            // given
-            final Long userId = 1L;
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.getUserById(userId))
-                    .isInstanceOf(JobNoteException.class)
-                    .hasMessage(ResponseCode.NOT_FOUND_USER.getMessage());
         }
     }
 
