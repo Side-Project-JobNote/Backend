@@ -26,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationEmailService verificationEmailService;
+    private final UserQueryService userQueryService;
     private final Time time;
 
     public User getUserById(final Long id) {
@@ -45,20 +46,20 @@ public class UserService {
     @Transactional
     public void socialSignUp(final SocialSignUpRequest request, final Long userId) {
         validateDuplicatedNickname(request.nickname());
-        final User user = getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         user.acceptSocial(request.nickname());
     }
 
     /* GET PROFILE */
     public UserProfileResponse getProfile(final Long userId) {
-        final User user = getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         return UserProfileResponse.from(user);
     }
 
     /* UPDATE PROFILE */
     @Transactional
     public UserProfileResponse updateAvatar(final Long userId, final UserAvatarRequest request) {
-        final User user = getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         user.updateAvatar(request.avatarUrl());
         return UserProfileResponse.from(user);
     }
@@ -66,7 +67,7 @@ public class UserService {
     @Transactional
     public UserProfileResponse updateNickname(final Long userId, final UserNicknameRequest request) {
         validateDuplicatedNickname(request.nickname());
-        final User user = getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         user.updateNickname(request.nickname());
         return UserProfileResponse.from(user);
     }
@@ -82,7 +83,7 @@ public class UserService {
     /* WITHDRAW */
     @Transactional
     public void withdraw(final Long userId) {
-        final User user = this.getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         user.withdraw(this.time.now());
     }
 

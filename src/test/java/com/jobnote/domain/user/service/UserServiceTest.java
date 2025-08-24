@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static com.jobnote.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +37,9 @@ class UserServiceTest extends ServiceUnitTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private UserQueryService userQueryService;
 
     @Mock
     private Time time;
@@ -124,7 +126,7 @@ class UserServiceTest extends ServiceUnitTest {
             final String updatedAvatarUrl = "updatedAvatarUrl";
             final UserAvatarRequest request = new UserAvatarRequest(updatedAvatarUrl);
 
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when
             final UserProfileResponse result = userService.updateAvatar(userId, request);
@@ -153,7 +155,7 @@ class UserServiceTest extends ServiceUnitTest {
             final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
 
             given(userRepository.existsByNickname(updatedNickname)).willReturn(false);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when
             final UserProfileResponse result = userService.updateNickname(userId, request);
@@ -177,7 +179,7 @@ class UserServiceTest extends ServiceUnitTest {
             assertThatThrownBy(() -> userService.updateNickname(userId, request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
-            then(userRepository).should(never()).findById(userId);
+            then(userQueryService).should(never()).getUserById(userId);
         }
     }
 
@@ -211,14 +213,14 @@ class UserServiceTest extends ServiceUnitTest {
             // given
             final long userId = 1L;
             final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
             given(time.now()).willReturn(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
 
             // when
             userService.withdraw(userId);
 
             // then
-            then(userRepository).should().findById(userId);
+            then(userQueryService).should().getUserById(userId);
             then(time).should().now();
             assertThat(user.isDeleted()).isTrue();
             assertThat(user.getDeletedDate()).isEqualTo(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
@@ -230,13 +232,13 @@ class UserServiceTest extends ServiceUnitTest {
             // given
             final long userId = 1L;
             final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when & then
             assertThatThrownBy(() -> userService.withdraw(userId))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(USER_ALREADY_WITHDRAWN.getMessage());
-            then(userRepository).should().findById(userId);
+            then(userQueryService).should().getUserById(userId);
             then(time).should().now();
         }
     }
