@@ -29,7 +29,7 @@ class UserTest {
     @DisplayName("자체 로그인 회원을 accept시 Role은 MEMBER가 된다.")
     void signUp_accept() {
         // given
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
+        final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
 
         // when
         user.accept();
@@ -42,7 +42,7 @@ class UserTest {
     @DisplayName("소셜 로그인 회원을 accept시 닉네임 업데이트와 함께 Role은 MEMBER가 된다.")
     void socialSignUp_accept() {
         // given
-        final User user = User.socialSignUp("testEmail@test.com", "testSocailEmail@test.com", SocialProvider.GOOGLE, "testSocialId");
+        final User user = UserFixture.createGuestKakao("testEmail@test.com", "testSocailEmail@test.com", "testSocialId");
         final String nickname = "testNickname";
 
         // when
@@ -57,8 +57,8 @@ class UserTest {
     @DisplayName("회원의 프로필 이미지를 수정한다")
     void updateAvatar() {
         // given
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-        final User socialUser = User.socialSignUp("testEmail@test.com", "testSocailEmail@test.com", SocialProvider.GOOGLE, "testSocialId");
+        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+        final User socialUser = UserFixture.createMemberKakao("testEmail@test.com", "testSocailEmail@test.com", "testSocialId");
         final String updatedAvatarUrl = "updatedAvatarUrl";
 
         // when
@@ -74,8 +74,8 @@ class UserTest {
     @DisplayName("회원의 닉네임을 수정한다")
     void updateNickname() {
         // given
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-        final User socialUser = User.socialSignUp("testEmail@test.com", "testSocailEmail@test.com", SocialProvider.GOOGLE, "testSocialId");
+        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+        final User socialUser = UserFixture.createMemberKakao("testEmail@test.com", "testSocailEmail@test.com", "testSocialId");
         final String updatedNickname = "updatedNickname";
 
         // when
@@ -93,7 +93,7 @@ class UserTest {
         // given
         final String existingPassword = "testPassword";
         final String newPassword = "testNewPassword";
-        final User user = User.signUp("testEmail@test.com", existingPassword, "testNickname");
+        final User user = UserFixture.createMember("testEmail@test.com", existingPassword, "testNickname");
 
         // when
         user.resetPassword(newPassword);

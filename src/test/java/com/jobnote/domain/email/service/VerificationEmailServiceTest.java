@@ -1,12 +1,16 @@
 package com.jobnote.domain.email.service;
 
 import com.jobnote.ServiceUnitTest;
+import com.jobnote.domain.common.Time;
+import com.jobnote.domain.email.domain.VerificationEmailFixture;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.email.domain.VerificationEmailStatus;
 import com.jobnote.domain.email.repository.VerificationEmailRepository;
 import com.jobnote.domain.email.event.VerificationEmailEvent;
+import com.jobnote.domain.user.domain.UserFixture;
+import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +39,9 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private Time time;
+
     @InjectMocks
     private VerificationEmailService verificationEmailService;
 
@@ -47,7 +55,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final User user = mock(User.class);
             final String token = "testToken";
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
@@ -83,12 +91,13 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
             final String token = "testToken";
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
+            given(time.now()).willReturn(currentDate);
             given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
 
             // when
-            final VerificationEmail result = verificationEmailService.verify(token, currentDate);
+            final VerificationEmail result = verificationEmailService.verify(token);
 
             // then
             assertThat(result).isEqualTo(verificationEmail);
@@ -103,16 +112,40 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         final User user = mock(User.class);
         final String token = "testToken";
         final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
-        final LocalDateTime expiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
+        final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
+        final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, emailVerificationExpiryDate);
 
+        given(time.now()).willReturn(currentDate);
         given(verificationEmailRepository.save(any(VerificationEmail.class))).willReturn(verificationEmail);
 
         // when
-        verificationEmailService.send(user, currentDate, VerificationEmailType.SIGN_UP);
+        verificationEmailService.send(user, VerificationEmailType.SIGN_UP);
 
         // then
         then(eventPublisher).should().publishEvent(VerificationEmailEvent.of(user.getEmail(), verificationEmail.getToken(), VerificationEmailType.SIGN_UP));
     }
 
+    @Nested
+    @DisplayName("회원가입 이메일 인증")
+    class EmailVerification {
+        @Test
+        @DisplayName("성공 - 회원의 Role은 MEMBER가 된다.")
+        void success() {
+            // given
+            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
+            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
+            final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
+            final String token = UUID.randomUUID().toString();
+            final VerificationEmail verificationEmail = VerificationEmailFixture.createPendingSignUp(token, user, expiryDate);
+
+            given(time.now()).willReturn(currentDate);
+            given(verificationEmailRepository.findByToken(token)).willReturn(Optional.of(verificationEmail));
+
+            // when
+            verificationEmailService.verifySignUp(token);
+
+            // then
+            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+        }
+    }
 }

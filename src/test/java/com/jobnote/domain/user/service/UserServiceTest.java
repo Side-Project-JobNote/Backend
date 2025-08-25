@@ -2,15 +2,14 @@ package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.common.Time;
+import com.jobnote.domain.email.domain.VerificationEmailFixture;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.domain.UserFixture;
-import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.dto.*;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.user.repository.UserRepository;
 import com.jobnote.domain.email.service.VerificationEmailService;
-import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,8 +19,6 @@ import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +39,9 @@ class UserServiceTest extends ServiceUnitTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
+    private UserQueryService userQueryService;
+
+    @Mock
     private Time time;
 
     @InjectMocks
@@ -59,21 +59,20 @@ class UserServiceTest extends ServiceUnitTest {
             final String password = "testPassword";
             final UserSignUpRequest request = new UserSignUpRequest(email, password, nickname);
             final User user = User.signUp(email, password, nickname);
-            final LocalDateTime emailVerificationExpiryDate = LocalDateTime.of(2025, 8, 6, 11, 31);
 
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByNickname(nickname)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(user);
-            willDoNothing().given(verificationEmailService).send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            willDoNothing().given(verificationEmailService).send(user, VerificationEmailType.SIGN_UP);
 
             // when
-            userService.signUp(request, emailVerificationExpiryDate);
+            userService.signUp(request);
 
             // then
             then(userRepository).should().existsByEmail(email);
             then(userRepository).should().existsByNickname(nickname);
             then(userRepository).should().save(any(User.class));
-            then(verificationEmailService).should().send(user, emailVerificationExpiryDate, VerificationEmailType.SIGN_UP);
+            then(verificationEmailService).should().send(user, VerificationEmailType.SIGN_UP);
         }
 
         @Test
@@ -84,13 +83,13 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByEmail(request.email())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
+            assertThatThrownBy(() -> userService.signUp(request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_EMAIL.getMessage());
 
             then(userRepository).should().existsByEmail(request.email());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(VerificationEmailType.class));
         }
 
         @Test
@@ -101,13 +100,13 @@ class UserServiceTest extends ServiceUnitTest {
             given(userRepository.existsByNickname(request.nickname())).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userService.signUp(request, LocalDateTime.now()))
+            assertThatThrownBy(() -> userService.signUp(request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
 
             then(userRepository).should().existsByNickname(request.nickname());
             then(userRepository).should(never()).save(any(User.class));
-            then(verificationEmailService).should(never()).send(any(User.class), any(LocalDateTime.class), any(VerificationEmailType.class));
+            then(verificationEmailService).should(never()).send(any(User.class), any(VerificationEmailType.class));
         }
     }
 
@@ -122,12 +121,12 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = User.signUp(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
 
             final String updatedAvatarUrl = "updatedAvatarUrl";
-            final UserAvatarRequest request = UserAvatarRequest.builder().avatarUrl(updatedAvatarUrl).build();
+            final UserAvatarRequest request = new UserAvatarRequest(updatedAvatarUrl);
 
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when
             final UserProfileResponse result = userService.updateAvatar(userId, request);
@@ -150,13 +149,13 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = User.signUp(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
 
             final String updatedNickname = "updatedNickname";
             final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
 
             given(userRepository.existsByNickname(updatedNickname)).willReturn(false);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when
             final UserProfileResponse result = userService.updateNickname(userId, request);
@@ -180,66 +179,7 @@ class UserServiceTest extends ServiceUnitTest {
             assertThatThrownBy(() -> userService.updateNickname(userId, request))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(DUPLICATED_USER_NICKNAME.getMessage());
-            then(userRepository).should(never()).findById(userId);
-        }
-    }
-
-    @Nested
-    @DisplayName("id로 회원 조회")
-    class GetUser {
-        @Test
-        @DisplayName("성공")
-        void success() {
-            // given
-            final Long userId = 1L;
-            final String email = "testEmail@test.com";
-            final String password = "testPassword";
-            final String nickname = "testNickname";
-            final User user = User.signUp(email, password, nickname);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            // when
-            final User result = userService.getUserById(userId);
-
-            // then
-            assertThat(result).isEqualTo(user);
-        }
-
-        @Test
-        @DisplayName("실패 - 회원이 존재하지 않는다.")
-        void fail_NotExistingUser() {
-            // given
-            final Long userId = 1L;
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.getUserById(userId))
-                    .isInstanceOf(JobNoteException.class)
-                    .hasMessage(ResponseCode.NOT_FOUND_USER.getMessage());
-        }
-    }
-
-    @Nested
-    @DisplayName("이메일 인증")
-    class EmailVerification {
-        @Test
-        @DisplayName("성공 - 회원의 Role은 MEMBER가 된다.")
-        void success() {
-            // given
-            final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-            final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
-            final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
-            final String token = UUID.randomUUID().toString();
-            final VerificationEmail verificationEmail = VerificationEmail.create(token, user, expiryDate, VerificationEmailType.SIGN_UP);
-
-            given(verificationEmailService.verify(token, currentDate)).willReturn(verificationEmail);
-
-            // when
-            userService.verifySignUp(token, currentDate);
-
-            // then
-            assertThat(user.getRole()).isEqualTo(UserRole.MEMBER);
+            then(userQueryService).should(never()).getUserById(userId);
         }
     }
 
@@ -251,9 +191,8 @@ class UserServiceTest extends ServiceUnitTest {
         final String newEncodedPassword = "testNewEncodedPassword";
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
-        final User user = User.signUp("testEmail@test.com", "testPassword", "testNickname");
-        final VerificationEmail verificationEmail = VerificationEmail.create(token, user, LocalDateTime.of(2025, 8, 6, 11, 31), VerificationEmailType.RESET_PASSWORD);
-        verificationEmail.verify();
+        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+        final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedResetPassword(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
 
         given(verificationEmailService.validateVerified(token)).willReturn(verificationEmail);
         given(passwordEncoder.encode(newPassword)).willReturn(newEncodedPassword);
@@ -274,14 +213,14 @@ class UserServiceTest extends ServiceUnitTest {
             // given
             final long userId = 1L;
             final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
             given(time.now()).willReturn(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
 
             // when
             userService.withdraw(userId);
 
             // then
-            then(userRepository).should().findById(userId);
+            then(userQueryService).should().getUserById(userId);
             then(time).should().now();
             assertThat(user.isDeleted()).isTrue();
             assertThat(user.getDeletedDate()).isEqualTo(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
@@ -293,13 +232,13 @@ class UserServiceTest extends ServiceUnitTest {
             // given
             final long userId = 1L;
             final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when & then
             assertThatThrownBy(() -> userService.withdraw(userId))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(USER_ALREADY_WITHDRAWN.getMessage());
-            then(userRepository).should().findById(userId);
+            then(userQueryService).should().getUserById(userId);
             then(time).should().now();
         }
     }

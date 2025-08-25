@@ -3,9 +3,9 @@ package com.jobnote.domain.user.service;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
-import com.jobnote.domain.user.domain.RefreshToken;
+import com.jobnote.domain.refreshtoken.domain.RefreshToken;
 import com.jobnote.domain.user.domain.User;
-import com.jobnote.domain.user.repository.RefreshTokenRepository;
+import com.jobnote.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +23,11 @@ public class AuthTokenService {
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserService userService;
+    private final UserQueryService userQueryService;
 
     @Transactional
     public Token saveAndGetToken(final Long userId) {
-        final User user = userService.getUserById(userId);
+        final User user = userQueryService.getUserById(userId);
         final Token token = issueToken(user.getEmail());
         final LocalDateTime expiration = tokenProvider.getExpiration(token.refreshToken(), CLAIM_VALUE_REFRESH_TOKEN);
         refreshTokenRepository.save(RefreshToken.of(user, token.refreshToken(), expiration));

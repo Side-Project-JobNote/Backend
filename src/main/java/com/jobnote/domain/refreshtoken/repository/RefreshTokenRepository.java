@@ -1,6 +1,6 @@
-package com.jobnote.domain.user.repository;
+package com.jobnote.domain.refreshtoken.repository;
 
-import com.jobnote.domain.user.domain.RefreshToken;
+import com.jobnote.domain.refreshtoken.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {

@@ -1,17 +1,19 @@
 package com.jobnote.domain.email.service;
 
+import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
+import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.email.domain.VerificationEmail;
 import com.jobnote.domain.email.repository.VerificationEmailRepository;
 import com.jobnote.domain.email.event.VerificationEmailEvent;
+import com.jobnote.domain.user.service.UserQueryService;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_EMAIL;
@@ -22,7 +24,9 @@ import static com.jobnote.global.common.ResponseCode.NOT_FOUND_VERIFICATION_EMAI
 public class VerificationEmailService {
 
     private final VerificationEmailRepository verificationEmailRepository;
+    private final UserQueryService userQueryService;
     private final ApplicationEventPublisher eventPublisher;
+    private final Time time;
 
     public VerificationEmail getVerificationEmailByToken(final String token) {
         return getByTokenOrThrow(token);
@@ -30,19 +34,33 @@ public class VerificationEmailService {
 
     /* VERIFY */
     @Transactional
-    public VerificationEmail verify(final String token, final LocalDateTime currentDate) {
+    public VerificationEmail verify(final String token) {
         final VerificationEmail verificationEmail = getVerificationEmailByToken(token);
 
-        verificationEmail.validateExpired(currentDate);
+        verificationEmail.validateExpired(time.now());
         verificationEmail.verify();
 
         return verificationEmail;
     }
 
+    @Transactional
+    public void verifySignUp(final String token) {
+        final VerificationEmail verificationEmail = verify(token);
+        final User user = verificationEmail.getUser();
+        user.accept();
+    }
+
     /* SEND */
     @Transactional
-    public void send(final User user, final LocalDateTime expiryDate, final VerificationEmailType type) {
-        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(VerificationEmail.create(UUID.randomUUID().toString(), user, expiryDate, type));
+    public void send(final VerificationEmailRequest request) {
+        final User user = userQueryService.getUserByEmail(request.email());
+        send(user, request.type());
+    }
+
+    @Transactional
+    public void send(final User user, final VerificationEmailType type) {
+        final VerificationEmail savedVerificationEmail = verificationEmailRepository.save(
+                VerificationEmail.create(UUID.randomUUID().toString(), user, time.now().plusDays(1), type));
         eventPublisher.publishEvent(VerificationEmailEvent.of(user.getEmail(), savedVerificationEmail.getToken(), type));
     }
 
