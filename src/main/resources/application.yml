@@ -48,3 +48,9 @@ app:
 file:
   quota:
     per-user: 100MB
+
+frontend:
+  main-page: /dashboard
+  login-fail-page: /login/fail
+  social-sign-up-page: /join/nickname
+  reset-password-page: /reset-password
