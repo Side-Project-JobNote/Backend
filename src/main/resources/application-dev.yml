@@ -1,0 +1,4 @@
+app:
+  base-url: https://jobnote.p-e.kr
+frontend:
+  base-url: https://job-note.vercel.app
