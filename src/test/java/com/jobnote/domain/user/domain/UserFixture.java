@@ -2,8 +2,9 @@ package com.jobnote.domain.user.domain;
 
 public class UserFixture {
 
-    public static User createMember(final String email, final String password, final String nickname) {
+    public static User createMember(final Long userId, final String email, final String password, final String nickname) {
         return User.builder()
+                .id(userId)
                 .email(email)
                 .password(password)
                 .nickname(nickname)
@@ -11,8 +12,9 @@ public class UserFixture {
                 .build();
     }
 
-    public static User createWithdrawnMember(final String email, final String password, final String nickname) {
+    public static User createWithdrawnMember(final Long userId, final String email, final String password, final String nickname) {
         return User.builder()
+                .id(userId)
                 .email(email)
                 .password(password)
                 .nickname(nickname)
@@ -21,8 +23,9 @@ public class UserFixture {
                 .build();
     }
 
-    public static User createGuest(final String email, final String password, final String nickname) {
+    public static User createGuest(final Long userId, final String email, final String password, final String nickname) {
         return User.builder()
+                .id(userId)
                 .email(email)
                 .password(password)
                 .nickname(nickname)
@@ -30,8 +33,9 @@ public class UserFixture {
                 .build();
     }
 
-    public static User createGuestKakao(final String email, final String socialEmail, final String socialId) {
+    public static User createGuestKakao(final Long userId, final String email, final String socialEmail, final String socialId) {
         return User.builder()
+                .id(userId)
                 .email(email)
                 .socialEmail(socialEmail)
                 .socialId(socialId)
@@ -40,8 +44,9 @@ public class UserFixture {
                 .build();
     }
 
-    public static User createMemberKakao(final String email, final String socialEmail, final String socialId) {
+    public static User createMemberKakao(final Long userId, final String email, final String socialEmail, final String socialId) {
         return User.builder()
+                .id(userId)
                 .email(email)
                 .socialEmail(socialEmail)
                 .socialId(socialId)

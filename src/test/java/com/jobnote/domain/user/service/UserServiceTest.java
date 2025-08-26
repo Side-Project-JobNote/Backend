@@ -121,7 +121,7 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(userId, existingEmail, existingPassword, existingNickname);
 
             final String updatedAvatarUrl = "updatedAvatarUrl";
             final UserAvatarRequest request = new UserAvatarRequest(updatedAvatarUrl);
@@ -149,7 +149,7 @@ class UserServiceTest extends ServiceUnitTest {
             final String existingEmail = "testEmail@test.com";
             final String existingPassword = "testPassword";
             final String existingNickname = "testNickname";
-            final User user = UserFixture.createMember(existingEmail, existingPassword, existingNickname);
+            final User user = UserFixture.createMember(userId, existingEmail, existingPassword, existingNickname);
 
             final String updatedNickname = "updatedNickname";
             final UserNicknameRequest request = UserNicknameRequest.builder().nickname(updatedNickname).build();
@@ -191,7 +191,7 @@ class UserServiceTest extends ServiceUnitTest {
         final String newEncodedPassword = "testNewEncodedPassword";
         final String token = "testToken";
         final UserResetPasswordRequest request = new UserResetPasswordRequest(newPassword);
-        final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+        final User user = UserFixture.createMember(1L, "testEmail@test.com", "testPassword", "testNickname");
         final VerificationEmail verificationEmail = VerificationEmailFixture.createVerifiedResetPassword(token, user, LocalDateTime.of(2025, 8, 6, 11, 31));
 
         given(verificationEmailService.validateVerified(token)).willReturn(verificationEmail);
@@ -212,7 +212,7 @@ class UserServiceTest extends ServiceUnitTest {
         void success() {
             // given
             final long userId = 1L;
-            final User user = UserFixture.createMember("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createMember(userId, "testEmail@test.com", "testPassword", "testNickname");
             given(userQueryService.getUserById(userId)).willReturn(user);
             given(time.now()).willReturn(LocalDateTime.of(2025, 8, 11, 22, 37, 0));
 
@@ -231,7 +231,7 @@ class UserServiceTest extends ServiceUnitTest {
         void fail_AlreadyWithdrawn_ThrowsException() {
             // given
             final long userId = 1L;
-            final User user = UserFixture.createWithdrawnMember("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createWithdrawnMember(userId, "testEmail@test.com", "testPassword", "testNickname");
             given(userQueryService.getUserById(userId)).willReturn(user);
 
             // when & then

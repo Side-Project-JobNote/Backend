@@ -46,10 +46,11 @@ class LoginServiceTest extends ServiceUnitTest {
         @DisplayName("성공")
         void success() {
             // given
+            final long userId = 1L;
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final UserLoginRequest request = new UserLoginRequest(email, password);
-            final User user = UserFixture.createMember(email, password, "testNickname");
+            final User user = UserFixture.createMember(userId, email, password, "testNickname");
             final CustomUserDetails principal = new CustomUserDetails(user);
 
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(authentication);
@@ -59,7 +60,7 @@ class LoginServiceTest extends ServiceUnitTest {
             loginService.login(request);
 
             // then
-            then(authTokenService).should().saveAndGetToken(any());
+            then(authTokenService).should().saveAndGetToken(userId);
         }
 
         @Test
@@ -69,7 +70,7 @@ class LoginServiceTest extends ServiceUnitTest {
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final UserLoginRequest request = new UserLoginRequest(email, password);
-            final User user = UserFixture.createGuest(email, password, "testNickname");
+            final User user = UserFixture.createGuest(1L, email, password, "testNickname");
             final CustomUserDetails principal = new CustomUserDetails(user);
 
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(authentication);

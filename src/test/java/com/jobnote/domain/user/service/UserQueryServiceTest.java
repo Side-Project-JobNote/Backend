@@ -37,7 +37,7 @@ class UserQueryServiceTest extends ServiceUnitTest {
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final String nickname = "testNickname";
-            final User user = UserFixture.createMember(email, password, nickname);
+            final User user = UserFixture.createMember(userId, email, password, nickname);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -72,7 +72,7 @@ class UserQueryServiceTest extends ServiceUnitTest {
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final String nickname = "testNickname";
-            final User user = UserFixture.createMember(email, password, nickname);
+            final User user = UserFixture.createMember(1L, email, password, nickname);
 
             given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
 

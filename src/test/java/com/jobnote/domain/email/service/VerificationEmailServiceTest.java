@@ -132,7 +132,7 @@ class VerificationEmailServiceTest extends ServiceUnitTest {
         @DisplayName("성공 - 회원의 Role은 MEMBER가 된다.")
         void success() {
             // given
-            final User user = UserFixture.createGuest("testEmail@test.com", "testPassword", "testNickname");
+            final User user = UserFixture.createGuest(1L, "testEmail@test.com", "testPassword", "testNickname");
             final LocalDateTime currentDate = LocalDateTime.of(2025, 7, 29, 12, 0);
             final LocalDateTime expiryDate = LocalDateTime.of(2025, 7, 30, 12, 0);
             final String token = UUID.randomUUID().toString();
