@@ -1,7 +1,7 @@
 package com.jobnote.domain.applicationform.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.applicationform.api.ApplicationFormApi;
 import com.jobnote.domain.applicationform.dto.ApplicationFormListResponse;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
@@ -30,7 +30,7 @@ public class ApplicationFormController implements ApplicationFormApi {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid final ApplicationFormRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         Long savedFormId = applicationFormService.save(principal.getUserId(), request);
 
@@ -44,7 +44,7 @@ public class ApplicationFormController implements ApplicationFormApi {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ApplicationFormResponse>> getApplicationForm(
             @PathVariable("id") final Long formId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         ApplicationFormResponse form = applicationFormService.getById(principal.getUserId(), formId);
 
@@ -54,7 +54,7 @@ public class ApplicationFormController implements ApplicationFormApi {
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<ApplicationFormListResponse>> getAllApplicationForms(
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         List<ApplicationFormResponse> forms = applicationFormService.getAll(principal.getUserId());
         ApplicationFormListResponse listResponse = ApplicationFormListResponse.from(forms);
@@ -68,7 +68,7 @@ public class ApplicationFormController implements ApplicationFormApi {
     public ResponseEntity<ApiResponse<Void>> updateApplicationForm(
             @PathVariable("id") final Long formId,
             @Valid @RequestBody final ApplicationFormRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         applicationFormService.update(principal.getUserId(), formId, request);
 
@@ -80,7 +80,7 @@ public class ApplicationFormController implements ApplicationFormApi {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteApplicationForm(
             @PathVariable("id") final Long formId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         applicationFormService.delete(principal.getUserId(), formId);
 

@@ -1,6 +1,6 @@
 package com.jobnote.auth.handler;
 
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
@@ -28,7 +28,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        final CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
+        final CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
         final Token token = authTokenService.saveAndGetToken(principal.getUserId());
         tokenProvider.addTokenToCookie(response, token);
 

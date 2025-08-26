@@ -1,7 +1,7 @@
 package com.jobnote.domain.schedule.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.schedule.api.ScheduleApi;
@@ -32,7 +32,7 @@ public class ScheduleController implements ScheduleApi {
     public ResponseEntity<ApiResponse<Void>> createSchedule(
             @PathVariable Long formId,
             @RequestBody @Valid final ScheduleRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
 
@@ -49,7 +49,7 @@ public class ScheduleController implements ScheduleApi {
     public ResponseEntity<ApiResponse<ScheduleResponse>> getSchedule(
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         ScheduleResponse form = scheduleService.getById(principal.getUserId(), formId, scheduleId);
 
@@ -63,7 +63,7 @@ public class ScheduleController implements ScheduleApi {
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
             @Valid @RequestBody final ScheduleRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         scheduleService.update(principal.getUserId(), formId, scheduleId, request);
 
@@ -76,7 +76,7 @@ public class ScheduleController implements ScheduleApi {
     public ResponseEntity<ApiResponse<Void>> deleteSchedule(
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         scheduleService.delete(principal.getUserId(), formId, scheduleId);
 

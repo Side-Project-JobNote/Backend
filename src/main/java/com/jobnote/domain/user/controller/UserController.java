@@ -1,7 +1,7 @@
 package com.jobnote.domain.user.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.dto.*;
@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/signup/social")
-    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomPrincipal principal) {
+    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomUserDetails principal) {
         userService.socialSignUp(request, principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
@@ -61,7 +61,7 @@ public class UserController {
 
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomPrincipal principal, final HttpServletRequest request, final HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomUserDetails principal, final HttpServletRequest request, final HttpServletResponse response) {
         final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
         tokenProvider.addTokenToCookie(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
@@ -69,20 +69,20 @@ public class UserController {
 
     /* GET PROFILE */
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(@LoginUser final CustomPrincipal principal) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(@LoginUser final CustomUserDetails principal) {
         final UserProfileResponse response = userService.getProfile(principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
 
     /* UPDATE PROFILE */
     @PatchMapping("/avatar")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomPrincipal principal, @RequestBody @Valid final UserAvatarRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateAvatar(@LoginUser final CustomUserDetails principal, @RequestBody @Valid final UserAvatarRequest request) {
         final UserProfileResponse response = userService.updateAvatar(principal.getUserId(), request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
 
     @PatchMapping("/nickname")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateNickname(@LoginUser final CustomPrincipal principal, @RequestBody @Valid final UserNicknameRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateNickname(@LoginUser final CustomUserDetails principal, @RequestBody @Valid final UserNicknameRequest request) {
         final UserProfileResponse response = userService.updateNickname(principal.getUserId(), request);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, response));
     }
@@ -96,7 +96,7 @@ public class UserController {
 
     /* WITHDRAW */
     @DeleteMapping("/withdraw")
-    public ResponseEntity<ApiResponse<Void>> withdraw(@LoginUser final CustomPrincipal principal) {
+    public ResponseEntity<ApiResponse<Void>> withdraw(@LoginUser final CustomUserDetails principal) {
         userService.withdraw(principal.getUserId());
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }

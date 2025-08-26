@@ -1,7 +1,7 @@
 package com.jobnote.domain.applicationform.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.applicationform.dto.ApplicationFormListResponse;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
@@ -30,7 +30,7 @@ public interface ApplicationFormApi {
     )
     ResponseEntity<ApiResponse<Void>> createApplicationForm(
             @RequestBody @Valid final ApplicationFormRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "지원서 단건 조회")
@@ -46,7 +46,7 @@ public interface ApplicationFormApi {
     )
     ResponseEntity<ApiResponse<ApplicationFormResponse>> getApplicationForm(
             @PathVariable("id") final Long formId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "지원서 목록 조회")
@@ -57,7 +57,7 @@ public interface ApplicationFormApi {
             )
     )
     ResponseEntity<ApiResponse<ApplicationFormListResponse>> getAllApplicationForms(
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "지원서 업데이트",
@@ -76,7 +76,7 @@ public interface ApplicationFormApi {
     ResponseEntity<ApiResponse<Void>> updateApplicationForm(
             @PathVariable("id") final Long formId,
             @Valid @RequestBody final ApplicationFormRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "지원서 삭제")
@@ -88,6 +88,6 @@ public interface ApplicationFormApi {
     )
     ResponseEntity<ApiResponse<Void>> deleteApplicationForm(
             @PathVariable("id") final Long formId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 }

@@ -1,7 +1,7 @@
 package com.jobnote.infra.s3.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import com.jobnote.infra.s3.api.S3Api;
@@ -24,7 +24,7 @@ public class S3Controller implements S3Api {
     @PostMapping("/presigned")
     public ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
             @RequestBody @Valid final PresignedFileRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         PresignedFileResponse signedUrl = s3Service.generatePresignedFile(principal.getUserId(), request);
         return  ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, signedUrl));

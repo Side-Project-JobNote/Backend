@@ -1,7 +1,7 @@
 package com.jobnote.domain.document.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.document.api.DocumentApi;
 import com.jobnote.domain.document.dto.*;
 import com.jobnote.domain.document.service.DocumentService;
@@ -28,7 +28,7 @@ public class DocumentController implements DocumentApi {
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody @Valid final DocumentRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         Long savedId = documentService.uploadNewDocument(principal.getUserId(), request);
 
@@ -42,7 +42,7 @@ public class DocumentController implements DocumentApi {
     public ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
             @PathVariable final Long documentId,
             @RequestBody @Valid final DocumentRequest request,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         Long savedId = documentService.uploadNewVersionDocument(principal.getUserId(), documentId, request);
 
@@ -55,7 +55,7 @@ public class DocumentController implements DocumentApi {
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         List<DocumentResponse> documents = documentService.getAll(principal.getUserId());
         DocumentListResponse listResponse = DocumentListResponse.from(documents);
@@ -67,7 +67,7 @@ public class DocumentController implements DocumentApi {
     @GetMapping("/{documentId}")
     public ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
             @PathVariable final Long documentId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         List<DocumentVersionResponse> documents = documentService.getAllVersions(principal.getUserId(), documentId);
         DocumentVersionListResponse listResponse = DocumentVersionListResponse.from(documents);
@@ -80,7 +80,7 @@ public class DocumentController implements DocumentApi {
     @DeleteMapping("/{documentId}")
     public ResponseEntity<ApiResponse<Void>> deleteDocument(
             @PathVariable final Long documentId,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         documentService.deleteDocument(principal.getUserId(), documentId);
 
