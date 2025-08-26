@@ -1,6 +1,7 @@
 package com.jobnote.global.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.jobnote.global.config.properties.FrontendProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,11 +10,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Configuration
 public class CorsConfig {
 
-    @Value("${frontend.base-url}")
-    private String frontendBaseUrl;
+    private final FrontendProperties frontendProperties;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -24,7 +25,7 @@ public class CorsConfig {
 
     private CorsConfiguration corsConfiguration() {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of(frontendBaseUrl));
+        corsConfiguration.setAllowedOrigins(List.of(frontendProperties.baseUrl()));
         corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

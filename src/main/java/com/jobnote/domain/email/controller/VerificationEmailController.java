@@ -4,10 +4,10 @@ import com.jobnote.domain.email.dto.VerificationEmailRequest;
 import com.jobnote.domain.email.service.VerificationEmailService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
+import com.jobnote.global.config.properties.FrontendProperties;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +19,7 @@ import java.io.IOException;
 public class VerificationEmailController {
 
     private final VerificationEmailService verificationEmailService;
-
-    @Value("${frontend.base-url}")
-    private String frontendBaseUrl;
+    private final FrontendProperties frontendProperties;
 
     /* SEND VERIFICATION EMAIL */
     @PostMapping
@@ -34,12 +32,12 @@ public class VerificationEmailController {
     @GetMapping("/signup/verify")
     public void verifySignUpEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
         verificationEmailService.verifySignUp(token);
-        response.sendRedirect(frontendBaseUrl);
+        response.sendRedirect(frontendProperties.baseUrl() + frontendProperties.mainPage());
     }
 
     @GetMapping("/reset-password/verify")
     public void verifyResetPasswordEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
         verificationEmailService.verify(token);
-        response.sendRedirect(frontendBaseUrl);
+        response.sendRedirect(frontendProperties.baseUrl() + frontendProperties.resetPasswordPage());
     }
 }
