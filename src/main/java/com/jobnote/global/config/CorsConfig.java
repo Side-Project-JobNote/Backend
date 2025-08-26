@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${app.frontend.base-url}")
+    @Value("${frontend.base-url}")
     private String frontendBaseUrl;
 
     @Bean

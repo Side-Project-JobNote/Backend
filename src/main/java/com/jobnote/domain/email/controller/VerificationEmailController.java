@@ -20,7 +20,7 @@ public class VerificationEmailController {
 
     private final VerificationEmailService verificationEmailService;
 
-    @Value("${app.frontend.base-url}")
+    @Value("${frontend.base-url}")
     private String frontendBaseUrl;
 
     /* SEND VERIFICATION EMAIL */

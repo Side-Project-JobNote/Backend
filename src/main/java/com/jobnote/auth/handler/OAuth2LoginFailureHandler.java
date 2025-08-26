@@ -13,7 +13,7 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    @Value("${app.frontend.base-url}")
+    @Value("${frontend.base-url}")
     private String frontendBaseUrl;
 
     @Override

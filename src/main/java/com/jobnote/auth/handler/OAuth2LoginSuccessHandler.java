@@ -23,7 +23,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final TokenProvider tokenProvider;
     private final AuthTokenService authTokenService;
 
-    @Value("${app.frontend.base-url}")
+    @Value("${frontend.base-url}")
     private String frontendBaseUrl;
 
     @Override
