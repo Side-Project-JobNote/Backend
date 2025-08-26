@@ -1,6 +1,6 @@
 package com.jobnote.auth.service;
 
-import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.auth.dto.CustomUserDetailsOld;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         final User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("아이디를 찾을 수 없습니다."));
 
-        return new CustomUserDetails(user);
+        return new CustomUserDetailsOld(user);
     }
 }
