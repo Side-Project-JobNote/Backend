@@ -28,19 +28,23 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        final CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         final CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
         final Token token = authTokenService.saveAndGetToken(principal.getUserId());
         tokenProvider.addTokenToCookie(response, token);
 
         if (UserRole.GUEST.getKey().equals(principal.getRole())) {
-            response.sendRedirect(frontendBaseUrl + signUpRequiredQueryParam(true));
+            response.sendRedirect(frontendBaseUrl + guestRedirectQueryString(principal.getEmail()));
             return;
         }
 
-        response.sendRedirect(frontendBaseUrl + signUpRequiredQueryParam(false));
+        final Token token = authTokenService.saveAndGetToken(principal.getUserId());
+        tokenProvider.addTokenToCookie(response, token);
+
+        response.sendRedirect(frontendBaseUrl);
     }
 
-    private String signUpRequiredQueryParam(final boolean result) {
-        return String.format("?sign-up-required=%s", result);
+    private String guestRedirectQueryString(final String email) {
+        return String.format("?sign-up-required=true&email=%s", email);
     }
 }

@@ -40,6 +40,9 @@ public class UserController {
     @PostMapping("/signup/social")
     public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, @LoginUser final CustomUserDetails principal) {
         userService.socialSignUp(request, principal.getUserId());
+    public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, final HttpServletResponse response) {
+        final Token token = userService.socialSignUp(request);
+        tokenProvider.addTokenToCookie(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
