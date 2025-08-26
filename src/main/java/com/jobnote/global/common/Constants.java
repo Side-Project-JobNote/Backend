@@ -1,6 +1,6 @@
 package com.jobnote.global.common;
 
-import java.util.List;
+import java.util.Set;
 
 public abstract class Constants {
 
@@ -24,7 +24,7 @@ public abstract class Constants {
 
     // whitelist
     public static final String[] WHITELIST = {
-            "/api/v1/users/signup",
+            "/api/v1/users/signup/**",
             "/api/v1/users/login",
             "/api/v1/users/reset-password",
             "/api/v1/verification-emails/**",
@@ -35,19 +35,16 @@ public abstract class Constants {
             "/v3/api-docs/**",
     };
 
-    public static final List<String> TOKEN_FILTER_WHITELIST = List.of(
+    public static final Set<String> TOKEN_FILTER_WHITELIST = Set.of(
             "/api/v1/users/signup",
+            "/api/v1/users/signup/social",
             "/api/v1/users/login",
             "/api/v1/users/reset-password",
             "/api/v1/verification-emails",
-            "/oauth2",
-            "/h2-console",
-            "/error",
-            "/swagger-ui",
-            "/v3/api-docs"
+            "/api/v1/verification-emails/signup/verify",
+            "/api/v1/verification-emails/reset-password/verify",
+            "/oauth2/authorization/naver",
+            "/oauth2/authorization/kakao",
+            "/oauth2/authorization/google"
     );
-
-    public static final String[] ONLY_GUEST = {
-            "/api/v1/users/signup/social",
-    };
 }
