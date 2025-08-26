@@ -1,7 +1,7 @@
 package com.jobnote.domain.schedule.controller;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.schedule.api.UserScheduleApi;
 import com.jobnote.domain.schedule.dto.ScheduleListResponse;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
@@ -33,7 +33,7 @@ public class UserScheduleController implements UserScheduleApi {
     public ResponseEntity<ApiResponse<ScheduleListResponse>> getAllSchedules(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
-            @LoginUser final CustomPrincipal principal
+            @LoginUser final CustomUserDetails principal
     ) {
         List<ScheduleResponse> schedules = scheduleService.getAll(principal.getUserId(), startDate, endDate);
         ScheduleListResponse listResponse = ScheduleListResponse.from(schedules);

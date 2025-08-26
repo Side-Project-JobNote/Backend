@@ -1,7 +1,7 @@
 package com.jobnote.infra.s3.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -34,6 +34,6 @@ public interface S3Api {
     )
     ResponseEntity<ApiResponse<PresignedFileResponse>> getPresignedUrl(
             @RequestBody @Valid final PresignedFileRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 }

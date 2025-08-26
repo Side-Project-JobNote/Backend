@@ -1,7 +1,7 @@
 package com.jobnote.domain.schedule.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.schedule.dto.ScheduleListResponse;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
@@ -28,6 +28,6 @@ public interface UserScheduleApi {
     ResponseEntity<ApiResponse<ScheduleListResponse>> getAllSchedules(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 }

@@ -1,7 +1,7 @@
 package com.jobnote.domain.schedule.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
@@ -34,7 +34,7 @@ public interface ScheduleApi {
     ResponseEntity<ApiResponse<Void>> createSchedule(
             @PathVariable Long formId,
             @RequestBody @Valid final ScheduleRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "일정 단건 조회")
@@ -52,7 +52,7 @@ public interface ScheduleApi {
     ResponseEntity<ApiResponse<ScheduleResponse>> getSchedule(
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "일정 업데이트")
@@ -67,7 +67,7 @@ public interface ScheduleApi {
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
             @Valid @RequestBody final ScheduleRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "일정 삭제")
@@ -81,6 +81,6 @@ public interface ScheduleApi {
     ResponseEntity<ApiResponse<Void>> deleteSchedule(
             @PathVariable Long formId,
             @PathVariable("id") final Long scheduleId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 }

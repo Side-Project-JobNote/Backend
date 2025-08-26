@@ -1,7 +1,7 @@
 package com.jobnote.domain.document.api;
 
 import com.jobnote.auth.config.LoginUser;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.document.dto.*;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
@@ -34,7 +34,7 @@ public interface DocumentApi {
     )
     ResponseEntity<ApiResponse<Void>> uploadNewDocument(
             @RequestBody @Valid final DocumentRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "기존 문서의 새로운 버전 문서 업로드",
@@ -54,7 +54,7 @@ public interface DocumentApi {
     ResponseEntity<ApiResponse<Void>> uploadNewVersionDocument(
             @PathVariable final Long documentId,
             @RequestBody @Valid final DocumentRequest request,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "문서 목록 조회")
@@ -65,7 +65,7 @@ public interface DocumentApi {
             )
     )
     ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "문서의 모든 버전 목록 조회")
@@ -77,7 +77,7 @@ public interface DocumentApi {
     )
     ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
             @PathVariable final Long documentId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 
     @Operation(summary = "문서 삭제")
@@ -89,6 +89,6 @@ public interface DocumentApi {
     )
     ResponseEntity<ApiResponse<Void>> deleteDocument(
             @PathVariable final Long documentId,
-            @Parameter(hidden = true) @LoginUser final CustomPrincipal principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
     );
 }

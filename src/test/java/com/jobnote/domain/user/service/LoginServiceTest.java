@@ -1,8 +1,9 @@
 package com.jobnote.domain.user.service;
 
 import com.jobnote.ServiceUnitTest;
-import com.jobnote.auth.dto.CustomPrincipal;
-import com.jobnote.domain.user.domain.UserRole;
+import com.jobnote.auth.dto.CustomUserDetails;
+import com.jobnote.domain.user.domain.User;
+import com.jobnote.domain.user.domain.UserFixture;
 import com.jobnote.domain.user.dto.UserLoginRequest;
 import com.jobnote.global.exception.JobNoteException;
 import org.junit.jupiter.api.DisplayName;
@@ -14,11 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.Collection;
-import java.util.List;
 
 import static com.jobnote.global.common.ResponseCode.INVALID_USERNAME_PASSWORD;
 import static com.jobnote.global.common.ResponseCode.PENDING_EMAIL_VERIFICATION;
@@ -49,11 +46,11 @@ class LoginServiceTest extends ServiceUnitTest {
         @DisplayName("성공")
         void success() {
             // given
-            final long userId = 1L;
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final UserLoginRequest request = new UserLoginRequest(email, password);
-            final MockCustomPrincipal principal = PrincipalFixture.createMember(userId, email);
+            final User user = UserFixture.createMember(email, password, "testNickname");
+            final CustomUserDetails principal = new CustomUserDetails(user);
 
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(authentication);
             given(authentication.getPrincipal()).willReturn(principal);
@@ -62,18 +59,18 @@ class LoginServiceTest extends ServiceUnitTest {
             loginService.login(request);
 
             // then
-            then(authTokenService).should().saveAndGetToken(userId);
+            then(authTokenService).should().saveAndGetToken(any());
         }
 
         @Test
         @DisplayName("실패 - 이메일 인증이 완료되지 않으면 예외를 발생한다.")
         void fail_PendingEmailVerification_ThrowsException() {
             // given
-            final long userId = 1L;
             final String email = "testEmail@test.com";
             final String password = "testPassword";
             final UserLoginRequest request = new UserLoginRequest(email, password);
-            final MockCustomPrincipal principal = PrincipalFixture.createGuest(userId, email);
+            final User user = UserFixture.createGuest(email, password, "testNickname");
+            final CustomUserDetails principal = new CustomUserDetails(user);
 
             given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(authentication);
             given(authentication.getPrincipal()).willReturn(principal);
@@ -122,38 +119,6 @@ class LoginServiceTest extends ServiceUnitTest {
 
             then(authentication).should(never()).getPrincipal();
             then(authTokenService).should(never()).saveAndGetToken(any(Long.class));
-        }
-    }
-
-    /* HELPER METHOD */
-    private static class MockCustomPrincipal extends CustomPrincipal {
-
-        private final UserRole role;
-
-        public MockCustomPrincipal(final Long userId, final String email, final UserRole role) {
-            super(userId, email);
-            this.role = role;
-        }
-
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-            return List.of();
-        }
-
-        @Override
-        public String getRole() {
-            return this.role.getKey();
-        }
-    }
-
-    private static class PrincipalFixture {
-
-        private static MockCustomPrincipal createMember(final long userId, final String email) {
-            return new MockCustomPrincipal(userId, email, UserRole.MEMBER);
-        }
-
-        private static MockCustomPrincipal createGuest(final long userId, final String email) {
-            return new MockCustomPrincipal(userId, email, UserRole.GUEST);
         }
     }
 }

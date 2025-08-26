@@ -1,6 +1,6 @@
 package com.jobnote.auth.service;
 
-import com.jobnote.auth.dto.CustomOAuth2User;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.dto.OAuth2Attributes;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.repository.UserRepository;
@@ -30,7 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         final OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(registrationId, attributes, userNameAttributeName);
         final User user = getUser(oAuth2Attributes);
 
-        return new CustomOAuth2User(user, oAuth2Attributes);
+        return new CustomUserDetails(user, oAuth2Attributes);
     }
 
     private User getUser(final OAuth2Attributes oAuth2Attributes) {

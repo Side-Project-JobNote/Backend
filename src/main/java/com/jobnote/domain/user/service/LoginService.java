@@ -1,6 +1,6 @@
 package com.jobnote.domain.user.service;
 
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.token.Token;
 import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.dto.UserLoginRequest;
@@ -31,7 +31,7 @@ public class LoginService {
 
         try {
             final Authentication authenticationResponse = authenticationManager.authenticate(authenticationRequest);
-            final CustomPrincipal principal = (CustomPrincipal) authenticationResponse.getPrincipal();
+            final CustomUserDetails principal = (CustomUserDetails) authenticationResponse.getPrincipal();
 
             if (UserRole.GUEST.getKey().equals(principal.getRole())) {
                 throw new JobNoteException(PENDING_EMAIL_VERIFICATION);

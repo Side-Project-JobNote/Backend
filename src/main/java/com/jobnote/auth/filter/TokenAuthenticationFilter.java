@@ -1,7 +1,7 @@
 package com.jobnote.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jobnote.auth.dto.CustomPrincipal;
+import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.auth.service.CustomUserDetailsService;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.global.exception.JobNoteException;
@@ -54,7 +54,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(final String email) {
-        CustomPrincipal principal = (CustomPrincipal) customUserDetailsService.loadUserByUsername(email);
+        CustomUserDetails principal = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
