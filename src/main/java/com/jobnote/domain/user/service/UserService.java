@@ -1,5 +1,6 @@
 package com.jobnote.domain.user.service;
 
+import com.jobnote.auth.token.Token;
 import com.jobnote.domain.common.Time;
 import com.jobnote.domain.email.domain.VerificationEmailType;
 import com.jobnote.domain.user.domain.User;
@@ -26,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationEmailService verificationEmailService;
+    private final AuthTokenService authTokenService;
     private final UserQueryService userQueryService;
     private final Time time;
 
@@ -44,10 +46,11 @@ public class UserService {
 
     /* SOCIAL LOGIN SIGN UP */
     @Transactional
-    public void socialSignUp(final SocialSignUpRequest request, final Long userId) {
+    public Token socialSignUp(final SocialSignUpRequest request) {
         validateDuplicatedNickname(request.nickname());
-        final User user = userQueryService.getUserById(userId);
+        final User user = userQueryService.getUserByEmail(request.email());
         user.acceptSocial(request.nickname());
+        return authTokenService.saveAndGetToken(user.getId());
     }
 
     /* GET PROFILE */

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import static com.jobnote.domain.user.domain.UserRole.*;
-import static com.jobnote.domain.user.domain.UserRole.GUEST;
 import static com.jobnote.global.common.Constants.*;
 
 @RequiredArgsConstructor
@@ -64,7 +64,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                         .requestMatchers(WHITELIST).permitAll()
                         .requestMatchers("/api/*/admin/**").hasRole(ADMIN.name())
-                        .requestMatchers(ONLY_GUEST).hasRole(GUEST.name())
                         .anyRequest().hasAnyRole(MEMBER.name(), ADMIN.name()));
 
         http
@@ -80,5 +79,16 @@ public class SecurityConfig {
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers(
+                        "/h2-console/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/error"
+                );
     }
 }
