@@ -4,8 +4,9 @@ spring:
 
   profiles:
     group:
-      local: secret
-      test: secret
+      local: local, secret, secret-local
+      dev: dev, secret, secret-dev
+      test: test
 
   security:
     oauth2:
