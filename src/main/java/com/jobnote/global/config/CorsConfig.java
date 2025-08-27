@@ -25,7 +25,7 @@ public class CorsConfig {
 
     private CorsConfiguration corsConfiguration() {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of(frontendProperties.baseUrl(), frontendProperties.localUrl()));
+        corsConfiguration.setAllowedOrigins(List.of(frontendProperties.baseUrl(), frontendProperties.localUrl(), frontendProperties.localSecureUrl()));
         corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
