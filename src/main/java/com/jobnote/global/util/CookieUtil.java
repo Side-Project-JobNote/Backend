@@ -28,8 +28,8 @@ public class CookieUtil {
                 .httpOnly(true)
                 .path(path)
                 .maxAge(maxAge)
-                // .secure(true) 운영 환경에서 설정
-                .sameSite(String.valueOf(org.springframework.boot.web.server.Cookie.SameSite.STRICT))
+                .secure(true)
+                .sameSite(String.valueOf(org.springframework.boot.web.server.Cookie.SameSite.NONE))
                 .build();
     }
 
