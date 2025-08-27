@@ -33,7 +33,7 @@ jobs:
         run: ./gradlew build
         
       - name: Copy JAR to server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
@@ -43,7 +43,7 @@ jobs:
           target: "/home/ubuntu/app/"
 
       - name: Restart Service
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
