@@ -1,6 +1,5 @@
 package com.jobnote.domain.document.domain;
 
-import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.common.BaseTimeEntity;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.global.exception.JobNoteException;
@@ -27,10 +26,6 @@ public class Document extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_form_id")
-    private ApplicationForm applicationForm;
-
     @Enumerated(EnumType.STRING)
     private DocumentType type;
 
@@ -39,12 +34,10 @@ public class Document extends BaseTimeEntity {
     @Builder
     public Document(
             final User user,
-            final ApplicationForm applicationForm,
             final DocumentType documentType,
             final String title
     ) {
         this.user = user;
-        this.applicationForm = applicationForm;
         this.type = documentType;
         this.title = title;
     }
