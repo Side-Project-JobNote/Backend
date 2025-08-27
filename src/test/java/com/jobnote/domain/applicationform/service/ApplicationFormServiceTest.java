@@ -1,10 +1,15 @@
 package com.jobnote.domain.applicationform.service;
 
+import com.jobnote.ServiceUnitTest;
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
+import com.jobnote.domain.applicationformdocument.repository.ApplicationFormDocumentRepository;
 import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
-import com.jobnote.domain.schedule.domain.ScheduleStatus;
+import com.jobnote.domain.applicationformdocument.service.ApplicationFormDocumentService;
+import com.jobnote.domain.document.domain.DocumentType;
+import com.jobnote.domain.document.dto.DocumentSimpleResponse;
+import com.jobnote.domain.document.service.DocumentService;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
 import com.jobnote.global.exception.JobNoteException;
@@ -14,10 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -37,20 +40,28 @@ import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
-@ExtendWith(MockitoExtension.class)
-class ApplicationFormServiceTest {
+class ApplicationFormServiceTest extends ServiceUnitTest {
 
     @InjectMocks
     private ApplicationFormService applicationFormService;
-
-    @Mock
-    private ApplicationFormRepository applicationFormRepository;
 
     @Mock
     private UserService userService;
 
     @Mock
     private ScheduleService scheduleService;
+
+    @Mock
+    private DocumentService documentService;
+
+    @Mock
+    private ApplicationFormDocumentService applicationFormDocumentService;
+
+    @Mock
+    private ApplicationFormRepository applicationFormRepository;
+
+    @Mock
+    private ApplicationFormDocumentRepository applicationFormDocumentRepository;
 
     private User user;
     private ApplicationForm applicationForm;
@@ -125,6 +136,48 @@ class ApplicationFormServiceTest {
         then(scheduleService).should().getAllGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
     }
 
+    @Test
+    @DisplayName("지원서마다 문서들이 그룹핑되어 함께 반환된다")
+    void getAllApplicationForms_withDocuments() {
+        // given
+        ApplicationForm form1 = ApplicationForm.builder().user(user).companyName("네이버").status(APPLIED).build();
+        ApplicationForm form2 = ApplicationForm.builder().user(user).companyName("카카오").status(DOCUMENT_PASSED).build();
+        ReflectionTestUtils.setField(form1, "id", 1L);
+        ReflectionTestUtils.setField(form2, "id", 2L);
+        List<ApplicationForm> forms = List.of(form1, form2);
+
+        given(applicationFormRepository.findAllByUserId(userId)).willReturn(forms);
+
+        DocumentSimpleResponse document1 = new DocumentSimpleResponse(101L, DocumentType.RESUME, "네이버 이력서");
+        DocumentSimpleResponse document2 = new DocumentSimpleResponse(102L, DocumentType.COVER_LETTER, "네이버 자소서");
+        DocumentSimpleResponse document3 = new DocumentSimpleResponse(103L, DocumentType.RESUME, "카카오 이력서");
+
+        given(applicationFormDocumentService.getSimpleResponsesGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L))))
+                .willReturn(Map.of(
+                        1L, List.of(document1, document2),
+                        2L, List.of(document3)
+                ));
+
+        // when
+        List<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId);
+
+        // then
+        assertThat(actualResult).hasSize(2);
+
+        ApplicationFormResponse result1 = actualResult.get(0);
+        assertThat(result1.companyName()).isEqualTo("네이버");
+        assertThat(result1.documents()).hasSize(2);
+        assertThat(result1.documents().get(0).title()).isEqualTo("네이버 이력서");
+
+        ApplicationFormResponse result2 = actualResult.get(1);
+        assertThat(result2.companyName()).isEqualTo("카카오");
+        assertThat(result2.documents()).hasSize(1);
+        assertThat(result2.documents().get(0).title()).isEqualTo("카카오 이력서");
+
+        then(applicationFormRepository).should().findAllByUserId(userId);
+        then(applicationFormDocumentService).should().getSimpleResponsesGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
+    }
+
     @Nested
     @DisplayName("지원서 단건 조회")
     class GetById {
@@ -174,7 +227,7 @@ class ApplicationFormServiceTest {
     @Test
     void saveApplicationForm() {
         // given
-        ApplicationFormRequest request = new ApplicationFormRequest("네이버", "02-1234-7812", "경기도 성남시", null, null, null, null, null, APPLIED, null);
+        ApplicationFormRequest request = new ApplicationFormRequest("네이버", "02-1234-7812", "경기도 성남시", null, null, null, null, null, APPLIED, null, null);
         given(userService.getUserById(userId)).willReturn(user);
         given(applicationFormRepository.save(any(ApplicationForm.class))).willReturn(applicationForm);
 
@@ -188,7 +241,7 @@ class ApplicationFormServiceTest {
     @Nested
     @DisplayName("지원서 수정")
     class Update {
-        ApplicationFormRequest request = new ApplicationFormRequest("카카오", "02-1111-2222", "경기도 성남시", null, null, null, null, null, APPLIED, null);
+        ApplicationFormRequest request = new ApplicationFormRequest("카카오", "02-1111-2222", "경기도 성남시", null, null, null, null, null, APPLIED, null, null);
 
         @DisplayName("성공")
         @Test
