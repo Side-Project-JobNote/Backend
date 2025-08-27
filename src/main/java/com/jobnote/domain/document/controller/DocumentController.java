@@ -82,7 +82,7 @@ public class DocumentController implements DocumentApi {
             @PathVariable final Long documentId,
             @LoginUser final CustomUserDetails principal
     ) {
-        documentService.deleteDocument(principal.getUserId(), documentId);
+        documentService.delete(principal.getUserId(), documentId);
 
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }

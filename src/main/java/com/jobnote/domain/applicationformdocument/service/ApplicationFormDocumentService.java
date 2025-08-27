@@ -69,6 +69,11 @@ public class ApplicationFormDocumentService {
     }
 
     @Transactional
+    public void deleteAllByDocumentId(final Long documentId) {
+        applicationFormDocumentRepository.deleteAllByDocumentId(documentId);
+    }
+
+    @Transactional
     public void delete(final ApplicationFormDocument document) {
         applicationFormDocumentRepository.delete(document);
     }

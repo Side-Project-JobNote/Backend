@@ -13,4 +13,7 @@ public interface ApplicationFormDocumentRepository extends JpaRepository<Applica
 
     // 해당 지원서에 속한 문서 연결 해제
     void deleteAllByApplicationFormId(final Long formId);
+
+    // 해당 문서에 속한 지원서 연결 해제
+    void deleteAllByDocumentId(final Long documentId);
 }
