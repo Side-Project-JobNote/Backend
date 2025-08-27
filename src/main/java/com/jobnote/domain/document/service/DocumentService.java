@@ -1,5 +1,7 @@
 package com.jobnote.domain.document.service;
 
+import com.jobnote.domain.applicationform.service.ApplicationFormService;
+import com.jobnote.domain.applicationformdocument.service.ApplicationFormDocumentService;
 import com.jobnote.domain.document.domain.Document;
 import com.jobnote.domain.document.domain.DocumentVersion;
 import com.jobnote.domain.document.dto.DocumentRequest;
@@ -28,6 +30,8 @@ public class DocumentService {
     private final DocumentVersionRepository documentVersionRepository;
     private final UserService userService;
     private final S3Service s3Service;
+    private final ApplicationFormService applicationFormService;
+    private final ApplicationFormDocumentService applicationFormDocumentService;
 
     @Transactional
     public Long uploadNewDocument(final Long userId, final DocumentRequest request) {
@@ -50,7 +54,7 @@ public class DocumentService {
 
     public List<DocumentResponse> getAll(final Long userId) {
         return documentRepository.findAllByUserId(userId).stream()
-                .map(DocumentResponse::from).toList();
+                .map(document -> DocumentResponse.from(document, applicationFormService.getAllSimple(userId))).toList();
     }
 
     public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {
@@ -61,7 +65,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocument(final Long userId, final Long documentId) {
+    public void delete(final Long userId, final Long documentId) {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
@@ -73,6 +77,7 @@ public class DocumentService {
 
         // 엔티티 삭제
         documentVersionRepository.deleteAllByDocumentId(documentId);
+        applicationFormDocumentService.deleteAllByDocumentId(documentId);
         documentRepository.delete(document);
     }
 
@@ -80,7 +85,7 @@ public class DocumentService {
     public void deleteAllDocuments(final Long userId) {
         List<Document> documents = documentRepository.findAllByUserId(userId);
         for (Document document : documents) {
-            deleteDocument(userId, document.getId());
+            delete(userId, document.getId());
         }
     }
 

@@ -42,13 +42,13 @@ public class ScheduleService {
     }
 
     public List<ScheduleResponse> getAllByApplicationFormId(final Long userId, final Long formId) {
-        return scheduleRepository.findAllByUserIdAndApplicationFormId(userId, formId).stream()
+        return scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(ScheduleResponse::from)
                 .toList();
     }
 
     public Map<Long, List<ScheduleResponse>> getAllGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
-        List<Schedule> schedules = scheduleRepository.findAllByUserIdAndApplicationFormIds(userId, formIds);
+        List<Schedule> schedules = scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 
         return schedules.stream()
                 .collect(Collectors.groupingBy(
@@ -92,7 +92,7 @@ public class ScheduleService {
     @Transactional
     public void updateAll(final Long userId, final ApplicationForm form, final List<ScheduleRequest> requests) {
         // 기존 일정 조회
-        List<Schedule> existsSchedules = scheduleRepository.findAllByUserIdAndApplicationFormId(userId, form.getId());
+        List<Schedule> existsSchedules = scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(form.getId()));
 
         // 요청 일정 ID 목록
         Set<Long> requestsIds = requests.stream()

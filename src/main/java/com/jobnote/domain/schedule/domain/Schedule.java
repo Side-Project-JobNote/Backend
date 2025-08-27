@@ -40,7 +40,7 @@ public class Schedule extends BaseTimeEntity {
 
     @Builder
     public Schedule(
-            final ApplicationForm  applicationForm,
+            final ApplicationForm applicationForm,
             final String title,
             final String memo,
             final LocalDateTime dateTime,

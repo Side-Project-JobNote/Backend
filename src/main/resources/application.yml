@@ -51,6 +51,7 @@ file:
 
 frontend:
   local-url: http://localhost:3000
+  local-secure-url: https://localhost:3000
   main-page: /dashboard
   login-fail-page: /login/fail
   social-sign-up-page: /join/nickname
