@@ -8,7 +8,8 @@ public record FrontendProperties(
         String mainPage,
         String socialSignUpPage,
         String loginFailPage,
-        String resetPasswordPage
+        String resetPasswordPage,
+        String localUrl
 ) {
 
 }

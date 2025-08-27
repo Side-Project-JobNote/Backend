@@ -50,6 +50,7 @@ file:
     per-user: 100MB
 
 frontend:
+  local-url: http://localhost:3000
   main-page: /dashboard
   login-fail-page: /login/fail
   social-sign-up-page: /join/nickname
