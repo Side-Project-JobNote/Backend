@@ -5,14 +5,15 @@ import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
 import com.jobnote.domain.user.service.AuthTokenService;
+import com.jobnote.global.config.properties.FrontendProperties;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -22,26 +23,33 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final TokenProvider tokenProvider;
     private final AuthTokenService authTokenService;
-
-    @Value("${app.frontend.base-url}")
-    private String frontendBaseUrl;
+    private final FrontendProperties frontendProperties;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         final CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
 
         if (UserRole.GUEST.getKey().equals(principal.getRole())) {
-            response.sendRedirect(frontendBaseUrl + guestRedirectQueryString(principal.getEmail()));
+            response.sendRedirect(guestRedirectUrl(principal.getEmail()));
             return;
         }
 
         final Token token = authTokenService.saveAndGetToken(principal.getUserId());
         tokenProvider.addTokenToCookie(response, token);
 
-        response.sendRedirect(frontendBaseUrl);
+        response.sendRedirect(memberRedirectUrl());
     }
 
-    private String guestRedirectQueryString(final String email) {
-        return String.format("?sign-up-required=true&email=%s", email);
+    private String guestRedirectUrl(final String email) {
+        return UriComponentsBuilder.fromUriString(frontendProperties.baseUrl())
+                .path(frontendProperties.mainPage())
+                .queryParam("sign-up-required", true)
+                .queryParam("email", email)
+                .build()
+                .toUriString();
+    }
+
+    private String memberRedirectUrl() {
+        return frontendProperties.baseUrl() + frontendProperties.mainPage();
     }
 }

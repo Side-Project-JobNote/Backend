@@ -21,7 +21,10 @@ jobs:
           distribution: 'temurin'
 
       - name: Set up Application Secret YML
-        run: echo "${{ secrets.APPLICATION_SECRET }}" | base64 --decode > src/main/resources/application-secret.yml
+        run: |
+          echo "${{ secrets.APPLICATION_SECRET }}" | base64 --decode > src/main/resources/application-secret.yml
+          echo "${{ secrets.APPLICATION_SECRET_LOCAL }}" | base64 --decode > src/main/resources/application-secret-local.yml
+          echo "${{ secrets.APPLICATION_SECRET_DEV }}" | base64 --decode > src/main/resources/application-secret-dev.yml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0

@@ -26,5 +26,5 @@ logging:
 
 app:
   base-url: http://localhost:8080
-  frontend:
-    base-url: http://localhost:5173
+frontend:
+  base-url: http://localhost:3000

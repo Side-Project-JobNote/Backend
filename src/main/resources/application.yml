@@ -4,8 +4,9 @@ spring:
 
   profiles:
     group:
-      local: secret
-      test: secret
+      local: local, secret, secret-local
+      dev: dev, secret, secret-dev
+      test: test
 
   security:
     oauth2:
@@ -47,3 +48,10 @@ app:
 file:
   quota:
     per-user: 100MB
+
+frontend:
+  local-url: http://localhost:3000
+  main-page: /dashboard
+  login-fail-page: /login/fail
+  social-sign-up-page: /join/nickname
+  reset-password-page: /reset-password

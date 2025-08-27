@@ -13,6 +13,47 @@ spring:
       hibernate:
         format_sql: true
 
+  mail:
+    host: test
+    username: test
+    password: test
+    port: 1
+
+  security:
+    oauth2:
+      client:
+        registration:
+          naver:
+            client-id: test
+            client-secret: test
+            redirect-uri: test
+          google:
+            client-id: test
+            client-secret: test
+            redirect-uri: test
+          kakao:
+            client-id: test
+            client-secret: test
+            redirect-uri: test
+
+jwt:
+  secret: q6we2uemsCYp3d4F4omkIy7MetsXW4rAxJX9In+D/tg=
+  access-token:
+    expiration-time: 3000
+  refresh-token:
+    expiration-time: 3000
+
+cloud:
+  aws:
+    credentials:
+      access-key: test
+      secret-key: test
+    region:
+      static: test
+    s3:
+      bucket: test
+
 app:
-  frontend:
-    base-url: http://localhost:5173
+  base-url: test
+frontend:
+  base-url: test
