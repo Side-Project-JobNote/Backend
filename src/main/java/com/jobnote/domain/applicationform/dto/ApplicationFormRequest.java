@@ -2,6 +2,7 @@ package com.jobnote.domain.applicationform.dto;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
 import com.jobnote.domain.applicationform.domain.ApplicationFormStatus;
+import com.jobnote.domain.applicationformdocument.dto.ApplicationFormDocumentRequest;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.user.domain.User;
 import jakarta.validation.Valid;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 public record ApplicationFormRequest(
@@ -35,7 +35,10 @@ public record ApplicationFormRequest(
         ApplicationFormStatus status,
 
         @Valid
-        List<ScheduleRequest> schedules
+        List<ScheduleRequest> schedules,
+
+        @Valid
+        List<ApplicationFormDocumentRequest> documents
 ) {
     public ApplicationForm toEntity(final User user) {
         return ApplicationForm.builder()
@@ -52,8 +55,14 @@ public record ApplicationFormRequest(
                 .build();
     }
 
+    /* null-safe */
     @Override
     public List<ScheduleRequest> schedules() {
-        return schedules != null ? schedules : Collections.emptyList();
+        return schedules != null ? schedules : List.of();
+    }
+
+    @Override
+    public List<ApplicationFormDocumentRequest> documents() {
+        return documents != null ? documents : List.of();
     }
 }
