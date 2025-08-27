@@ -1,5 +1,6 @@
 package com.jobnote.domain.document.service;
 
+import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.document.domain.Document;
 import com.jobnote.domain.document.domain.DocumentVersion;
 import com.jobnote.domain.document.dto.DocumentRequest;
@@ -28,6 +29,7 @@ public class DocumentService {
     private final DocumentVersionRepository documentVersionRepository;
     private final UserService userService;
     private final S3Service s3Service;
+    private final ApplicationFormService applicationFormService;
 
     @Transactional
     public Long uploadNewDocument(final Long userId, final DocumentRequest request) {
@@ -50,7 +52,7 @@ public class DocumentService {
 
     public List<DocumentResponse> getAll(final Long userId) {
         return documentRepository.findAllByUserId(userId).stream()
-                .map(DocumentResponse::from).toList();
+                .map(document -> DocumentResponse.from(document, applicationFormService.getAllSimple(userId))).toList();
     }
 
     public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {

@@ -1,9 +1,14 @@
 package com.jobnote.domain.applicationform.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
+import com.jobnote.domain.applicationform.dto.ApplicationFormSimpleResponse;
+import com.jobnote.domain.applicationformdocument.domain.ApplicationFormDocument;
+import com.jobnote.domain.applicationformdocument.dto.ApplicationFormDocumentRequest;
 import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
+import com.jobnote.domain.applicationformdocument.service.ApplicationFormDocumentService;
+import com.jobnote.domain.document.dto.DocumentSimpleResponse;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
 import com.jobnote.global.exception.JobNoteException;
@@ -15,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_APPLICATION_FORM;
 
@@ -26,6 +34,7 @@ public class ApplicationFormService {
     private final ApplicationFormRepository applicationFormRepository;
     private final UserService userService;
     private final ScheduleService scheduleService;
+    private final ApplicationFormDocumentService applicationFormDocumentService;
 
     /* READ */
     public ApplicationFormResponse getById(final Long userId, final Long formId) {
@@ -33,8 +42,9 @@ public class ApplicationFormService {
         form.validateOwner(userId);
 
         List<ScheduleResponse> schedules = scheduleService.getAllByApplicationFormId(userId, formId);
+        List<DocumentSimpleResponse> documents = applicationFormDocumentService.getSimpleResponsesByApplicationFormId(userId, formId);
 
-        return ApplicationFormResponse.from(form, schedules);
+        return ApplicationFormResponse.from(form, schedules, documents);
     }
 
     public List<ApplicationFormResponse> getAll(final Long userId) {
@@ -42,9 +52,22 @@ public class ApplicationFormService {
         List<Long> formIds = forms.stream().map(ApplicationForm::getId).toList();
 
         Map<Long, List<ScheduleResponse>> schedulesByFormId = scheduleService.getAllGroupedByApplicationFormIds(userId, formIds);
+        Map<Long, List<DocumentSimpleResponse>> documentsByFormId = applicationFormDocumentService.getSimpleResponsesGroupedByApplicationFormIds(userId, formIds);
 
         return forms.stream()
-                .map(form -> ApplicationFormResponse.from(form, schedulesByFormId.getOrDefault(form.getId(), List.of())))
+                .map(form -> ApplicationFormResponse.from(
+                        form,
+                        schedulesByFormId.getOrDefault(form.getId(), List.of()),
+                        documentsByFormId.getOrDefault(form.getId(), List.of()))
+                )
+                .toList();
+    }
+
+    public List<ApplicationFormSimpleResponse> getAllSimple(final Long userId) {
+        List<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId);
+
+        return forms.stream()
+                .map(ApplicationFormSimpleResponse::from)
                 .toList();
     }
 
@@ -53,8 +76,14 @@ public class ApplicationFormService {
     public Long save(final Long userId, final ApplicationFormRequest request) {
         User user = userService.getUserById(userId);
 
+        // 지원서 생성
         ApplicationForm form = applicationFormRepository.save(request.toEntity(user));
+
+        // 일정 등록
         scheduleService.saveAll(userId, form, request.schedules());
+
+        // 연결된 문서 등록
+        applicationFormDocumentService.saveAll(form, request.documents());
 
         return form.getId();
     }
@@ -65,8 +94,14 @@ public class ApplicationFormService {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
+        // 지원서 업데이트
         form.update(request);
+
+        // 일정 업데이트
         scheduleService.updateAll(userId, form, request.schedules());
+
+        // 연결된 문서 업데이트
+        updateApplicationFormDocuments(userId, form, request.documents());
     }
 
     /* DELETE */
@@ -76,6 +111,7 @@ public class ApplicationFormService {
         form.validateOwner(userId);
 
         scheduleService.deleteAllByApplicationFormId(form.getId());
+        applicationFormDocumentService.deleteAllByApplicationFormId(form.getId());
         applicationFormRepository.delete(form);
     }
 
@@ -83,5 +119,30 @@ public class ApplicationFormService {
     public ApplicationForm getByIdOrThrow(final Long formId) {
         return applicationFormRepository.findById(formId)
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_APPLICATION_FORM));
+    }
+
+    private void updateApplicationFormDocuments(final Long userId, final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
+        // 기존 연결된 문서 조회
+        List<ApplicationFormDocument> existsDocuments = applicationFormDocumentService.getAllByApplicationFormId(userId, form.getId());
+
+        // 요청 문서 ID 목록
+        Set<Long> requestsIds = requests.stream()
+                .map(ApplicationFormDocumentRequest::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 삭제 : 기존 문서 중 요청에 없는 문서 삭제
+        for (ApplicationFormDocument document : existsDocuments) {
+            if (!requestsIds.contains(document.getId())) {
+                applicationFormDocumentService.delete(document);
+            }
+        }
+
+        // 신규 생성 (
+        for (ApplicationFormDocumentRequest req : requests) {
+            if (req.id() == null) {
+                applicationFormDocumentService.saveAll(form, List.of(req));
+            }
+        }
     }
 }
