@@ -9,12 +9,13 @@ import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/documents")
@@ -54,25 +55,25 @@ public class DocumentController implements DocumentApi {
     /* READ */
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
-            @LoginUser final CustomUserDetails principal
+    public ResponseEntity<ApiResponse<Page<DocumentResponse>>> getAllDocuments(
+            @LoginUser final CustomUserDetails principal,
+            Pageable pageable
     ) {
-        List<DocumentResponse> documents = documentService.getAll(principal.getUserId());
-        DocumentListResponse listResponse = DocumentListResponse.from(documents);
+        Page<DocumentResponse> documents = documentService.getAll(principal.getUserId(), pageable);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
     }
 
     @Override
     @GetMapping("/{documentId}")
-    public ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
+    public ResponseEntity<ApiResponse<Page<DocumentVersionResponse>>> getAllDocumentVersions(
             @PathVariable final Long documentId,
-            @LoginUser final CustomUserDetails principal
+            @LoginUser final CustomUserDetails principal,
+            Pageable pageable
     ) {
-        List<DocumentVersionResponse> documents = documentService.getAllVersions(principal.getUserId(), documentId);
-        DocumentVersionListResponse listResponse = DocumentVersionListResponse.from(documents);
+        Page<DocumentVersionResponse> documents = documentService.getAllVersions(principal.getUserId(), documentId, pageable);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, documents));
     }
 
     /* DELETE */
