@@ -20,6 +20,8 @@ public class DocumentVersion extends BaseTimeEntity {
 
     private int version;
 
+    private String title;
+
     private String originFileName;
 
     private String fileKey;
@@ -33,12 +35,14 @@ public class DocumentVersion extends BaseTimeEntity {
     @Builder
     public DocumentVersion(
             final int version,
+            final String title,
             final String originFileName,
             final String fileKey,
             final Long fileSize,
             final Document document
     ) {
         this.version = version;
+        this.title = title;
         this.originFileName = originFileName;
         this.fileKey = fileKey;
         this.fileSize = fileSize;
