@@ -6,6 +6,10 @@ import com.jobnote.domain.user.domain.User;
 import jakarta.validation.constraints.*;
 
 public record DocumentRequest(
+        @NotBlank(message = "문서 제목은 비어있을 수 없습니다.")
+        @Size(max = 100, message = "문서 제목은 100자 이하여야 합니다.")
+        String title,
+
         @NotBlank(message = "파일 이름은 비어있을 수 없습니다.")
         @Pattern(regexp = "^[^/:*?\"<>|]+$",
                 message = "파일 이름에는 / : * ? \" < > | 문자를 사용할 수 없습니다.")
@@ -28,7 +32,7 @@ public record DocumentRequest(
         return Document.builder()
                 .user(user)
                 .documentType(fileType)
-                .title(fileName)
+                .title(title)
                 .build();
     }
 }
