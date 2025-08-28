@@ -21,6 +21,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -83,15 +86,17 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
         ApplicationForm form2 = ApplicationForm.builder().user(user).companyName("카카오").status(DOCUMENT_PASSED).build();
         List<ApplicationForm> expectedResult = Arrays.asList(form1, form2);
 
-        given(applicationFormRepository.findAllByUserId(userId)).willReturn(expectedResult);
+        Page<ApplicationForm> pageExpectedResult = new PageImpl<>(expectedResult);
+        given(applicationFormRepository.findAllByUserId(eq(userId), any(Pageable.class))).willReturn(pageExpectedResult);
 
         // when
-        List<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId);
+        Page<ApplicationFormResponse> pageActualResult = applicationFormService.getAll(userId, Pageable.unpaged());
+        List<ApplicationFormResponse> actualResult = pageActualResult.getContent();
 
         // then
         assertThat(actualResult).hasSize(2);
         assertThat(actualResult.get(0).companyName()).isEqualTo("네이버");
-        then(applicationFormRepository).should().findAllByUserId(userId);
+        then(applicationFormRepository).should().findAllByUserId(userId, Pageable.unpaged());
     }
 
     @Test
@@ -104,7 +109,8 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
         ReflectionTestUtils.setField(form2, "id", 2L);
         List<ApplicationForm> forms = List.of(form1, form2);
 
-        given(applicationFormRepository.findAllByUserId(userId)).willReturn(forms);
+        Page<ApplicationForm> pageForms = new PageImpl<>(forms);
+        given(applicationFormRepository.findAllByUserId(eq(userId), any(Pageable.class))).willReturn(pageForms);
 
         ScheduleResponse schedule1 = new ScheduleResponse(101L, "지원서 제출", "오전", LocalDateTime.of(2025, 8, 1, 10, 0), PLANNED);
         ScheduleResponse schedule2 = new ScheduleResponse(102L, "코딩테스트", "연습문제 풀이", LocalDateTime.of(2025, 8, 2, 9, 0), PLANNED);
@@ -117,22 +123,22 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
                 ));
 
         // when
-        List<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId);
+        Page<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId, Pageable.unpaged());
 
         // then
         assertThat(actualResult).hasSize(2);
 
-        ApplicationFormResponse result1 = actualResult.get(0);
+        ApplicationFormResponse result1 = actualResult.getContent().get(0);
         assertThat(result1.companyName()).isEqualTo("네이버");
         assertThat(result1.schedules()).hasSize(1);
         assertThat(result1.schedules().get(0).title()).isEqualTo("지원서 제출");
 
-        ApplicationFormResponse result2 = actualResult.get(1);
+        ApplicationFormResponse result2 = actualResult.getContent().get(1);
         assertThat(result2.companyName()).isEqualTo("카카오");
         assertThat(result2.schedules()).hasSize(2);
         assertThat(result2.schedules().get(0).title()).isEqualTo("코딩테스트");
 
-        then(applicationFormRepository).should().findAllByUserId(userId);
+        then(applicationFormRepository).should().findAllByUserId(eq(userId), any(Pageable.class));
         then(scheduleService).should().getAllGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
     }
 
@@ -146,7 +152,8 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
         ReflectionTestUtils.setField(form2, "id", 2L);
         List<ApplicationForm> forms = List.of(form1, form2);
 
-        given(applicationFormRepository.findAllByUserId(userId)).willReturn(forms);
+        Page<ApplicationForm> pageForms = new PageImpl<>(forms);
+        given(applicationFormRepository.findAllByUserId(eq(userId), any(Pageable.class))).willReturn(pageForms);
 
         DocumentSimpleResponse document1 = new DocumentSimpleResponse(101L, DocumentType.RESUME, "네이버 이력서");
         DocumentSimpleResponse document2 = new DocumentSimpleResponse(102L, DocumentType.COVER_LETTER, "네이버 자소서");
@@ -159,22 +166,22 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
                 ));
 
         // when
-        List<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId);
+        Page<ApplicationFormResponse> actualResult = applicationFormService.getAll(userId, Pageable.unpaged());
 
         // then
         assertThat(actualResult).hasSize(2);
 
-        ApplicationFormResponse result1 = actualResult.get(0);
+        ApplicationFormResponse result1 = actualResult.getContent().get(0);
         assertThat(result1.companyName()).isEqualTo("네이버");
         assertThat(result1.documents()).hasSize(2);
         assertThat(result1.documents().get(0).title()).isEqualTo("네이버 이력서");
 
-        ApplicationFormResponse result2 = actualResult.get(1);
+        ApplicationFormResponse result2 = actualResult.getContent().get(1);
         assertThat(result2.companyName()).isEqualTo("카카오");
         assertThat(result2.documents()).hasSize(1);
         assertThat(result2.documents().get(0).title()).isEqualTo("카카오 이력서");
 
-        then(applicationFormRepository).should().findAllByUserId(userId);
+        then(applicationFormRepository).should().findAllByUserId(eq(userId), any(Pageable.class));
         then(applicationFormDocumentService).should().getSimpleResponsesGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
     }
 

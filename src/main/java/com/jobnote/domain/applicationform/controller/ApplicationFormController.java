@@ -3,7 +3,6 @@ package com.jobnote.domain.applicationform.controller;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.applicationform.api.ApplicationFormApi;
-import com.jobnote.domain.applicationform.dto.ApplicationFormListResponse;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
 import com.jobnote.domain.applicationform.service.ApplicationFormService;
@@ -11,12 +10,13 @@ import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/application-forms")
@@ -53,13 +53,13 @@ public class ApplicationFormController implements ApplicationFormApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<ApplicationFormListResponse>> getAllApplicationForms(
-            @LoginUser final CustomUserDetails principal
+    public ResponseEntity<ApiResponse<Page<ApplicationFormResponse>>> getAllApplicationForms(
+            @LoginUser final CustomUserDetails principal,
+            Pageable pageable
     ) {
-        List<ApplicationFormResponse> forms = applicationFormService.getAll(principal.getUserId());
-        ApplicationFormListResponse listResponse = ApplicationFormListResponse.from(forms);
+        Page<ApplicationFormResponse> forms = applicationFormService.getAll(principal.getUserId(), pageable);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, forms));
     }
 
     /* UPDATE */
