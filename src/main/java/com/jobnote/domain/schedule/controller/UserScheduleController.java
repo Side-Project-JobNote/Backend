@@ -3,13 +3,14 @@ package com.jobnote.domain.schedule.controller;
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomUserDetails;
 import com.jobnote.domain.schedule.api.UserScheduleApi;
-import com.jobnote.domain.schedule.dto.ScheduleListResponse;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.service.ScheduleService;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -30,14 +30,14 @@ public class UserScheduleController implements UserScheduleApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<ApiResponse<ScheduleListResponse>> getAllSchedules(
+    public ResponseEntity<ApiResponse<Page<ScheduleResponse>>> getAllSchedules(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endDate,
-            @LoginUser final CustomUserDetails principal
+            @LoginUser final CustomUserDetails principal,
+            Pageable pageable
     ) {
-        List<ScheduleResponse> schedules = scheduleService.getAll(principal.getUserId(), startDate, endDate);
-        ScheduleListResponse listResponse = ScheduleListResponse.from(schedules);
+        Page<ScheduleResponse> schedules = scheduleService.getAll(principal.getUserId(), startDate, endDate, pageable);
 
-        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, listResponse));
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK, schedules));
     }
 }
