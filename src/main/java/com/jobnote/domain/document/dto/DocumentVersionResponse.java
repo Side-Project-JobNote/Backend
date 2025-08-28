@@ -8,6 +8,7 @@ import lombok.Builder;
 public record DocumentVersionResponse(
     Long id,
     int version,
+    String title,
     String fileName,
     String fileUrl,
     Long fileSize
@@ -16,6 +17,7 @@ public record DocumentVersionResponse(
         return DocumentVersionResponse.builder()
                 .id(documentVersion.getId())
                 .version(documentVersion.getVersion())
+                .title(documentVersion.getTitle())
                 .fileName(documentVersion.getOriginFileName())
                 .fileUrl(fileUrl)
                 .fileSize(documentVersion.getFileSize())

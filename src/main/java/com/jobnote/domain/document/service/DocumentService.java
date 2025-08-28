@@ -101,6 +101,7 @@ public class DocumentService {
 
         DocumentVersion documentVersion = DocumentVersion.builder()
                 .version(version)
+                .title(request.title())
                 .originFileName(request.fileName())
                 .fileKey(request.fileKey())
                 .fileSize(fileSize)
