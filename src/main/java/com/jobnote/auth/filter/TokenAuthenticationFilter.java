@@ -64,8 +64,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private String validateAuthorizationHeader(final HttpServletRequest request) {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (StringUtils.hasText(header) || !header.startsWith(BEARER)) {
+        if (!StringUtils.hasText(header) || !header.startsWith(BEARER)) {
             throw new JobNoteException(INVALID_HEADER);
         }
 
