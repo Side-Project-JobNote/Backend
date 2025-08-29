@@ -6,11 +6,11 @@ import com.jobnote.domain.user.dto.UserLoginRequest;
 import com.jobnote.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static com.jobnote.global.common.Constants.COOKIE_NAME_ACCESS_TOKEN;
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
 import static com.jobnote.global.common.ResponseCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,7 +51,7 @@ class LoginApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isForbidden())
-                        .andExpect(cookie().doesNotExist(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(header().doesNotExist(HttpHeaders.AUTHORIZATION))
                         .andExpect(cookie().doesNotExist(COOKIE_NAME_REFRESH_TOKEN))
                         .andExpect(jsonPath("$.data").isEmpty())
                         .andExpect(jsonPath("$.code").value(PENDING_EMAIL_VERIFICATION.getCode()));
@@ -72,7 +72,7 @@ class LoginApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isOk())
-                        .andExpect(cookie().exists(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(header().exists(HttpHeaders.AUTHORIZATION))
                         .andExpect(cookie().exists(COOKIE_NAME_REFRESH_TOKEN));
             }
         }
@@ -100,7 +100,7 @@ class LoginApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isUnauthorized())
-                        .andExpect(cookie().doesNotExist(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(header().doesNotExist(HttpHeaders.AUTHORIZATION))
                         .andExpect(cookie().doesNotExist(COOKIE_NAME_REFRESH_TOKEN))
                         .andExpect(jsonPath("$.data").isEmpty())
                         .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));
@@ -122,7 +122,7 @@ class LoginApplicationTest extends JobnoteApplicationTests {
                 // then
                 resultActions
                         .andExpect(status().isUnauthorized())
-                        .andExpect(cookie().doesNotExist(COOKIE_NAME_ACCESS_TOKEN))
+                        .andExpect(header().doesNotExist(HttpHeaders.AUTHORIZATION))
                         .andExpect(cookie().doesNotExist(COOKIE_NAME_REFRESH_TOKEN))
                         .andExpect(jsonPath("$.data").isEmpty())
                         .andExpect(jsonPath("$.code").value(INVALID_USERNAME_PASSWORD.getCode()));

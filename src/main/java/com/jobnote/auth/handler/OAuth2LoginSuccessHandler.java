@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         final Token token = authTokenService.saveAndGetToken(principal.getUserId());
-        tokenProvider.addTokenToCookie(response, token);
+        tokenProvider.responseToken(response, token);
 
         response.sendRedirect(memberRedirectUrl());
     }
