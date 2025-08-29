@@ -11,6 +11,10 @@ public interface ApplicationFormDocumentRepository extends JpaRepository<Applica
     @Query("select afd from ApplicationFormDocument afd join fetch afd.applicationForm af join fetch af.user where af.user.id = :userId and af.id in :formId")
     List<ApplicationFormDocument> findAllByUserIdAndApplicationFormIdIn(final Long userId, final List<Long> formId);
 
+    // 해당 문서에 속한 지원서(지원서-문서 맵핑 엔티티) 목록 반환
+    @Query("select afd from ApplicationFormDocument afd join fetch afd.document d join fetch d.user where d.user.id = :userId and d.id in :documentId")
+    List<ApplicationFormDocument> findAllByUserIdAndDocumentId(final Long userId, final Long documentId);
+
     // 해당 지원서에 속한 문서 연결 해제
     void deleteAllByApplicationFormId(final Long formId);
 

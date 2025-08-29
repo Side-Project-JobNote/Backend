@@ -1,6 +1,7 @@
 package com.jobnote.domain.applicationformdocument.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
+import com.jobnote.domain.applicationform.dto.ApplicationFormSimpleResponse;
 import com.jobnote.domain.applicationformdocument.domain.ApplicationFormDocument;
 import com.jobnote.domain.applicationformdocument.dto.ApplicationFormDocumentRequest;
 import com.jobnote.domain.applicationformdocument.repository.ApplicationFormDocumentRepository;
@@ -31,6 +32,12 @@ public class ApplicationFormDocumentService {
     /* READ */
     public List<ApplicationFormDocument> getAllByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId));
+    }
+
+    public List<ApplicationFormSimpleResponse> getSimpleResponsesByDocumentId(final Long userId, final Long documentId) {
+        return applicationFormDocumentRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
+                .map(afd -> ApplicationFormSimpleResponse.from(afd.getApplicationForm()))
+                .toList();
     }
 
     public List<DocumentSimpleResponse> getSimpleResponsesByApplicationFormId(final Long userId, final Long formId) {

@@ -54,7 +54,11 @@ public class DocumentService {
 
     public Page<DocumentResponse> getAll(final Long userId, final Pageable pageable) {
         return documentRepository.findAllByUserId(userId, pageable)
-                .map(document -> DocumentResponse.from(document, applicationFormService.getAllSimple(userId)));
+                .map(document ->
+                        DocumentResponse.from(
+                                document,
+                                applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
+                        ));
     }
 
     public Page<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId, final Pageable pageable) {

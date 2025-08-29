@@ -1,7 +1,6 @@
 package com.jobnote.domain.applicationform.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
-import com.jobnote.domain.applicationform.dto.ApplicationFormSimpleResponse;
 import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.applicationform.dto.ApplicationFormRequest;
 import com.jobnote.domain.applicationform.dto.ApplicationFormResponse;
@@ -56,12 +55,6 @@ public class ApplicationFormService {
                 schedulesByFormId.getOrDefault(form.getId(), List.of()),
                 documentsByFormId.getOrDefault(form.getId(), List.of()))
         );
-    }
-
-    public List<ApplicationFormSimpleResponse> getAllSimple(final Long userId) {
-        Page<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId, Pageable.unpaged());
-
-        return forms.map(ApplicationFormSimpleResponse::from).toList();
     }
 
     /* CREATE */
