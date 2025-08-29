@@ -4,6 +4,8 @@ import java.util.Set;
 
 public abstract class Constants {
 
+    public static final String BEARER = "Bearer ";
+
     // claim
     public static final String CLAIM_NAME_TOKEN_TYPE = "token";
     public static final String CLAIM_NAME_EMAIL = "email";
