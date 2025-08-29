@@ -33,7 +33,7 @@ public class CookieUtil {
                 .build();
     }
 
-    public static ResponseCookie invalidateCookie(final String name) {
-        return createResponseCookie(name, "", "/", Duration.ZERO);
+    public static ResponseCookie invalidateCookie(final String name, final String path) {
+        return createResponseCookie(name, "", path, Duration.ZERO);
     }
 }
