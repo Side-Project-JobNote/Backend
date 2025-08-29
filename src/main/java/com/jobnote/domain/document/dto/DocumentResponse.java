@@ -17,7 +17,7 @@ public record DocumentResponse(
         LocalDate lastModifiedDate,
         List<ApplicationFormSimpleResponse> applicationForms
 ) {
-    public static DocumentResponse from(final Document document, final List<ApplicationFormSimpleResponse> applicationForms) {
+    public static DocumentResponse of(final Document document, final List<ApplicationFormSimpleResponse> applicationForms) {
         return DocumentResponse.builder()
                 .id(document.getId())
                 .type(document.getType())

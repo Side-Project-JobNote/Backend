@@ -1,6 +1,5 @@
 package com.jobnote.domain.document.service;
 
-import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.applicationformdocument.service.ApplicationFormDocumentService;
 import com.jobnote.domain.document.domain.Document;
 import com.jobnote.domain.document.domain.DocumentVersion;
@@ -30,7 +29,6 @@ public class DocumentService {
     private final DocumentVersionRepository documentVersionRepository;
     private final UserService userService;
     private final S3Service s3Service;
-    private final ApplicationFormService applicationFormService;
     private final ApplicationFormDocumentService applicationFormDocumentService;
 
     @Transactional
@@ -47,7 +45,7 @@ public class DocumentService {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
-        int version = documentVersionRepository.findMaxVersionByDocumentId(documentId).orElse(0) + 1;
+        int version = documentVersionRepository.findLatestVersionByDocumentId(documentId).orElse(0) + 1;
 
         return saveDocumentVersion(userId, document, request, version);
     }
@@ -55,7 +53,7 @@ public class DocumentService {
     public Page<DocumentResponse> getAll(final Long userId, final Pageable pageable) {
         return documentRepository.findAllByUserId(userId, pageable)
                 .map(document ->
-                        DocumentResponse.from(
+                        DocumentResponse.of(
                                 document,
                                 applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
                         ));
