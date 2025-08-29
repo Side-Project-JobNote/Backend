@@ -4,6 +4,7 @@ import com.jobnote.global.common.ResponseCode;
 import com.jobnote.global.common.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException e) {
         log.error("HttpRequestMethodNotSupportedException: ", e);
         ResponseCode responseCode = ResponseCode.METHOD_NOT_ALLOWED;
+        return new ResponseEntity<>(ApiResponse.ofFail(responseCode), responseCode.getStatus());
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDisabledException(final DisabledException e) {
+        log.error("DisabledException: ", e);
+        ResponseCode responseCode = ResponseCode.INACTIVE_USER;
         return new ResponseEntity<>(ApiResponse.ofFail(responseCode), responseCode.getStatus());
     }
 

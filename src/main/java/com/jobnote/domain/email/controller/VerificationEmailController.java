@@ -38,6 +38,6 @@ public class VerificationEmailController {
     @GetMapping("/reset-password/verify")
     public void verifyResetPasswordEmail(@RequestParam("token") final String token, final HttpServletResponse response) throws IOException {
         verificationEmailService.verify(token);
-        response.sendRedirect(frontendProperties.baseUrl() + frontendProperties.resetPasswordPage());
+        response.sendRedirect(frontendProperties.baseUrl() + frontendProperties.resetPasswordPage() + "?token=" + token);
     }
 }

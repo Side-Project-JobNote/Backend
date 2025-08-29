@@ -10,6 +10,7 @@ import org.springframework.http.ResponseCookie;
 import java.time.Duration;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_ACCESS_TOKEN;
+import static com.jobnote.global.common.Constants.COOKIE_PATH_ACCESS_TOKEN;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,7 +55,7 @@ class CookieUtilTest {
         // given
 
         // when
-        ResponseCookie responseCookie = CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN);
+        ResponseCookie responseCookie = CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN, COOKIE_PATH_ACCESS_TOKEN);
 
         // then
         assertThat(responseCookie.getValue()).isEmpty();

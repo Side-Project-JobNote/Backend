@@ -63,7 +63,7 @@ public class TokenProvider {
     }
 
     public void addInvalidateCookie(final HttpServletResponse response) {
-        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN).toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_REFRESH_TOKEN).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN, COOKIE_PATH_ACCESS_TOKEN).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_REFRESH_TOKEN, COOKIE_PATH_REFRESH_TOKEN).toString());
     }
 }
