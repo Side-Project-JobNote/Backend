@@ -30,7 +30,7 @@ class CookieUtilTest {
             Cookie[] cookies = new Cookie[]{new Cookie(COOKIE_NAME_ACCESS_TOKEN, accessToken)};
 
             // when
-            String result = CookieUtil.getTokenFromCookie(cookies, COOKIE_NAME_ACCESS_TOKEN);
+            String result = CookieUtil.getValueFromCookie(cookies, COOKIE_NAME_ACCESS_TOKEN);
 
             // then
             assertThat(result).isEqualTo(accessToken);
@@ -43,7 +43,7 @@ class CookieUtilTest {
             Cookie[] cookies = new Cookie[]{};
 
             // when & then
-            assertThatThrownBy(() -> CookieUtil.getTokenFromCookie(cookies, COOKIE_NAME_ACCESS_TOKEN))
+            assertThatThrownBy(() -> CookieUtil.getValueFromCookie(cookies, COOKIE_NAME_ACCESS_TOKEN))
                     .isInstanceOf(JobNoteException.class)
                     .hasMessage(INVALID_COOKIE.getMessage());
         }

@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
-import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
+import static com.jobnote.global.util.CookieUtil.getValueFromCookie;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -55,7 +55,7 @@ public class UserController {
     /* LOGOUT */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(final HttpServletRequest request, final HttpServletResponse response) {
-        authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        authTokenService.invalidate(getValueFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
         tokenProvider.responseInvalidatedToken(response);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
@@ -63,7 +63,7 @@ public class UserController {
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomUserDetails principal, final HttpServletRequest request, final HttpServletResponse response) {
-        final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        final Token token = authTokenService.reissue(principal.getUserId(), getValueFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
         tokenProvider.responseToken(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
