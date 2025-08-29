@@ -14,10 +14,10 @@ import com.jobnote.domain.user.service.UserService;
 import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.infra.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_DOCUMENT;
 
@@ -52,16 +52,15 @@ public class DocumentService {
         return saveDocumentVersion(userId, document, request, version);
     }
 
-    public List<DocumentResponse> getAll(final Long userId) {
-        return documentRepository.findAllByUserId(userId).stream()
-                .map(document -> DocumentResponse.from(document, applicationFormService.getAllSimple(userId))).toList();
+    public Page<DocumentResponse> getAll(final Long userId, final Pageable pageable) {
+        return documentRepository.findAllByUserId(userId, pageable)
+                .map(document -> DocumentResponse.from(document, applicationFormService.getAllSimple(userId)));
     }
 
-    public List<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId) {
-        return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
+    public Page<DocumentVersionResponse> getAllVersions(final Long userId, final Long documentId, final Pageable pageable) {
+        return documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId, pageable)
                 .map(docVer ->
-                        DocumentVersionResponse.of(docVer, s3Service.generateFileUrl(docVer.getFileKey())))
-                .toList();
+                        DocumentVersionResponse.of(docVer, s3Service.generateFileUrl(docVer.getFileKey())));
     }
 
     @Transactional
@@ -70,7 +69,7 @@ public class DocumentService {
         document.validateOwner(userId);
 
         // s3에서 삭제
-        List<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId);
+        Page<DocumentVersion> allByDocumentId = documentVersionRepository.findAllByUserIdAndDocumentId(userId, documentId, Pageable.unpaged());
         for (DocumentVersion documentVersion : allByDocumentId) {
             s3Service.deleteFile(documentVersion.getFileKey());
         }
@@ -83,7 +82,7 @@ public class DocumentService {
 
     @Transactional
     public void deleteAllDocuments(final Long userId) {
-        List<Document> documents = documentRepository.findAllByUserId(userId);
+        Page<Document> documents = documentRepository.findAllByUserId(userId, Pageable.unpaged());
         for (Document document : documents) {
             delete(userId, document.getId());
         }

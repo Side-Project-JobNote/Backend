@@ -6,12 +6,15 @@ import com.jobnote.domain.document.dto.*;
 import com.jobnote.global.annotation.swagger.ApiErrorResponseExplanation;
 import com.jobnote.global.annotation.swagger.ApiResponseExplanations;
 import com.jobnote.global.annotation.swagger.ApiSuccessResponseExplanation;
+import com.jobnote.global.annotation.swagger.PageableAsQueryParam;
 import com.jobnote.global.common.ApiResponse;
 import com.jobnote.global.common.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,26 +61,18 @@ public interface DocumentApi {
     );
 
     @Operation(summary = "문서 목록 조회")
-    @ApiResponseExplanations(
-            success = @ApiSuccessResponseExplanation(
-                    responseClass = DocumentListResponse.class,
-                    description = "조회 성공"
-            )
-    )
-    ResponseEntity<ApiResponse<DocumentListResponse>> getAllDocuments(
-            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
+    @PageableAsQueryParam
+    ResponseEntity<ApiResponse<Page<DocumentResponse>>> getAllDocuments(
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal,
+            @Parameter(hidden = true) Pageable pageable
     );
 
     @Operation(summary = "문서의 모든 버전 목록 조회")
-    @ApiResponseExplanations(
-            success = @ApiSuccessResponseExplanation(
-                    responseClass = DocumentVersionListResponse.class,
-                    description = "조회 성공"
-            )
-    )
-    ResponseEntity<ApiResponse<DocumentVersionListResponse>> getAllDocumentVersions(
+    @PageableAsQueryParam
+    ResponseEntity<ApiResponse<Page<DocumentVersionResponse>>> getAllDocumentVersions(
             @PathVariable final Long documentId,
-            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal
+            @Parameter(hidden = true) @LoginUser final CustomUserDetails principal,
+            @Parameter(hidden = true) Pageable pageable
     );
 
     @Operation(summary = "문서 삭제")

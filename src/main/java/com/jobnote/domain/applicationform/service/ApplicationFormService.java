@@ -15,6 +15,8 @@ import com.jobnote.global.exception.JobNoteException;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,28 +49,24 @@ public class ApplicationFormService {
         return ApplicationFormResponse.from(form, schedules, documents);
     }
 
-    public List<ApplicationFormResponse> getAll(final Long userId) {
-        List<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId);
-        List<Long> formIds = forms.stream().map(ApplicationForm::getId).toList();
+    public Page<ApplicationFormResponse> getAll(final Long userId, final Pageable pageable) {
+        Page<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId, pageable);
+        List<Long> formIds = forms.map(ApplicationForm::getId).toList();
 
         Map<Long, List<ScheduleResponse>> schedulesByFormId = scheduleService.getAllGroupedByApplicationFormIds(userId, formIds);
         Map<Long, List<DocumentSimpleResponse>> documentsByFormId = applicationFormDocumentService.getSimpleResponsesGroupedByApplicationFormIds(userId, formIds);
 
-        return forms.stream()
-                .map(form -> ApplicationFormResponse.from(
-                        form,
-                        schedulesByFormId.getOrDefault(form.getId(), List.of()),
-                        documentsByFormId.getOrDefault(form.getId(), List.of()))
-                )
-                .toList();
+        return forms.map(form -> ApplicationFormResponse.from(
+                form,
+                schedulesByFormId.getOrDefault(form.getId(), List.of()),
+                documentsByFormId.getOrDefault(form.getId(), List.of()))
+        );
     }
 
     public List<ApplicationFormSimpleResponse> getAllSimple(final Long userId) {
-        List<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId);
+        Page<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId, Pageable.unpaged());
 
-        return forms.stream()
-                .map(ApplicationFormSimpleResponse::from)
-                .toList();
+        return forms.map(ApplicationFormSimpleResponse::from).toList();
     }
 
     /* CREATE */

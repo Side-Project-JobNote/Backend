@@ -7,6 +7,8 @@ import com.jobnote.domain.schedule.dto.ScheduleResponse;
 import com.jobnote.domain.schedule.repository.ScheduleRepository;
 import com.jobnote.global.exception.JobNoteException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +37,9 @@ public class ScheduleService {
         return ScheduleResponse.from(schedule);
     }
 
-    public List<ScheduleResponse> getAll(final Long userId, final LocalDateTime startDate, final LocalDateTime endDate) {
-        return scheduleRepository.findAllByUserIdAndDateTimeBetween(userId, startDate, endDate).stream()
-                .map(ScheduleResponse::from)
-                .toList();
+    public Page<ScheduleResponse> getAll(final Long userId, final LocalDateTime startDate, final LocalDateTime endDate, final Pageable pageable) {
+        return scheduleRepository.findAllByUserIdAndDateTimeBetween(userId, startDate, endDate, pageable)
+                .map(ScheduleResponse::from);
     }
 
     public List<ScheduleResponse> getAllByApplicationFormId(final Long userId, final Long formId) {
