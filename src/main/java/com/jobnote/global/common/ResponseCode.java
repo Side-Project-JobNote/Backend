@@ -36,6 +36,7 @@ public enum ResponseCode {
     PENDING_EMAIL_VERIFICATION(HttpStatus.FORBIDDEN, "4031", "이메일 인증이 완료되지 않았습니다."),
     NOT_YET_SIGNED_UP(HttpStatus.FORBIDDEN, "4032", "회원가입 절차가 완료되지 않았습니다."),
     VERIFICATION_EMAIL_NOT_YET_VERIFIED(HttpStatus.FORBIDDEN, "4033", "인증이 완료되지 않은 인증 이메일입니다."),
+    INACTIVE_USER(HttpStatus.FORBIDDEN, "4034", "탈퇴한 회원입니다."),
 
     // 404 Not Found
     NOT_FOUND(HttpStatus.NOT_FOUND, "4040", "요청 리소스를 찾을 수 없습니다."),
