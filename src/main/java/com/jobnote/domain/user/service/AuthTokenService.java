@@ -36,10 +36,13 @@ public class AuthTokenService {
     }
 
     @Transactional
-    public Token reissue(final Long userId, final String existingRefreshToken) {
+    public Token reissue(final String existingRefreshToken) {
         tokenProvider.validateRefreshToken(existingRefreshToken);
-        invalidate(existingRefreshToken);
-        return saveAndGetToken(userId);
+
+        final RefreshToken refreshToken = getRefreshTokenByToken(existingRefreshToken);
+        refreshTokenRepository.delete(refreshToken);
+
+        return saveAndGetToken(refreshToken.getUser().getId());
     }
 
     @Transactional
@@ -59,5 +62,10 @@ public class AuthTokenService {
         if (!refreshTokenRepository.existsByToken(existingRefreshToken)) {
             throw new JobNoteException(NOT_FOUND_REFRESH_TOKEN);
         }
+    }
+
+    private RefreshToken getRefreshTokenByToken(final String token) {
+        return refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_REFRESH_TOKEN));
     }
 }
