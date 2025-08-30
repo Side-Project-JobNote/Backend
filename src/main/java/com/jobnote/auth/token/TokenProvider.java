@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import static com.jobnote.global.common.Constants.*;
 import static com.jobnote.global.common.ResponseCode.EXPIRED_TOKEN;
-import static com.jobnote.global.util.CookieUtil.createResponseCookie;
 
 @RequiredArgsConstructor
 @Component
@@ -54,16 +53,13 @@ public class TokenProvider {
         }
     }
 
-    public void addTokenToCookie(final HttpServletResponse response, final Token token) {
-        ResponseCookie accessTokenCookie = createResponseCookie(COOKIE_NAME_ACCESS_TOKEN, token.accessToken(), COOKIE_PATH_ACCESS_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().accessToken().expirationTime()));
-        ResponseCookie refreshTokenCookie = createResponseCookie(COOKIE_NAME_REFRESH_TOKEN, token.refreshToken(), COOKIE_PATH_REFRESH_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().refreshToken().expirationTime()));
-
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+    public void responseToken(final HttpServletResponse response, final Token token) {
+        final ResponseCookie refreshTokenCookie = CookieUtil.createResponseCookie(COOKIE_NAME_REFRESH_TOKEN, token.refreshToken(), COOKIE_PATH_REFRESH_TOKEN, Duration.ofMillis(jwtProvider.getJwtProperties().refreshToken().expirationTime()));
+        response.setHeader(HttpHeaders.AUTHORIZATION, token.accessToken());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
-    public void addInvalidateCookie(final HttpServletResponse response) {
-        response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_ACCESS_TOKEN, COOKIE_PATH_ACCESS_TOKEN).toString());
+    public void responseInvalidatedToken(final HttpServletResponse response) {
         response.addHeader(HttpHeaders.SET_COOKIE, CookieUtil.invalidateCookie(COOKIE_NAME_REFRESH_TOKEN, COOKIE_PATH_REFRESH_TOKEN).toString());
     }
 }

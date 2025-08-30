@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.jobnote.global.common.Constants.COOKIE_NAME_REFRESH_TOKEN;
-import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
+import static com.jobnote.global.util.CookieUtil.getValueFromCookie;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -40,7 +40,7 @@ public class UserController {
     @PostMapping("/signup/social")
     public ResponseEntity<ApiResponse<Void>> socialSignUp(@RequestBody @Valid final SocialSignUpRequest request, final HttpServletResponse response) {
         final Token token = userService.socialSignUp(request);
-        tokenProvider.addTokenToCookie(response, token);
+        tokenProvider.responseToken(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
@@ -48,23 +48,23 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Void>> login(@RequestBody @Valid final UserLoginRequest request, final HttpServletResponse response) {
         final Token token = loginService.login(request);
-        tokenProvider.addTokenToCookie(response, token);
+        tokenProvider.responseToken(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
     /* LOGOUT */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(final HttpServletRequest request, final HttpServletResponse response) {
-        authTokenService.invalidate(getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
-        tokenProvider.addInvalidateCookie(response);
+        authTokenService.invalidate(getValueFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        tokenProvider.responseInvalidatedToken(response);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
     /* TOKEN REISSUE */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(@LoginUser CustomUserDetails principal, final HttpServletRequest request, final HttpServletResponse response) {
-        final Token token = authTokenService.reissue(principal.getUserId(), getTokenFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
-        tokenProvider.addTokenToCookie(response, token);
+        final Token token = authTokenService.reissue(principal.getUserId(), getValueFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));
+        tokenProvider.responseToken(response, token);
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 

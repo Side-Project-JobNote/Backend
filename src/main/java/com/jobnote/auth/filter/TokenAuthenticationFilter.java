@@ -12,17 +12,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 import static com.jobnote.global.common.Constants.*;
+import static com.jobnote.global.common.ResponseCode.INVALID_HEADER;
 import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
-import static com.jobnote.global.util.CookieUtil.getTokenFromCookie;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,7 +49,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticate(final HttpServletRequest request) {
-        final String email = tokenProvider.getEmailFromPayload(getTokenFromCookie(request.getCookies(), COOKIE_NAME_ACCESS_TOKEN))
+        final String accessToken = validateAuthorizationHeader(request);
+        final String email = tokenProvider.getEmailFromPayload(accessToken)
                 .orElseThrow(() -> new JobNoteException(INVALID_TOKEN));
 
         setAuthentication(email);
@@ -57,6 +60,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         CustomUserDetails principal = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    }
+
+    private String validateAuthorizationHeader(final HttpServletRequest request) {
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (!StringUtils.hasText(header) || !header.startsWith(BEARER)) {
+            throw new JobNoteException(INVALID_HEADER);
+        }
+
+        return header.substring(BEARER.length());
     }
 
     @Override

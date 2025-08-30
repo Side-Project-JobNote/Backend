@@ -7,19 +7,19 @@ import org.springframework.http.ResponseCookie;
 import java.time.Duration;
 import java.util.Arrays;
 
-import static com.jobnote.global.common.ResponseCode.INVALID_TOKEN;
+import static com.jobnote.global.common.ResponseCode.INVALID_COOKIE;
 
 public class CookieUtil {
 
-    public static String getTokenFromCookie(final Cookie[] cookies, final String name) {
+    public static String getValueFromCookie(final Cookie[] cookies, final String name) {
         if (cookies == null) {
-            throw new JobNoteException(INVALID_TOKEN);
+            throw new JobNoteException(INVALID_COOKIE);
         }
 
         return Arrays.stream(cookies)
                 .filter(cookie -> name.equals(cookie.getName()))
                 .findFirst()
-                .orElseThrow(() -> new JobNoteException(INVALID_TOKEN))
+                .orElseThrow(() -> new JobNoteException(INVALID_COOKIE))
                 .getValue();
     }
 
