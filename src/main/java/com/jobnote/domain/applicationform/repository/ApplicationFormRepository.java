@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ApplicationFormRepository extends JpaRepository<ApplicationForm, Long> {
-    Page<ApplicationForm> findAllByUserId(final Long id, final Pageable pageable);
+    Page<ApplicationForm> findAllByUserId(final Long userId, final Pageable pageable);
 }

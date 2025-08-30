@@ -59,14 +59,14 @@ public interface ApplicationFormApi {
     );
 
     @Operation(summary = "지원서 업데이트",
-               description = "일정 : (삭제)-> 요청에 미포함, (업데이트)-> id포함 내용변경, (신규)-> id미포함 내용생성")
+            description = "일정 : (삭제)-> 삭제할 id를 요청에 미기재, (업데이트)-> id 기재 후 내용변경, (신규)-> id 미기재 내용 생성\n" +
+                    "문서 : (삭제)-> 삭제할 id를 요청에 미기재, (신규)->id 미기재 documentId 기재")
     @ApiResponseExplanations(
             success = @ApiSuccessResponseExplanation(
                     responseClass = ApplicationFormResponse.class,
                     description = "지원서 업데이트 성공"
             ),
             errors = {
-                    @ApiErrorResponseExplanation(exceptionCode = ResponseCode.NOT_FOUND_APPLICATION_FORM),
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.INVALID_SCHEDULE_FORM_ASSOCIATION),
                     @ApiErrorResponseExplanation(exceptionCode = ResponseCode.FORBIDDEN)
             }
