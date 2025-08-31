@@ -234,7 +234,7 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
     @Test
     void saveApplicationForm() {
         // given
-        ApplicationFormRequest request = new ApplicationFormRequest("네이버", "02-1234-7812", "경기도 성남시", null, null, null, null, null, APPLIED, null, null);
+        ApplicationFormRequest request = new ApplicationFormRequest("네이버", "경기도 성남시", null, null, null, APPLIED, null, null);
         given(userService.getUserById(userId)).willReturn(user);
         given(applicationFormRepository.save(any(ApplicationForm.class))).willReturn(applicationForm);
 
@@ -248,7 +248,7 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
     @Nested
     @DisplayName("지원서 수정")
     class Update {
-        ApplicationFormRequest request = new ApplicationFormRequest("카카오", "02-1111-2222", "경기도 성남시", null, null, null, null, null, APPLIED, null, null);
+        ApplicationFormRequest request = new ApplicationFormRequest("카카오", "경기도 성남시", null, null, null, APPLIED, null, null);
 
         @DisplayName("성공")
         @Test

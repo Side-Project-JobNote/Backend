@@ -27,20 +27,13 @@ public class ApplicationForm extends BaseTimeEntity {
     @Column(nullable = false)
     private String companyName;
 
-    private String companyTel;
-
     private String companyAddress;
 
     private String companyUrl;
 
-    private String companyEmail;
-
     private String companyScale;
 
     private String position;
-
-    @Lob
-    private String memo;
 
     @Enumerated(EnumType.STRING)
     private ApplicationFormStatus status;
@@ -49,24 +42,18 @@ public class ApplicationForm extends BaseTimeEntity {
     public ApplicationForm(
             final User user,
             final String companyName,
-            final String companyTel,
             final String companyAddress,
             final String companyUrl,
-            final String companyEmail,
             final String companyScale,
             final String position,
-            final String memo,
             final ApplicationFormStatus status
     ) {
       this.user = user;
       this.companyName = companyName;
-      this.companyTel = companyTel;
       this.companyAddress = companyAddress;
       this.companyUrl = companyUrl;
-      this.companyEmail = companyEmail;
       this.companyScale = companyScale;
       this.position = position;
-      this.memo = memo;
       this.status = status;
     }
 
@@ -78,13 +65,10 @@ public class ApplicationForm extends BaseTimeEntity {
 
     public void update(final ApplicationFormRequest request) {
         this.companyName = request.companyName();
-        this.companyTel = request.companyTel();
         this.companyAddress = request.companyAddress();
         this.companyUrl = request.companyUrl();
-        this.companyEmail = request.companyEmail();
         this.companyScale = request.companyScale();
         this.position = request.position();
-        this.memo = request.memo();
         this.status = request.status();
     }
 }
