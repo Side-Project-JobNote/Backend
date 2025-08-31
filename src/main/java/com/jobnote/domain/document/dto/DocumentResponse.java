@@ -15,14 +15,16 @@ public record DocumentResponse(
         DocumentType type,
         String title,
         LocalDate lastModifiedDate,
+        Long latestVersion,
         List<ApplicationFormSimpleResponse> applicationForms
 ) {
-    public static DocumentResponse of(final Document document, final List<ApplicationFormSimpleResponse> applicationForms) {
+    public static DocumentResponse of(final Document document, final Long latestVersion, final List<ApplicationFormSimpleResponse> applicationForms) {
         return DocumentResponse.builder()
                 .id(document.getId())
                 .type(document.getType())
                 .title(document.getTitle())
                 .lastModifiedDate(document.getModifiedDate().toLocalDate())
+                .latestVersion(latestVersion)
                 .applicationForms(applicationForms)
                 .build();
     }

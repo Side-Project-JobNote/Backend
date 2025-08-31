@@ -18,7 +18,7 @@ public class DocumentVersion extends BaseTimeEntity {
     @Column(name = "document_version_id")
     private Long id;
 
-    private int version;
+    private Long version;
 
     private String title;
 
@@ -34,7 +34,7 @@ public class DocumentVersion extends BaseTimeEntity {
 
     @Builder
     public DocumentVersion(
-            final int version,
+            final Long version,
             final String title,
             final String originFileName,
             final String fileKey,

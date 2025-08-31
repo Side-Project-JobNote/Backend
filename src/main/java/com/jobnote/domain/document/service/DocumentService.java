@@ -37,7 +37,7 @@ public class DocumentService {
         Document document = request.toEntity(user);
         documentRepository.save(document);
 
-        return saveDocumentVersion(userId, document, request, 1);
+        return saveDocumentVersion(userId, document, request, 1L);
     }
 
     @Transactional
@@ -45,7 +45,7 @@ public class DocumentService {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
-        int version = documentVersionRepository.findLatestVersionByDocumentId(documentId).orElse(0) + 1;
+        Long version = documentVersionRepository.findLatestVersionByDocumentId(documentId) + 1L;
 
         return saveDocumentVersion(userId, document, request, version);
     }
@@ -55,6 +55,7 @@ public class DocumentService {
                 .map(document ->
                         DocumentResponse.of(
                                 document,
+                                documentVersionRepository.findLatestVersionByDocumentId(document.getId()),
                                 applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
                         ));
     }
@@ -96,7 +97,7 @@ public class DocumentService {
                 .orElseThrow(() -> new JobNoteException(NOT_FOUND_DOCUMENT));
     }
 
-    private Long saveDocumentVersion(final Long userId, final Document document, final DocumentRequest request, final int version) {
+    private Long saveDocumentVersion(final Long userId, final Document document, final DocumentRequest request, final Long version) {
         s3Service.validateIsOwner(userId, request.fileKey());
         long fileSize = s3Service.getFileSize(request.fileKey());
 

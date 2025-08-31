@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder(access = AccessLevel.PRIVATE)
 public record DocumentVersionResponse(
     Long id,
-    int version,
+    Long version,
     String title,
     String fileName,
     String fileUrl,
