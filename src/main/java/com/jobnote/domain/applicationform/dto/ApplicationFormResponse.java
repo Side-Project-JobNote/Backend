@@ -13,13 +13,10 @@ import java.util.List;
 public record ApplicationFormResponse(
         Long id,
         String companyName,
-        String companyTel,
         String companyAddress,
         String companyUrl,
-        String companyEmail,
         String companyScale,
         String position,
-        String memo,
         ApplicationFormStatus status,
         List<ScheduleResponse> schedules,
         List<DocumentSimpleResponse> documents
@@ -28,13 +25,10 @@ public record ApplicationFormResponse(
         return ApplicationFormResponse.builder()
                 .id(form.getId())
                 .companyName(form.getCompanyName())
-                .companyTel(form.getCompanyTel())
                 .companyAddress(form.getCompanyAddress())
                 .companyUrl(form.getCompanyUrl())
-                .companyEmail(form.getCompanyEmail())
                 .companyScale(form.getCompanyScale())
                 .position(form.getPosition())
-                .memo(form.getMemo())
                 .status(form.getStatus())
                 .schedules(schedules)
                 .documents(documents)

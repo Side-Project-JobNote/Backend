@@ -6,7 +6,6 @@ import com.jobnote.domain.applicationformdocument.dto.ApplicationFormDocumentReq
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.user.domain.User;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,20 +15,13 @@ public record ApplicationFormRequest(
         @NotBlank(message = "회사명은 비어있을 수 없습니다.")
         String companyName,
 
-        String companyTel,
-
         String companyAddress,
 
         String companyUrl,
 
-        @Email(message = "형식에 맞는 이메일을 입력해주세요.")
-        String companyEmail,
-
         String companyScale,
 
         String position,
-
-        String memo,
 
         @NotNull(message = "지원 상태는 비어있을 수 없습니다.")
         ApplicationFormStatus status,
@@ -44,13 +36,10 @@ public record ApplicationFormRequest(
         return ApplicationForm.builder()
                 .user(user)
                 .companyName(companyName)
-                .companyTel(companyTel)
                 .companyAddress(companyAddress)
                 .companyUrl(companyUrl)
-                .companyEmail(companyEmail)
                 .companyScale(companyScale)
                 .position(position)
-                .memo(memo)
                 .status(status)
                 .build();
     }
