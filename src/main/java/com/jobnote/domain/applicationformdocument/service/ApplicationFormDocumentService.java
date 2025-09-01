@@ -30,23 +30,27 @@ public class ApplicationFormDocumentService {
     private final DocumentRepository documentRepository;
 
     /* READ */
+    // 해당 지원서의 등록된 문서 목록 반환
     public List<ApplicationFormDocument> getAllByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId));
     }
 
-    public List<ApplicationFormSimpleResponse> getSimpleResponsesByDocumentId(final Long userId, final Long documentId) {
+    // 해당 문서와 연결된 지원서 목록 반환
+    public List<ApplicationFormSimpleResponse> getAllSimpleByDocumentId(final Long userId, final Long documentId) {
         return applicationFormDocumentRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
                 .map(afd -> ApplicationFormSimpleResponse.from(afd.getApplicationForm()))
                 .toList();
     }
 
-    public List<DocumentSimpleResponse> getSimpleResponsesByApplicationFormId(final Long userId, final Long formId) {
+    // 해당 지원서와 연결된 문서 목록 반환
+    public List<DocumentSimpleResponse> getAllSimpleByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(afd -> DocumentSimpleResponse.from(afd.getDocument()))
                 .toList();
     }
 
-    public Map<Long, List<DocumentSimpleResponse>> getSimpleResponsesGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
+    // 각 지원서에 대한 등록된 문서 목록 반환
+    public Map<Long, List<DocumentSimpleResponse>> getAllSimpleGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
         List<ApplicationFormDocument> list = applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 
         return list.stream()
@@ -63,9 +67,11 @@ public class ApplicationFormDocumentService {
 
     /* CREATE */
     @Transactional
-    public void saveAll(final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
+    public void saveAll(final Long userId, final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
         for (ApplicationFormDocumentRequest request : requests) {
             Document document = getByIdOrThrow(request.documentId());
+            document.validateOwner(userId);
+
             ApplicationFormDocument entity = request.toEntity(form, document);
             applicationFormDocumentRepository.save(entity);
         }
@@ -93,7 +99,7 @@ public class ApplicationFormDocumentService {
         // 신규 생성
         for (ApplicationFormDocumentRequest req : requests) {
             if (req.id() == null) {
-                saveAll(form, List.of(req));
+                saveAll(userId, form, List.of(req));
             }
         }
     }

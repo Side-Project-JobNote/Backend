@@ -159,7 +159,7 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
         DocumentSimpleResponse document2 = new DocumentSimpleResponse(102L, DocumentType.COVER_LETTER, "네이버 자소서");
         DocumentSimpleResponse document3 = new DocumentSimpleResponse(103L, DocumentType.RESUME, "카카오 이력서");
 
-        given(applicationFormDocumentService.getSimpleResponsesGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L))))
+        given(applicationFormDocumentService.getAllSimpleGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L))))
                 .willReturn(Map.of(
                         1L, List.of(document1, document2),
                         2L, List.of(document3)
@@ -182,7 +182,7 @@ class ApplicationFormServiceTest extends ServiceUnitTest {
         assertThat(result2.documents().get(0).title()).isEqualTo("카카오 이력서");
 
         then(applicationFormRepository).should().findAllByUserId(eq(userId), any(Pageable.class));
-        then(applicationFormDocumentService).should().getSimpleResponsesGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
+        then(applicationFormDocumentService).should().getAllSimpleGroupedByApplicationFormIds(eq(userId), eq(List.of(1L, 2L)));
     }
 
     @Nested

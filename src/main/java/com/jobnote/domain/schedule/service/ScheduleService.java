@@ -1,6 +1,7 @@
 package com.jobnote.domain.schedule.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
+import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.schedule.domain.Schedule;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.jobnote.global.common.ResponseCode.NOT_FOUND_APPLICATION_FORM;
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
 
 @Service
@@ -27,6 +29,7 @@ import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final ApplicationFormRepository applicationFormRepository;
 
     /* READ */
     public ScheduleResponse getById(final Long userId, final Long formId, final Long scheduleId) {
@@ -37,17 +40,20 @@ public class ScheduleService {
         return ScheduleResponse.from(schedule);
     }
 
+    // 해당 기간의 일정 목록 반환
     public Page<ScheduleResponse> getAll(final Long userId, final LocalDateTime startDate, final LocalDateTime endDate, final Pageable pageable) {
         return scheduleRepository.findAllByUserIdAndDateTimeBetween(userId, startDate, endDate, pageable)
                 .map(ScheduleResponse::from);
     }
 
+    // 해당 지원서의 일정 목록 반환
     public List<ScheduleResponse> getAllByApplicationFormId(final Long userId, final Long formId) {
         return scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(ScheduleResponse::from)
                 .toList();
     }
 
+    // 각 지원서의 일정 목록 반환
     public Map<Long, List<ScheduleResponse>> getAllGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
         List<Schedule> schedules = scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 
@@ -62,7 +68,9 @@ public class ScheduleService {
 
     /* CREATE */
     @Transactional
-    public Long save(final Long userId, final ApplicationForm form, final ScheduleRequest request) {
+    public Long save(final Long userId, final Long formId, final ScheduleRequest request) {
+        ApplicationForm form = applicationFormRepository.findById(formId)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_APPLICATION_FORM));
         form.validateOwner(userId);
 
         Schedule saved = scheduleRepository.save(request.toEntity(form));
@@ -70,9 +78,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void saveAll(final Long userId, final ApplicationForm form, final List<ScheduleRequest> requests) {
-        form.validateOwner(userId);
-
+    public void saveAll(final ApplicationForm form, final List<ScheduleRequest> requests) {
         List<Schedule> schedules = requests.stream()
                 .map(req -> req.toEntity(form))
                 .toList();

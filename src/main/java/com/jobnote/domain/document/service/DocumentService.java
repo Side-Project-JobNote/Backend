@@ -56,7 +56,7 @@ public class DocumentService {
                         DocumentResponse.of(
                                 document,
                                 documentVersionRepository.findLatestVersionByDocumentId(document.getId()),
-                                applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
+                                applicationFormDocumentService.getAllSimpleByDocumentId(userId, document.getId())
                         ));
     }
 
@@ -77,9 +77,13 @@ public class DocumentService {
             s3Service.deleteFile(documentVersion.getFileKey());
         }
 
-        // 엔티티 삭제
-        documentVersionRepository.deleteAllByDocumentId(documentId);
+        // 맵핑 엔티티 삭제
         applicationFormDocumentService.deleteAllByDocumentId(documentId);
+
+        // 개별 문서 삭제
+        documentVersionRepository.deleteAllByDocumentId(documentId);
+
+        // 문서 삭제
         documentRepository.delete(document);
     }
 
