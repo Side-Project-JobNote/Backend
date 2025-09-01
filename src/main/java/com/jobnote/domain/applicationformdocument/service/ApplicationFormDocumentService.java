@@ -63,9 +63,11 @@ public class ApplicationFormDocumentService {
 
     /* CREATE */
     @Transactional
-    public void saveAll(final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
+    public void saveAll(final Long userId, final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
         for (ApplicationFormDocumentRequest request : requests) {
             Document document = getByIdOrThrow(request.documentId());
+            document.validateOwner(userId);
+
             ApplicationFormDocument entity = request.toEntity(form, document);
             applicationFormDocumentRepository.save(entity);
         }
@@ -93,7 +95,7 @@ public class ApplicationFormDocumentService {
         // 신규 생성
         for (ApplicationFormDocumentRequest req : requests) {
             if (req.id() == null) {
-                saveAll(form, List.of(req));
+                saveAll(userId, form, List.of(req));
             }
         }
     }

@@ -47,6 +47,7 @@ public class ApplicationFormService {
         Page<ApplicationForm> forms = applicationFormRepository.findAllByUserId(userId, pageable);
         List<Long> formIds = forms.map(ApplicationForm::getId).toList();
 
+        // 각 지원서에 대한 일정, 등록된 문서 목록 생성
         Map<Long, List<ScheduleResponse>> schedulesByFormId = scheduleService.getAllGroupedByApplicationFormIds(userId, formIds);
         Map<Long, List<DocumentSimpleResponse>> documentsByFormId = applicationFormDocumentService.getAllSimpleGroupedByApplicationFormIds(userId, formIds);
 
@@ -66,10 +67,10 @@ public class ApplicationFormService {
         ApplicationForm form = applicationFormRepository.save(request.toEntity(user));
 
         // 일정 등록
-        scheduleService.saveAll(userId, form, request.schedules());
+        scheduleService.saveAll(form, request.schedules());
 
         // 연결된 문서 등록
-        applicationFormDocumentService.saveAll(form, request.documents());
+        applicationFormDocumentService.saveAll(userId, form, request.documents());
 
         return form.getId();
     }
@@ -96,8 +97,13 @@ public class ApplicationFormService {
         ApplicationForm form = getByIdOrThrow(formId);
         form.validateOwner(userId);
 
+        // 일정 삭제
         scheduleService.deleteAllByApplicationFormId(form.getId());
+
+        // 연결된 문서 삭제
         applicationFormDocumentService.deleteAllByApplicationFormId(form.getId());
+
+        // 지원서 삭제
         applicationFormRepository.delete(form);
     }
 

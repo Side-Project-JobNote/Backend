@@ -70,9 +70,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void saveAll(final Long userId, final ApplicationForm form, final List<ScheduleRequest> requests) {
-        form.validateOwner(userId);
-
+    public void saveAll(final ApplicationForm form, final List<ScheduleRequest> requests) {
         List<Schedule> schedules = requests.stream()
                 .map(req -> req.toEntity(form))
                 .toList();
