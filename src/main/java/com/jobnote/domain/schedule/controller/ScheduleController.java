@@ -2,8 +2,6 @@ package com.jobnote.domain.schedule.controller;
 
 import com.jobnote.auth.config.LoginUser;
 import com.jobnote.auth.dto.CustomUserDetails;
-import com.jobnote.domain.applicationform.domain.ApplicationForm;
-import com.jobnote.domain.applicationform.service.ApplicationFormService;
 import com.jobnote.domain.schedule.api.ScheduleApi;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
@@ -24,7 +22,6 @@ import java.net.URI;
 public class ScheduleController implements ScheduleApi {
 
     private final ScheduleService scheduleService;
-    private final ApplicationFormService applicationFormService;
 
     /* CREATE */
     @Override
@@ -34,9 +31,7 @@ public class ScheduleController implements ScheduleApi {
             @RequestBody @Valid final ScheduleRequest request,
             @LoginUser final CustomUserDetails principal
     ) {
-        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
-
-        Long savedScheduleId = scheduleService.save(principal.getUserId(), form, request);
+        Long savedScheduleId = scheduleService.save(principal.getUserId(), formId, request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedScheduleId).toUri();
 
