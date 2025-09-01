@@ -45,7 +45,7 @@ public class DocumentService {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
 
-        int version = documentVersionRepository.findLatestVersionByDocumentId(documentId).orElse(0) + 1;
+        int version = documentVersionRepository.findLatestVersionByDocumentId(documentId) + 1;
 
         return saveDocumentVersion(userId, document, request, version);
     }
@@ -55,6 +55,7 @@ public class DocumentService {
                 .map(document ->
                         DocumentResponse.of(
                                 document,
+                                documentVersionRepository.findLatestVersionByDocumentId(document.getId()),
                                 applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
                         ));
     }
