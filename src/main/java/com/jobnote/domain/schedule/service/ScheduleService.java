@@ -39,17 +39,20 @@ public class ScheduleService {
         return ScheduleResponse.from(schedule);
     }
 
+    // 해당 기간의 일정 목록 반환
     public Page<ScheduleResponse> getAll(final Long userId, final LocalDateTime startDate, final LocalDateTime endDate, final Pageable pageable) {
         return scheduleRepository.findAllByUserIdAndDateTimeBetween(userId, startDate, endDate, pageable)
                 .map(ScheduleResponse::from);
     }
 
+    // 해당 지원서의 일정 목록 반환
     public List<ScheduleResponse> getAllByApplicationFormId(final Long userId, final Long formId) {
         return scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(ScheduleResponse::from)
                 .toList();
     }
 
+    // 각 지원서의 일정 목록 반환
     public Map<Long, List<ScheduleResponse>> getAllGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
         List<Schedule> schedules = scheduleRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 

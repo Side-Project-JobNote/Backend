@@ -30,22 +30,26 @@ public class ApplicationFormDocumentService {
     private final DocumentRepository documentRepository;
 
     /* READ */
+    // 해당 지원서의 등록된 문서 목록 반환
     public List<ApplicationFormDocument> getAllByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId));
     }
 
+    // 해당 문서와 연결된 지원서 목록 반환
     public List<ApplicationFormSimpleResponse> getAllSimpleByDocumentId(final Long userId, final Long documentId) {
         return applicationFormDocumentRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
                 .map(afd -> ApplicationFormSimpleResponse.from(afd.getApplicationForm()))
                 .toList();
     }
 
+    // 해당 지원서와 연결된 문서 목록 반환
     public List<DocumentSimpleResponse> getAllSimpleByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(afd -> DocumentSimpleResponse.from(afd.getDocument()))
                 .toList();
     }
 
+    // 각 지원서에 대한 등록된 문서 목록 반환
     public Map<Long, List<DocumentSimpleResponse>> getAllSimpleGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
         List<ApplicationFormDocument> list = applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 
