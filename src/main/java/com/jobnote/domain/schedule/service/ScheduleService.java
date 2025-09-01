@@ -1,7 +1,7 @@
 package com.jobnote.domain.schedule.service;
 
 import com.jobnote.domain.applicationform.domain.ApplicationForm;
-import com.jobnote.domain.applicationform.service.ApplicationFormService;
+import com.jobnote.domain.applicationform.repository.ApplicationFormRepository;
 import com.jobnote.domain.schedule.domain.Schedule;
 import com.jobnote.domain.schedule.dto.ScheduleRequest;
 import com.jobnote.domain.schedule.dto.ScheduleResponse;
@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.jobnote.global.common.ResponseCode.NOT_FOUND_APPLICATION_FORM;
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
 
 @Service
@@ -28,7 +29,7 @@ import static com.jobnote.global.common.ResponseCode.NOT_FOUND_SCHEDULE;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final ApplicationFormService applicationFormService;
+    private final ApplicationFormRepository applicationFormRepository;
 
     /* READ */
     public ScheduleResponse getById(final Long userId, final Long formId, final Long scheduleId) {
@@ -68,7 +69,8 @@ public class ScheduleService {
     /* CREATE */
     @Transactional
     public Long save(final Long userId, final Long formId, final ScheduleRequest request) {
-        ApplicationForm form = applicationFormService.getByIdOrThrow(formId);
+        ApplicationForm form = applicationFormRepository.findById(formId)
+                .orElseThrow(() -> new JobNoteException(NOT_FOUND_APPLICATION_FORM));
         form.validateOwner(userId);
 
         Schedule saved = scheduleRepository.save(request.toEntity(form));
