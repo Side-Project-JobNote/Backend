@@ -13,7 +13,7 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     /* 해당 문서의 최신 버전 조회 */
     @Query("select MAX(v.version) from DocumentVersion v where v.document.id = :documentId")
-    Long findLatestVersionByDocumentId(final Long documentId);
+    int findLatestVersionByDocumentId(final Long documentId);
 
     /* 해당 유저의 문서 총 이용 용량 조회 */
     @Query("select COALESCE(SUM(v.fileSize), 0) from DocumentVersion v join v.document d where d.user.id = :userId")

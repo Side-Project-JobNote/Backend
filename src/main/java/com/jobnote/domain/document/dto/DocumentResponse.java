@@ -15,10 +15,10 @@ public record DocumentResponse(
         DocumentType type,
         String title,
         LocalDate lastModifiedDate,
-        Long latestVersion,
+        int latestVersion,
         List<ApplicationFormSimpleResponse> applicationForms
 ) {
-    public static DocumentResponse of(final Document document, final Long latestVersion, final List<ApplicationFormSimpleResponse> applicationForms) {
+    public static DocumentResponse of(final Document document, final int latestVersion, final List<ApplicationFormSimpleResponse> applicationForms) {
         return DocumentResponse.builder()
                 .id(document.getId())
                 .type(document.getType())
