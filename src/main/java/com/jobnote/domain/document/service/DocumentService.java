@@ -56,7 +56,7 @@ public class DocumentService {
                         DocumentResponse.of(
                                 document,
                                 documentVersionRepository.findLatestVersionByDocumentId(document.getId()),
-                                applicationFormDocumentService.getSimpleResponsesByDocumentId(userId, document.getId())
+                                applicationFormDocumentService.getAllSimpleByDocumentId(userId, document.getId())
                         ));
     }
 

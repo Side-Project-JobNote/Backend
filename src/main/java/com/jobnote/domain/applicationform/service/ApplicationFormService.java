@@ -38,7 +38,7 @@ public class ApplicationFormService {
         form.validateOwner(userId);
 
         List<ScheduleResponse> schedules = scheduleService.getAllByApplicationFormId(userId, formId);
-        List<DocumentSimpleResponse> documents = applicationFormDocumentService.getSimpleResponsesByApplicationFormId(userId, formId);
+        List<DocumentSimpleResponse> documents = applicationFormDocumentService.getAllSimpleByApplicationFormId(userId, formId);
 
         return ApplicationFormResponse.from(form, schedules, documents);
     }
@@ -48,7 +48,7 @@ public class ApplicationFormService {
         List<Long> formIds = forms.map(ApplicationForm::getId).toList();
 
         Map<Long, List<ScheduleResponse>> schedulesByFormId = scheduleService.getAllGroupedByApplicationFormIds(userId, formIds);
-        Map<Long, List<DocumentSimpleResponse>> documentsByFormId = applicationFormDocumentService.getSimpleResponsesGroupedByApplicationFormIds(userId, formIds);
+        Map<Long, List<DocumentSimpleResponse>> documentsByFormId = applicationFormDocumentService.getAllSimpleGroupedByApplicationFormIds(userId, formIds);
 
         return forms.map(form -> ApplicationFormResponse.from(
                 form,

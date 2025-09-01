@@ -34,19 +34,19 @@ public class ApplicationFormDocumentService {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId));
     }
 
-    public List<ApplicationFormSimpleResponse> getSimpleResponsesByDocumentId(final Long userId, final Long documentId) {
+    public List<ApplicationFormSimpleResponse> getAllSimpleByDocumentId(final Long userId, final Long documentId) {
         return applicationFormDocumentRepository.findAllByUserIdAndDocumentId(userId, documentId).stream()
                 .map(afd -> ApplicationFormSimpleResponse.from(afd.getApplicationForm()))
                 .toList();
     }
 
-    public List<DocumentSimpleResponse> getSimpleResponsesByApplicationFormId(final Long userId, final Long formId) {
+    public List<DocumentSimpleResponse> getAllSimpleByApplicationFormId(final Long userId, final Long formId) {
         return applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, List.of(formId)).stream()
                 .map(afd -> DocumentSimpleResponse.from(afd.getDocument()))
                 .toList();
     }
 
-    public Map<Long, List<DocumentSimpleResponse>> getSimpleResponsesGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
+    public Map<Long, List<DocumentSimpleResponse>> getAllSimpleGroupedByApplicationFormIds(final Long userId, final List<Long> formIds) {
         List<ApplicationFormDocument> list = applicationFormDocumentRepository.findAllByUserIdAndApplicationFormIdIn(userId, formIds);
 
         return list.stream()
