@@ -69,7 +69,7 @@ public class ApplicationFormDocumentService {
     @Transactional
     public void saveAll(final Long userId, final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
         for (ApplicationFormDocumentRequest request : requests) {
-            Document document = getByIdOrThrow(request.documentId());
+            Document document = getByIdOrThrow(request.id());
             document.validateOwner(userId);
 
             ApplicationFormDocument entity = request.toEntity(form, document);
@@ -82,6 +82,9 @@ public class ApplicationFormDocumentService {
     public void updateAll(final Long userId, final ApplicationForm form, final List<ApplicationFormDocumentRequest> requests) {
         // 기존 연결된 문서 조회
         List<ApplicationFormDocument> existsDocuments = getAllByApplicationFormId(userId, form.getId());
+        Set<Long> existsIds =  existsDocuments.stream()
+                .map(document -> document.getDocument().getId())
+                .collect(Collectors.toSet());
 
         // 요청 문서 ID 목록
         Set<Long> requestsIds = requests.stream()
@@ -91,14 +94,14 @@ public class ApplicationFormDocumentService {
 
         // 삭제 : 기존 문서 중 요청에 없는 문서 삭제
         for (ApplicationFormDocument document : existsDocuments) {
-            if (!requestsIds.contains(document.getId())) {
+            if (!requestsIds.contains(document.getDocument().getId())) {
                 delete(document);
             }
         }
 
-        // 신규 생성
+        // 신규 생성 : 새로운 id
         for (ApplicationFormDocumentRequest req : requests) {
-            if (req.id() == null) {
+            if (!existsIds.contains(req.id())) {
                 saveAll(userId, form, List.of(req));
             }
         }

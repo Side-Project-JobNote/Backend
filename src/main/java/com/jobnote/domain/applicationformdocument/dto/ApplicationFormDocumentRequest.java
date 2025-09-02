@@ -6,10 +6,8 @@ import com.jobnote.domain.document.domain.Document;
 import jakarta.validation.constraints.NotNull;
 
 public record ApplicationFormDocumentRequest(
-        Long id,
-
         @NotNull(message = "문서 ID는 null일 수 없습니다.")
-        Long documentId
+        Long id
 ) {
     public ApplicationFormDocument toEntity(final ApplicationForm form, final Document document) {
         return ApplicationFormDocument.builder()
