@@ -19,7 +19,7 @@ public abstract class Constants {
     public static final String COOKIE_NAME_ACCESS_TOKEN = "access_token";
     public static final String COOKIE_NAME_REFRESH_TOKEN = "refresh_token";
     public static final String COOKIE_PATH_ACCESS_TOKEN = "/";
-    public static final String COOKIE_PATH_REFRESH_TOKEN = "/api/v1/users";
+    public static final String COOKIE_PATH_REFRESH_TOKEN = "/";
 
     // whitelist
     public static final String[] WHITELIST = {
