@@ -60,7 +60,14 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
     }
 
-    /* TOKEN REISSUE */
+    /* TOKEN ISSUE */
+    @PostMapping("/issue/code")
+    public ResponseEntity<ApiResponse<Void>> tokenIssueByCode(@RequestBody @Valid final TokenIssueRequest request, final HttpServletResponse response) {
+        final Token token = authTokenService.issueByCode(request.code());
+        tokenProvider.responseToken(response, token);
+        return ResponseEntity.ok(ApiResponse.ofSuccess(ResponseCode.OK));
+    }
+
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<Void>> tokenReissue(final HttpServletRequest request, final HttpServletResponse response) {
         final Token token = authTokenService.reissue(getValueFromCookie(request.getCookies(), COOKIE_NAME_REFRESH_TOKEN));

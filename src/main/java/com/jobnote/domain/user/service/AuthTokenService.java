@@ -3,6 +3,7 @@ package com.jobnote.domain.user.service;
 import com.jobnote.auth.token.Token;
 import com.jobnote.auth.token.TokenClaim;
 import com.jobnote.auth.token.TokenProvider;
+import com.jobnote.domain.code.service.TempCodeService;
 import com.jobnote.domain.refreshtoken.domain.RefreshToken;
 import com.jobnote.domain.user.domain.User;
 import com.jobnote.domain.refreshtoken.repository.RefreshTokenRepository;
@@ -24,6 +25,7 @@ public class AuthTokenService {
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserQueryService userQueryService;
+    private final TempCodeService tempCodeService;
 
     @Transactional
     public Token saveAndGetToken(final Long userId) {
@@ -43,6 +45,12 @@ public class AuthTokenService {
         refreshTokenRepository.delete(refreshToken);
 
         return saveAndGetToken(refreshToken.getUser().getId());
+    }
+
+    @Transactional
+    public Token issueByCode(final String code) {
+        final long userId = tempCodeService.validate(code);
+        return saveAndGetToken(userId);
     }
 
     @Transactional
