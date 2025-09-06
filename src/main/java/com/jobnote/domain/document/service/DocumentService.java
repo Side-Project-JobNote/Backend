@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.jobnote.global.common.ResponseCode.NOT_FOUND_DOCUMENT;
 
 @Service
@@ -44,6 +46,7 @@ public class DocumentService {
     public Long uploadNewVersionDocument(final Long userId, final Long documentId, final DocumentRequest request) {
         Document document = getByIdOrThrow(documentId);
         document.validateOwner(userId);
+        document.updateModifiedDate(LocalDateTime.now());
 
         int version = documentVersionRepository.findLatestVersionByDocumentId(documentId) + 1;
 
