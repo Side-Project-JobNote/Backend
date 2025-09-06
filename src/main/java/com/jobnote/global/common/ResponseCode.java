@@ -21,6 +21,7 @@ public enum ResponseCode {
     VERIFICATION_EMAIL_ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "4005", "이미 인증이 완료된 인증 이메일입니다."),
     INVALID_HEADER(HttpStatus.BAD_REQUEST, "4006", "헤더가 올바르지 않습니다."),
     INVALID_COOKIE(HttpStatus.BAD_REQUEST, "4007", "쿠키가 올바르지 않습니다."),
+    EXPIRED_TEMP_CODE(HttpStatus.BAD_REQUEST, "4008", "만료된 임시 코드입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4010", "요청 리소스에 대한 액세스 권한이 없습니다."),
@@ -49,6 +50,7 @@ public enum ResponseCode {
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "4045", "해당 리프레시 토큰을 찾을 수 없습니다."),
     NOT_FOUND_DOCUMENT(HttpStatus.NOT_FOUND, "4046", "해당 문서를 찾을 수 없습니다."),
     NOT_FOUND_S3_FILE(HttpStatus.NOT_FOUND, "4047", "업로드된 문서가 아닙니다."),
+    NOT_FOUND_TEMP_CODE(HttpStatus.NOT_FOUND, "4048", "임시 코드를 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "4050", "요청 메소드를 지원하지 않습니다."),
