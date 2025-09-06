@@ -1,10 +1,8 @@
 package com.jobnote.auth.handler;
 
 import com.jobnote.auth.dto.CustomUserDetails;
-import com.jobnote.auth.token.Token;
-import com.jobnote.auth.token.TokenProvider;
 import com.jobnote.domain.user.domain.UserRole;
-import com.jobnote.domain.user.service.AuthTokenService;
+import com.jobnote.domain.code.service.TempCodeService;
 import com.jobnote.global.config.properties.FrontendProperties;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,8 +19,7 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final TokenProvider tokenProvider;
-    private final AuthTokenService authTokenService;
+    private final TempCodeService tempCodeService;
     private final FrontendProperties frontendProperties;
 
     @Override
@@ -34,10 +31,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             return;
         }
 
-        final Token token = authTokenService.saveAndGetToken(principal.getUserId());
-        tokenProvider.responseToken(response, token);
-
-        response.sendRedirect(memberRedirectUrl());
+        final String code = tempCodeService.create(principal.getUserId());
+        response.sendRedirect(memberRedirectUrl(code));
     }
 
     private String guestRedirectUrl(final String email) {
@@ -49,7 +44,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .toUriString();
     }
 
-    private String memberRedirectUrl() {
-        return frontendProperties.baseUrl() + frontendProperties.mainPage();
+    private String memberRedirectUrl(final String code) {
+        return UriComponentsBuilder.fromUriString(frontendProperties.baseUrl())
+                .path(frontendProperties.mainPage())
+                .queryParam("code", code)
+                .build()
+                .toUriString();
     }
 }
