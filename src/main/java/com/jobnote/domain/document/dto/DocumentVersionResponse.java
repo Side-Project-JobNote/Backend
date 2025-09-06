@@ -4,6 +4,8 @@ import com.jobnote.domain.document.domain.DocumentVersion;
 import lombok.AccessLevel;
 import lombok.Builder;
 
+import java.time.LocalDate;
+
 @Builder(access = AccessLevel.PRIVATE)
 public record DocumentVersionResponse(
     Long id,
@@ -11,7 +13,8 @@ public record DocumentVersionResponse(
     String title,
     String fileName,
     String fileUrl,
-    Long fileSize
+    Long fileSize,
+    LocalDate createdDate
 ) {
     public static DocumentVersionResponse of(final DocumentVersion documentVersion, final String fileUrl) {
         return DocumentVersionResponse.builder()
@@ -21,6 +24,7 @@ public record DocumentVersionResponse(
                 .fileName(documentVersion.getOriginFileName())
                 .fileUrl(fileUrl)
                 .fileSize(documentVersion.getFileSize())
+                .createdDate(documentVersion.getCreatedDate().toLocalDate())
                 .build();
     }
 }
