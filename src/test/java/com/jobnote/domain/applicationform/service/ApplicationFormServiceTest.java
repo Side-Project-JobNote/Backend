@@ -45,26 +45,15 @@ import static org.mockito.Mockito.never;
 
 class ApplicationFormServiceTest extends ServiceUnitTest {
 
-    @InjectMocks
-    private ApplicationFormService applicationFormService;
+    @InjectMocks private ApplicationFormService applicationFormService;
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
+    @Mock private ScheduleService scheduleService;
+    @Mock private DocumentService documentService;
+    @Mock private ApplicationFormDocumentService applicationFormDocumentService;
 
-    @Mock
-    private ScheduleService scheduleService;
-
-    @Mock
-    private DocumentService documentService;
-
-    @Mock
-    private ApplicationFormDocumentService applicationFormDocumentService;
-
-    @Mock
-    private ApplicationFormRepository applicationFormRepository;
-
-    @Mock
-    private ApplicationFormDocumentRepository applicationFormDocumentRepository;
+    @Mock private ApplicationFormRepository applicationFormRepository;
+    @Mock private ApplicationFormDocumentRepository applicationFormDocumentRepository;
 
     private User user;
     private ApplicationForm applicationForm;
